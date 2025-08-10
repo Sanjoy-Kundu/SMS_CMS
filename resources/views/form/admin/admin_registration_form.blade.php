@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>College Admin Registration</title>
 
-    <!-- Bootstrap 5 CSS -->
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- SweetAlert2 -->
@@ -19,61 +19,65 @@
             min-height: 100vh;
             display: flex;
             align-items: center;
-            background-color: #f8f9fa;
+            justify-content: center;
+            background: url('/logo/admin_bg.jpg') no-repeat center center/cover;
         }
-        .card {
-            border-radius: 0.5rem;
-            overflow: hidden;
+        .register-wrapper {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
         }
-        .card-img-top {
-            height: 200px;
-            object-fit: cover;
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .register-header img {
+            width: 80px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .register-header h4 {
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="row justify-content-center">
-        <!-- Center column -->
-        <div class="col-lg-6 col-md-8 col-sm-10">
-            <div class="card shadow">
-                <!-- Header Image -->
-                <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1" 
-                     class="card-img-top" alt="College Admin">
-                
-                <div class="card-body">
-                    <h4 class="card-title text-center mb-4">Admin Registration</h4>
-                    
-                    <form id="adminRegisterForm">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Full Name</label>
-                            <input type="text" id="name" name="name" class="form-control" placeholder="Enter full name" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email Address</label>
-                            <input type="email" id="email" name="email" class="form-control" placeholder="Enter email" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" id="password" name="password" class="form-control" placeholder="Enter password" minlength="8" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="password_confirmation" class="form-label">Confirm Password</label>
-                            <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" placeholder="Confirm password" minlength="8" required>
-                        </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">Register</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+<div class="register-wrapper">
+    <div class="register-header">
+        <img src="/logo/logo.png" alt="College Logo">
+        <h4>College Admin Registration</h4>
+        <p class="text-muted">Fill out the form below to create an admin account</p>
     </div>
+
+    <form id="adminRegisterForm">
+        <div class="mb-3">
+            <label for="name" class="form-label">Full Name</label>
+            <input type="text" id="name" name="name" class="form-control" placeholder="Enter full name" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email Address</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="Enter email" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="Enter password" minlength="8" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="password_confirmation" class="form-label">Confirm Password</label>
+            <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" placeholder="Confirm password" minlength="8" required>
+        </div>
+
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg">Register</button>
+        </div>
+    </form>
 </div>
 
 <script>

@@ -18,3 +18,9 @@ Route::get('admin/registration', [AdminController::class, 'admin_registration_pa
 
 
 Route::post('/admin/registration/store', [AdminController::class, 'admin_registration_store']);
+Route::post('/admin/login/store', [AdminController::class, 'admin_login_store']);
+
+Route::get('/admin/dashboard', [AdminController::class, 'admin_dashboard']);
+// Route::middleware(['auth:sanctum', 'second'])->group(function () {
+    
+// });
