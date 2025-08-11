@@ -48,7 +48,7 @@
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Sanjoy Kundu</span>
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small" id="dashboard_name">Sanjoy Kundu</span>
                                 <img class="img-profile rounded-circle" src="img/undraw_profile.svg">
                             </a>
                             <!-- Dropdown - User Information -->
@@ -57,6 +57,10 @@
                                 <a class="dropdown-item" href="#">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Profile
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-envelope fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    <span  id="dashboard_email"></span>
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="#" data-toggle="modal"
@@ -68,3 +72,40 @@
                         </li>
                     </ul>
                 </nav>
+
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    getUserInfor();
+    async function getUserInfor(){
+        let token = localStorage.getItem('token');
+        if(!token){
+            window.location.href = '/admin/login';
+            return;
+        }
+
+        try{
+            let res = await axios.post('/auth/admin/details', {}, { 
+                headers: {'Authorization': `Bearer ${token}`}
+            });
+
+            if(res.data.status === 'success'){
+                document.querySelector('#dashboard_name').innerHTML = res.data.data.name ? res.data.data.name : 'Not Found';
+                document.querySelector('#dashboard_email').innerHTML = res.data.data.email ? res.data.data.email : 'Not Found';
+            }   
+            
+            if(res.data.status === 'error'){
+                localStorage.removeItem('token');
+                window.location.href = '/admin/login';
+                return;
+            }
+        }catch(error){
+            console.error('error', error);
+            Swal.fire('Error', 'Authentication failed. Please login again.', 'error').then(() => {
+                localStorage.removeItem('token');
+                window.location.href = '/admin/login';
+            });
+        }  
+    }
+</script>

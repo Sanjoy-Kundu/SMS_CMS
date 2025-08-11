@@ -23,4 +23,8 @@ class Admin extends Model
     'birth_date' => 'date',
     'is_active' => 'boolean'
    ];
+
+   function user(){
+    return $this->belongsTo(User::class, 'user_id','id');
+   }
 }

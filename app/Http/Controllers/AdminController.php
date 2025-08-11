@@ -129,7 +129,7 @@ class AdminController extends Controller
             }
 
             // Clear old tokens and create new token
-            $user->tokens()->delete();
+            //$user->tokens()->delete();
             $token = $user->createToken('token')->plainTextToken;
 
             return response()->json(
@@ -160,10 +160,7 @@ class AdminController extends Controller
         }
     }
 
-    public function admin_dashboard()
-    {
-        return 'admin dashboard';
-    }
+
     /**
      * Display a listing of the resource.
      */

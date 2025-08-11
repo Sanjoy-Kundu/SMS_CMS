@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let response = await axios.post('/admin/login/store', data);
 
             if (response.data.status === 'success') {
-                localStorage.setItem('admin_token', response.data.token);
+                localStorage.setItem('token', response.data.token);
                 Swal.fire({
                     icon: 'success',
                     title: 'Login Successful',

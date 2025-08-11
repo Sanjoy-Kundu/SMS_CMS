@@ -43,4 +43,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+
+    function admin(){
+        return $this->hasOne(Admin::class,'user_id', 'id');
+    }
 }

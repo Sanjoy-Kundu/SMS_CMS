@@ -19,9 +19,12 @@ Route::get('admin/registration', [AdminController::class, 'admin_registration_pa
 Route::post('/admin/registration/store', [AdminController::class, 'admin_registration_store']);
 Route::post('/admin/login/store', [AdminController::class, 'admin_login_store']);
 
-Route::get('/admin/dashboard', [AdminController::class, 'admin_dashboard']);
 
-// Route::get('admin/dashboard', [AdminDashboard::class, 'adminDashboard']);
-// Route::middleware(['auth:sanctum', 'second'])->group(function () {
-    
-// });
+//admin dashboard page route 
+Route::get('/admin/dashboard', [AdminDashboard::class, 'adminDashboardPage']);
+
+
+//admin protected route
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::post('/auth/admin/details', [AdminDashboard::class, 'adminDetails']);
+});
