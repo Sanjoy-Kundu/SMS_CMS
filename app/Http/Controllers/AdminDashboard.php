@@ -18,6 +18,9 @@ class AdminDashboard extends Controller
         }
     }
 
+    /***
+     * Admin Details
+     */
     public function adminDetails()
     {
         try {
@@ -36,6 +39,19 @@ class AdminDashboard extends Controller
             return response()->json(['status' => 'success', 'data' => $adminDetails]);
         } catch (Exception $ex) {
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
+    }
+
+    /***
+     * Admin Logout
+     */
+    public function logout(Request $request)
+    {
+        try {
+            $request->user()->currentAccessToken()->delete();
+            return response()->json(['status' => 'success', 'message' => 'Logged out successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'fail', 'message' => $e->getMessage()], 500);
         }
     }
 }

@@ -27,4 +27,5 @@ Route::get('/admin/dashboard', [AdminDashboard::class, 'adminDashboardPage']);
 //admin protected route
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/auth/admin/details', [AdminDashboard::class, 'adminDetails']);
+    Route::post('admin/logout', [AdminDashboard::class, 'logout']);
 });
