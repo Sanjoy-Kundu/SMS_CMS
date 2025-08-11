@@ -30,4 +30,6 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/auth/admin/details', [AdminDashboard::class, 'adminDetails']);
     Route::post('admin/logout', [AdminDashboard::class, 'logout']);
     Route::post('/admin/update-profile',[AdminDashboard::class, 'adminUpdateProfile']);
+    Route::post('/admin/password/update',[AdminDashboard::class, 'adminUpdatePassword']);
+
 });

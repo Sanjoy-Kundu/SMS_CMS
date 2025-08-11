@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class AdminDashboard extends Controller
 {
@@ -142,4 +144,67 @@ class AdminDashboard extends Controller
             ]);
         }
     }
+
+
+    /**
+     * Admin Password Update
+     */
+public function adminUpdatePassword(Request $request)
+{
+    try {
+        // Validate input
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'current_password' => 'required|string|min:8',
+            'new_password' => 'required|string|min:8|confirmed', // expects new_password_confirmation field
+        ], [
+            'email.exists' => 'The provided email does not exist in our records.',
+            'current_password.required' => 'Current password is required.',
+            'current_password.min' => 'Current password must be at least 8 characters.',
+            'new_password.required' => 'New password is required.',
+            'new_password.min' => 'New password must be at least 8 characters.',
+            'new_password.confirmed' => 'New password and confirmation do not match.',
+        ]);
+
+        // Find user by email and role admin
+        $user = User::where('email', $request->email)->where('role', 'admin')->first();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Email does not match any admin account.'
+            ], 404);
+        }
+
+        // Verify current password
+        if (!Hash::check($request->current_password, $user->password)) {
+            // Throw validation exception with proper error message
+            throw ValidationException::withMessages([
+                'current_password' => ['The current password is incorrect.']
+            ]);
+        }
+
+        // Update password
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Password updated successfully.'
+        ]);
+    } catch (ValidationException $ex) {
+        // Return validation errors with status 422
+        return response()->json([
+            'status' => 'fail',
+            'errors' => $ex->errors()
+        ], 422);
+    } catch (\Exception $ex) {
+        // Return generic error with status 500
+        return response()->json([
+            'status' => 'fail',
+            'message' => $ex->getMessage()
+        ], 500);
+    }
+}
+
 }

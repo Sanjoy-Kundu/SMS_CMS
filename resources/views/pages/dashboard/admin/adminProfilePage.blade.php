@@ -4,4 +4,5 @@
     @include('components.dashboard.admin.navComponent')
     @include('components.dashboard.admin.profileComponent')
     @include('components.dashboard.admin.footerComponent')
+    @include('components.dashboard.admin.changePasswordComponent')
 @endsection

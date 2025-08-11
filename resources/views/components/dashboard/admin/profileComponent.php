@@ -1,3 +1,24 @@
+<style>
+    .profile-img-table {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #007B7F;
+        box-shadow: 0 0 8px rgba(23, 162, 184, 0.6);
+    }
+
+    .table-profile {
+        max-width: 100%;
+        margin-top: 1rem;
+    }
+
+    .btn-change-password-table {
+        margin-top: 1rem;
+        width: 100%;
+        font-weight: 600;
+    }
+</style>
 <div class="container-fluid mt-4">
 
     <!-- Page Heading -->
@@ -5,23 +26,67 @@
 
     <div class="row">
 
-        <!-- Profile Info Card -->
         <div class="col-lg-4">
-            <div class="card shadow mb-4">
-                <div class="card-body">
+            <div class="card shadow card-profile">
+                <!-- Profile Image Centered -->
+                <div class="text-center">
                     <img id="profile_img_preview" src="/uploads/admin/profile/default.png" alt="Profile Picture"
-                        class="rounded-circle img-fluid mb-3 text-center"
-                        style="width: 150px; height: 150px; object-fit: cover; margin:0 auto">
-
-                    <h5 class="card-title">Name: <span id="profile_name"></span></h5>
-                    <h5 class="card-title">Email: <span id="profile_email"></span></h5>
-                    <h5 class="card-title">Phone: <span id="profile_phone"></span></h5>
-                    <h5 class="card-title">Role: <span id="profile_role"></span></h5>
-                    <h5 class="card-title">Status: <span class="badge bg-primary text-white p-1"
-                            id="profile_status"></span></h5>
+                        class="profile-img-table">
                 </div>
+
+                <!-- Profile Info Table -->
+                <table class="table table-striped w-100 table-profile">
+                    <tbody>
+                        <tr>
+                            <th>Name</th>
+                            <td id="profile_name"></td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td id="profile_email"></td>
+                        </tr>
+                        <tr>
+                            <th>Phone</th>
+                            <td id="profile_phone"></td>
+                        </tr>
+                        <tr>
+                            <th>Role</th>
+                            <td id="profile_role"></td>
+                        </tr>
+                        <tr>
+                            <th>Joined On</th>
+                            <td id="profile_joined_at"></td>
+                        </tr>
+                        <tr>
+                            <th>Last Updated</th>
+                            <td id="profile_updated_at"></td>
+                        </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td>
+                                <span id="profile_status" class="badge status-badge"
+                                    style="font-size: 20px;color:white; background-color:#007B7F;"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Action</td>
+                            <td>
+                                <button type="button" class="btn passwordChangeBtn"
+                                    style="background-color: #007B7F; color: white;">
+                                    Change Password
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
             </div>
         </div>
+
+
+
+
+
 
         <!-- Profile Edit Form -->
         <div class="col-lg-8">
@@ -92,6 +157,7 @@
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -115,7 +181,9 @@
             if (res.data.status === 'success') {
                 let birthDate = res.data.data.admin.birth_date;
 
-                console.log(res.data.data.admin.image)
+                /*console.log(res.data)
+                console.log(res.data.data.email)
+                */
 
                 document.querySelector('#profile_name').innerHTML = res.data.data.name || 'N/A';
                 document.querySelector('#profile_email').innerHTML = res.data.data.email || 'N/A';
@@ -123,6 +191,10 @@
                 document.querySelector('#profile_role').innerHTML = res.data.data.role || 'N/A';
                 document.querySelector('#profile_status').innerHTML = res.data.data.admin.is_active ? 'Active' :
                     'Inactive';
+                document.querySelector('#profile_joined_at').innerHTML = res.data.data.created_at ? new Date(res
+                    .data.data.created_at).toLocaleDateString() : 'N/A';
+                document.querySelector('#profile_updated_at').innerHTML = res.data.data.updated_at ? new Date(res
+                    .data.data.updated_at).toLocaleDateString() : 'N/A';
 
                 //form details
                 document.querySelector('#phone').value = res.data.data.admin.phone ? res.data.data.admin.phone : '';
@@ -155,7 +227,7 @@
                 // window.location.href = '/admin/login';
                 conosle.log(error)
             });
-        }finally{
+        } finally {
             document.getElementById('loader').style.display = 'none';
         }
     }
@@ -169,6 +241,23 @@
                 document.querySelector('#profile_img_preview').src = e.target.result;
             }
             reader.readAsDataURL(file);
+        }
+    });
+
+
+
+    //password change button
+    $('.passwordChangeBtn').on('click',async function() {
+        let token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/admin/login';
+            return;
+        }
+        let email = $('#profile_email').text().trim();
+        //console.log(email);
+        if (email) {
+            await fillUpdatePasswordForm(email);
+            $('#changePasswordModal').modal('show');
         }
     });
 
