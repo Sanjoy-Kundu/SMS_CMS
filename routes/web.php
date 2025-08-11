@@ -22,10 +22,12 @@ Route::post('/admin/login/store', [AdminController::class, 'admin_login_store'])
 
 //admin dashboard page route 
 Route::get('/admin/dashboard', [AdminDashboard::class, 'adminDashboardPage']);
+Route::get('/admin/profile', [AdminDashboard::class, 'adminProfilePage']);
 
 
 //admin protected route
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/auth/admin/details', [AdminDashboard::class, 'adminDetails']);
     Route::post('admin/logout', [AdminDashboard::class, 'logout']);
+    Route::post('/admin/update-profile',[AdminDashboard::class, 'adminUpdateProfile']);
 });

@@ -4,15 +4,32 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\User;
+use App\Models\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AdminDashboard extends Controller
 {
+    /**
+     * Admin Dashboard Page
+     */
     public function adminDashboardPage()
     {
         try {
-            return view('pages.dashboard.indexPage');
+            return view('pages.dashboard.admin.indexPage');
+        } catch (Exception $ex) {
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
+    }
+
+    /**
+     * Admin Profile page
+     */
+
+    public function adminProfilePage()
+    {
+        try {
+            return view('pages.dashboard.admin.adminProfilePage');
         } catch (Exception $ex) {
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
         }
@@ -52,6 +69,77 @@ class AdminDashboard extends Controller
             return response()->json(['status' => 'success', 'message' => 'Logged out successfully']);
         } catch (\Exception $e) {
             return response()->json(['status' => 'fail', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Admin Profile Update
+     */
+    public function adminUpdateProfile(Request $request)
+    {
+        try {
+            $admin = Admin::where('user_id', Auth::id())->firstOrFail();
+
+            // Validation
+            $request->validate([
+                'phone' => 'required|string|max:20|unique:admins,phone,' . $admin->id,
+                'address' => 'required|string|max:255',
+                'birth_date' => 'required|date',
+                'nid' => 'required|string|max:50|unique:admins,nid,' . $admin->id,
+                'gender' => 'required|in:male,female,other',
+                'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            ]);
+
+        
+
+
+            $oldImage = $admin->image;
+
+     
+            $admin->phone = $request->phone;
+            $admin->address = $request->address;
+            $admin->birth_date = $request->birth_date;
+            $admin->nid = $request->nid;
+            $admin->gender = $request->gender;
+
+            // Image upload handling
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $newImagePath = '/uploads/admin/profile/' . $filename;
+
+  
+                if ($oldImage !== $newImagePath) {
+                    if ($oldImage && $oldImage != '/uploads/admin/profile/default.png') {
+                        $oldPath = public_path($oldImage);
+                        if (file_exists($oldPath)) {
+                            unlink($oldPath);
+                        }
+                    }
+
+                    $file->move(public_path('uploads/admin/profile'), $filename);
+                    $admin->image = $newImagePath;
+                }
+            }
+
+            // Save only if changed
+            if ($admin->isDirty()) {
+                $admin->save();
+                $message = 'Profile updated successfully';
+            } else {
+                $message = 'No changes detected';
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => $message,
+                'data' => $admin,
+            ]);
+        } catch (Exception $ex) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $ex->getMessage(),
+            ]);
         }
     }
 }

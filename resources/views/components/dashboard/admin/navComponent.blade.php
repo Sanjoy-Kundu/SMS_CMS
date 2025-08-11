@@ -48,12 +48,12 @@
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="mr-2 d-none d-lg-inline text-gray-600 small" id="dashboard_name">Sanjoy
                             Kundu</span>
-                        <img class="img-profile rounded-circle" src="img/undraw_profile.svg">
+                        <img class="img-profile rounded-circle" id="nav_profile_image" src="">
                     </a>
                     <!-- Dropdown - User Information -->
                     <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                         aria-labelledby="userDropdown">
-                        <a class="dropdown-item" href="#">
+                        <a class="dropdown-item" href="{{url('/admin/profile')}}" target="_blank">
                             <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                             Profile
                         </a>
@@ -82,19 +82,21 @@
                     window.location.href = '/admin/login';
                     return;
                 }
-
+                let profileDefault = '/uploads/admin/profile/default.png'
                 try {
                     let res = await axios.post('/auth/admin/details', {}, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
                     });
+                //      if (res.data.data.admin.image) {
+                //     document.querySelector('#profile_img_preview').src = res.data.data.admin.image;
+                // }  
 
                     if (res.data.status === 'success') {
-                        document.querySelector('#dashboard_name').innerHTML = res.data.data.name ? res.data.data.name :
-                            'Not Found';
-                        document.querySelector('#dashboard_email').innerHTML = res.data.data.email ? res.data.data.email :
-                            'Not Found';
+                        document.querySelector('#dashboard_name').innerHTML = res.data.data.name ? res.data.data.name :'Not Found';
+                        document.querySelector('#dashboard_email').innerHTML = res.data.data.email ? res.data.data.email :'Not Found';
+                        document.querySelector('#nav_profile_image').src = res.data.data.admin.image?res.data.data.admin.image :profileDefault;
                     }
 
                     if (res.data.status === 'error') {
