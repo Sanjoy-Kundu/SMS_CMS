@@ -137,7 +137,7 @@ class AdminController extends Controller
                     'status' => 'success',
                     'message' => 'Login successful',
                     'token' => $token,
-                    'user' => $user,
+                    'email' => $user->email,
                 ],
                 200,
             );

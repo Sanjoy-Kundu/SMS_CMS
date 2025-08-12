@@ -27,7 +27,7 @@ class UserController extends Controller
 
     public function showResetPasswordForm(){
         try{
-            return view('form.reset_password_form');
+            return view('form.admin.reset_password_form');
         }catch(Exception $ex){
             return response()->json(['status' => 'errro', 'message' => $ex->getMessage()]);
         }

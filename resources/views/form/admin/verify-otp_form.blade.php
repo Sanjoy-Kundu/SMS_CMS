@@ -104,29 +104,28 @@
 
 <body>
 
-    <div class="otp-card" data-email="{{ $email ?? 'user@example.com' }}">
+    <div class="otp-card" data-email="">
         <h2>Verify OTP</h2>
         <p class="text-muted mb-4">Enter the 6-digit OTP sent to your email.</p>
-     <div class="otp-image d-flex align-items-center mb-4 gap-3">
-    <img src="/uploads/admin/profile/default.png" alt="OTP Image" id="user_profile_image_otp"
-        style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+        <div class="otp-image d-flex align-items-center mb-4 gap-3">
+            <img src="/uploads/admin/profile/default.png" alt="OTP Image" id="user_profile_image_otp"
+                style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
 
-    <div class="user-name" style="font-weight: 600; font-size: 1.25rem; color: #333;">
-        <div class="user-info-row d-flex justify-content-start mb-2">
-            <div style="min-width: 80px; font-weight: 700;">Name:</div>
-            <div><span id="user_name__otp"></span></div>
+            <div class="user-name" style="font-weight: 600; font-size: 1.25rem; color: #333;">
+                <div class="user-info-row d-flex justify-content-start mb-2">
+                    <div style="min-width: 80px; font-weight: 700;">Name:</div>
+                    <div><span id="user_name__otp"></span></div>
+                </div>
+                <div class="user-info-row d-flex justify-content-start mb-2">
+                    <div style="min-width: 80px; font-weight: 700;">Email:</div>
+                    <div><span id="user_email__otp"></span></div>
+                </div>
+                <div class="user-info-row d-flex justify-content-start">
+                    <div style="min-width: 80px; font-weight: 700;">Role:</div>
+                    <div><span id="user_role__otp"></span></div>
+                </div>
+            </div>
         </div>
-        <div class="user-info-row d-flex justify-content-start mb-2">
-            <div style="min-width: 80px; font-weight: 700;">Email:</div>
-            <div><span id="user_email__otp"></span></div>
-        </div>
-        <div class="user-info-row d-flex justify-content-start">
-            <div style="min-width: 80px; font-weight: 700;">Role:</div>
-            <div><span id="user_role__otp"></span></div>
-        </div>
-    </div>
-</div>
-
 
         <form id="otpForm" novalidate autocomplete="off">
 
@@ -139,10 +138,17 @@
                 <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" name="otp[]" required>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100" onclick="verifyOtp(event)">Verify OTP</button>
+            <button id="verifyBtn" type="submit" class="btn btn-primary w-100">
+                <span id="verifyBtnText">Verify OTP</span>
+                <span id="verifyBtnLoader" class="spinner-border spinner-border-sm ms-2" role="status"
+                    aria-hidden="true" style="display:none;"></span>
+            </button>
         </form>
 
-        <div class="resend-text" id="resendOtp">Didn't receive OTP? Resend</div>
+        <div class="mt-3">
+            Didn't receive OTP? <span id="resendOtpBtn" class="resend-link"
+                style="color:#0d6efd; cursor:pointer;">Resend</span>
+        </div>
     </div>
 
     <!-- jQuery -->
@@ -159,6 +165,7 @@
 
     <script>
         getUserInfo();
+
         async function getUserInfo() {
             let token = localStorage.getItem('token');
             let email = localStorage.getItem('verify_otp_email');
@@ -176,13 +183,14 @@
                     }
                 });
                 if (res.data.status === 'success') {
-                    console.log(res.data.user.name);
-                    document.querySelector('#user_name__otp').innerText = res.data.user.name?res.data.user.name:"N/A";
-                    document.querySelector('#user_email__otp').innerText = res.data.user.email?res.data.user.email:"N/A";
-                    document.querySelector('#user_role__otp').innerText = res.data.user.role?res.data.user.role:"N/A";
-                    if (res.data.user.admin.image) {
+                    document.querySelector('#user_name__otp').innerText = res.data.user.name ? res.data.user.name :
+                        "N/A";
+                    document.querySelector('#user_email__otp').innerText = res.data.user.email ? res.data.user.email :
+                        "N/A";
+                    document.querySelector('#user_role__otp').innerText = res.data.user.role ? res.data.user.role :
+                        "N/A";
+                    if (res.data.user.admin && res.data.user.admin.image) {
                         document.querySelector('#user_profile_image_otp').src = res.data.user.admin.image;
-                        
                     } else {
                         document.querySelector('#user_profile_image_otp').src = '/uploads/admin/profile/default.png';
                     }
@@ -192,182 +200,172 @@
             }
         }
 
+        // Verify OTP Function with loader and button disable
+        async function verifyOtp(event) {
+            event.preventDefault();
 
+            let token = localStorage.getItem('token');
+            let email = localStorage.getItem('verify_otp_email');
 
-async function verifyOtp(event) {
-    event.preventDefault();
-
-    let token = localStorage.getItem('token');
-    let email = localStorage.getItem('verify_otp_email');
-
-    if (!token || !email) {
-        window.location.href = "/forgot-password";
-        return;
-    }
-
-    const otpInputs = document.querySelectorAll('input[name="otp[]"]');
-    let otp = '';
-    otpInputs.forEach(input => {
-        otp += input.value.trim();
-    });
-
-    try {
-        let res = await axios.post('/forgot-password/verify-otp', { email, otp }, {
-            headers: {
-                'Authorization': `Bearer ${token}`
+            if (!token || !email) {
+                window.location.href = "/forgot-password";
+                return;
             }
-        });
 
-        if (res.data.status === 'success') {
-            Swal.fire({
-                icon: 'success',
-                title: 'OTP Verified',
-                text: 'You can now reset your password.',
-                confirmButtonText: 'Continue'
-            }).then(() => {
-                // Reset localStorage items if needed
-                //localStorage.removeItem('verify_otp_email');
-                // Redirect to reset password page
-                window.location.href = '/forgot-password/reset-password';
+            const otpInputs = document.querySelectorAll('input[name="otp[]"]');
+            let otp = '';
+            otpInputs.forEach(input => {
+                otp += input.value.trim();
             });
-        } else {
-            Swal.fire('Error', res.data.message || 'Invalid OTP.', 'error');
+
+            if (otp.length !== 6) {
+                Swal.fire('Error', 'Please enter the complete 6-digit OTP.', 'error');
+                return;
+            }
+
+            const verifyBtn = document.getElementById('verifyBtn');
+            const verifyBtnText = document.getElementById('verifyBtnText');
+            const verifyBtnLoader = document.getElementById('verifyBtnLoader');
+
+            // Show loader and disable button
+            verifyBtn.disabled = true;
+            verifyBtnText.style.display = 'none';
+            verifyBtnLoader.style.display = 'inline-block';
+
+            try {
+                let res = await axios.post('/forgot-password/verify-otp', {
+                    email,
+                    otp
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (res.data.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'OTP Verified',
+                        text: 'You can now reset your password.',
+                        confirmButtonText: 'Continue'
+                    }).then(() => {
+                        window.location.href = '/reset-password';
+                    });
+                } else {
+                    Swal.fire('Error', res.data.message || 'Invalid OTP.', 'error');
+                }
+            } catch (error) {
+                let message = 'Failed to verify OTP. Try again.';
+                if (error.response && error.response.status === 422) {
+                    message = error.response.data.message || 'Invalid or expired OTP.';
+                }
+                Swal.fire('Error', message, 'error');
+                console.error(error);
+            } finally {
+                // Hide loader and enable button again
+                verifyBtn.disabled = false;
+                verifyBtnText.style.display = 'inline';
+                verifyBtnLoader.style.display = 'none';
+            }
         }
-    } catch (error) {
-        let message = 'Failed to verify OTP. Try again.';
-        if (error.response && error.response.status === 422) {
-            message = error.response.data.message || 'Invalid or expired OTP.';
-        }
-        Swal.fire('Error', message, 'error');
-        console.error(error);
-    }
-}
 
+        document.getElementById('otpForm').addEventListener('submit', verifyOtp);
 
+        $(document).ready(function() {
+            const resendOtpBtn = $('#resendOtpBtn');
+            let token = localStorage.getItem('token');
+            let email = localStorage.getItem('verify_otp_email');
+            let countdownInterval;
 
+            function startResendCountdown(seconds = 60) {
+                resendOtpBtn.addClass('disabled').css('pointer-events', 'none');
+                let timeLeft = seconds;
 
+                resendOtpBtn.text(`Resend available in ${timeLeft} sec`);
 
+                countdownInterval = setInterval(() => {
+                    timeLeft--;
+                    if (timeLeft > 0) {
+                        resendOtpBtn.text(`Resend available in ${timeLeft} sec`);
+                    } else {
+                        clearInterval(countdownInterval);
+                        resendOtpBtn.text('Resend');
+                        resendOtpBtn.removeClass('disabled').css('pointer-events', 'auto');
+                    }
+                }, 1000);
+            }
 
+            // Start countdown on page load to prevent immediate resend (optional)
+            startResendCountdown(60);
 
+            resendOtpBtn.on('click', async function() {
+                if (resendOtpBtn.hasClass('disabled')) {
+                    return; // Prevent clicks while disabled
+                }
 
+                // Confirm dialog before resending OTP
+                const {
+                    isConfirmed
+                } = await Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to resend the OTP?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, resend it!',
+                    cancelButtonText: 'Cancel'
+                });
 
+                if (!isConfirmed) {
+                    return; // User cancelled
+                }
 
+                // Refresh token and email every click in case changed
+                token = localStorage.getItem('token');
+                email = localStorage.getItem('verify_otp_email');
 
+                if (!token || !email) {
+                    Swal.fire('Error', 'Session expired. Please try forgot password again.', 'error');
+                    window.location.href = '/forgot-password';
+                    return;
+                }
 
+                try {
+                    // Show loading popup while request is in progress
+                    Swal.fire({
+                        title: 'Resending OTP...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
 
+                    const response = await axios.post('/forgot-password/resend-otp', {
+                        email
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
 
+                    Swal.close(); // Close loading popup
 
-
-        // $(function() {
-        //     // CSRF token from meta
-        //     axios.defaults.headers.common['X-CSRF-TOKEN'] = $('meta[name="csrf-token"]').attr('content');
-
-        //     const inputs = $('.otp-inputs input');
-        //     const resendOtpBtn = $('#resendOtp');
-        //     const otpCard = $('.otp-card');
-        //     const email = otpCard.data('email');
-        //     let resendTimer;
-
-        //     // Auto focus next input on input
-        //     inputs.on('input', function() {
-        //         const index = inputs.index(this);
-        //         if (this.value.length === 1 && index < inputs.length - 1) {
-        //             inputs.eq(index + 1).focus();
-        //         }
-        //     });
-
-        //     // Backspace to previous input
-        //     inputs.on('keydown', function(e) {
-        //         const index = inputs.index(this);
-        //         if (e.key === 'Backspace' && this.value === '' && index > 0) {
-        //             inputs.eq(index - 1).focus();
-        //         }
-        //     });
-
-        //     // Resend OTP click handler
-        //     resendOtpBtn.on('click', function() {
-        //         if (resendOtpBtn.hasClass('disabled')) return;
-
-        //         axios.post('/forgot-password/send-otp', { email: email })
-        //         .then(response => {
-        //             if(response.data.status === 'success') {
-        //                 Swal.fire('Success', 'OTP resent successfully! Please check your email.', 'success');
-        //                 startResendTimer(30);
-        //             } else {
-        //                 Swal.fire('Error', response.data.message || 'Failed to resend OTP.', 'error');
-        //             }
-        //         })
-        //         .catch(error => {
-        //             Swal.fire('Error', 'Failed to resend OTP. Try again later.', 'error');
-        //             console.error(error);
-        //         });
-        //     });
-
-        //     // Timer for resend button
-        //     function startResendTimer(seconds) {
-        //         let timeLeft = seconds;
-        //         resendOtpBtn.addClass('disabled').text(`Resend available in ${timeLeft} seconds`);
-
-        //         resendTimer = setInterval(() => {
-        //             timeLeft--;
-        //             if(timeLeft > 0) {
-        //                 resendOtpBtn.text(`Resend available in ${timeLeft} second${timeLeft > 1 ? 's' : ''}`);
-        //             } else {
-        //                 clearInterval(resendTimer);
-        //                 resendOtpBtn.removeClass('disabled').text("Didn't receive OTP? Resend");
-        //             }
-        //         }, 1000);
-        //     }
-
-        //     // Form submit handler
-        //     $('#otpForm').on('submit', function(e) {
-        //         e.preventDefault();
-
-        //         // Collect OTP digits
-        //         const otpValues = inputs.map(function() {
-        //             return $(this).val().trim();
-        //         }).get();
-
-        //         // Validate OTP inputs
-        //         if(otpValues.some(val => val === '' || !/^\d$/.test(val))) {
-        //             Swal.fire('Error', 'Please enter a valid 6-digit OTP.', 'error');
-        //             return;
-        //         }
-
-        //         const otp = otpValues.join('');
-
-        //         axios.post('/forgot-password/verify-otp', { otp: otp, email: email })
-        //         .then(response => {
-        //             if(response.data.status === 'success') {
-        //                 Swal.fire({
-        //                     icon: 'success',
-        //                     title: 'OTP Verified',
-        //                     text: 'You can now reset your password.',
-        //                     confirmButtonText: 'Continue'
-        //                 }).then(() => {
-        //                     window.location.href = '/forgot-password/reset-password'; // Adjust URL if needed
-        //                 });
-        //             } else {
-        //                 Swal.fire('Error', response.data.message || 'Invalid OTP.', 'error');
-        //             }
-        //         })
-        //         .catch(error => {
-        //             if(error.response && error.response.status === 422) {
-        //                 let errors = error.response.data.errors;
-        //                 let messages = Object.values(errors).flat().join('<br>');
-        //                 Swal.fire({ icon: 'error', title: 'Validation Error', html: messages });
-        //             } else {
-        //                 Swal.fire('Error', 'Failed to verify OTP. Try again.', 'error');
-        //             }
-        //             console.error(error);
-        //         });
-        //     });
-        // });
-
-
+                    if (response.data.status === 'success') {
+                        Swal.fire('Success', response.data.message || 'OTP resent successfully.',
+                            'success');
+                        // Start countdown after successful resend
+                        startResendCountdown(60);
+                    } else {
+                        Swal.fire('Error', response.data.message || 'Failed to resend OTP.', 'error');
+                    }
+                } catch (error) {
+                    Swal.close(); // Close loading popup if error
+                    Swal.fire('Error', 'Failed to resend OTP. Try again later.', 'error');
+                    //console.error(error);
+                }
+            });
+        });
     </script>
 
 </body>
 
 </html>
-        

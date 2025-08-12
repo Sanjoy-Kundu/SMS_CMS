@@ -7,6 +7,8 @@
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
 
     <style>
         body, html {
@@ -16,7 +18,6 @@
         }
 
         body {
-            /* ব্যাকগ্রাউন্ড ইমেজ, কলেজ থিম মতো */
             background: url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
             background-size: cover;
             display: flex;
@@ -59,23 +60,21 @@
 
 <div class="reset-card">
     <h2>Reset Password</h2>
-    <form id="resetPasswordForm" novalidate autocomplete="off" method="POST" action="/forgot-password/reset-password">
-        <!-- CSRF Token -->
-        <!-- যদি Laravel Blade হয়: @csrf -->
-        <input type="hidden" name="email" value="{{ $email ?? '' }}">
+    <form id="resetPasswordForm" novalidate>
+        <input type="hidden" id="email" name="email" />
 
         <div class="mb-3">
             <label for="password" class="form-label">New Password</label>
-            <input
-                type="password"
-                class="form-control"
-                id="password"
-                name="password"
-                placeholder="Enter new password"
-                required
-                minlength="8"
-                autocomplete="new-password"
-            >
+            <input 
+                type="password" 
+                class="form-control" 
+                id="password" 
+                name="password" 
+                placeholder="Enter new password" 
+                required 
+                minlength="8" 
+                autocomplete="new-password" 
+            />
             <div class="invalid-feedback">
                 Please enter a password of at least 8 characters.
             </div>
@@ -83,16 +82,16 @@
 
         <div class="mb-4">
             <label for="password_confirmation" class="form-label">Confirm New Password</label>
-            <input
-                type="password"
-                class="form-control"
-                id="password_confirmation"
-                name="password_confirmation"
-                placeholder="Confirm new password"
-                required
-                minlength="8"
-                autocomplete="new-password"
-            >
+            <input 
+                type="password" 
+                class="form-control" 
+                id="password_confirmation" 
+                name="password_confirmation" 
+                placeholder="Confirm new password" 
+                required 
+                minlength="8" 
+                autocomplete="new-password" 
+            />
             <div class="invalid-feedback">
                 Password confirmation must match the new password.
             </div>
@@ -102,35 +101,126 @@
     </form>
 </div>
 
-<!-- Bootstrap 5 JS Bundle -->
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Axios -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Bootstrap JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Simple client-side validation for password confirmation
-    (function() {
-        'use strict';
-        const form = document.getElementById('resetPasswordForm');
+$(document).ready(function() {
+    const email = localStorage.getItem('verify_otp_email');
+    const token = localStorage.getItem('token');
 
-        form.addEventListener('submit', function(event) {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-            } else {
-                const password = form.password.value;
-                const confirm = form.password_confirmation.value;
-                if (password !== confirm) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    form.password_confirmation.classList.add('is-invalid');
-                    form.password_confirmation.nextElementSibling.textContent = 'Password confirmation does not match.';
-                } else {
-                    form.password_confirmation.classList.remove('is-invalid');
-                }
-            }
-            form.classList.add('was-validated');
+    if (!email || !token) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Warning',
+            text: 'Session expired or invalid. Please try forgot password again.',
+        }).then(() => {
+            window.location.href = '/forgot-password';
         });
-    })();
+        return;
+    }
+
+    $('#email').val(email);
+
+    $('#resetPasswordForm').on('submit', function(e) {
+        e.preventDefault();
+
+        const password = $('#password').val().trim();
+        const password_confirmation = $('#password_confirmation').val().trim();
+
+        // Validation checks
+        if (!password) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Password is required.',
+            });
+            return;
+        }
+
+        if (password.length < 8) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Password must be at least 8 characters long.',
+            });
+            return;
+        }
+
+        if (!password_confirmation) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Password confirmation is required.',
+            });
+            return;
+        }
+
+        if (password !== password_confirmation) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Passwords do not match.',
+            });
+            return;
+        }
+
+        // If all validations pass, send request
+        const data = {
+            email: email,
+            password: password,
+            password_confirmation: password_confirmation
+        };
+
+        axios.post('/forgot-password/reset-password', data, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if(response.data.status === 'success'){
+                // Clear localStorage and redirect
+                localStorage.removeItem('token');
+                localStorage.removeItem('verify_otp_email');
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: response.data.message || 'Password reset successfully.',
+                    confirmButtonText: 'Go to Login'
+                }).then(() => {
+                    window.location.href = '/admin/login';
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: response.data.message || 'Something went wrong.',
+                });
+            }
+        })
+        .catch(error => {
+            let msg = 'Something went wrong.';
+            if(error.response && error.response.data){
+                msg = error.response.data.message || JSON.stringify(error.response.data.errors) || msg;
+            }
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: msg,
+            });
+        });
+    });
+});
 </script>
+
 
 </body>
 </html>

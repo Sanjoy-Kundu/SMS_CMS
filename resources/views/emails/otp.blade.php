@@ -69,7 +69,7 @@
         <div class="otp-code">{{ $otp }}</div>
 
         <p class="text-center">
-            <a href="{{url('/forgot-password/verify-otp')}}" class="btn btn-primary" target="_blank" rel="noopener">Verify OTP</a>
+            <a href="{{url('/verify-otp')}}" class="btn btn-primary text-white" target="_blank" rel="noopener" style="color: white">Verify OTP</a>
         </p>
 
         <p>This OTP is valid for the next 10 minutes. If you did not request this, please ignore this email.</p>
