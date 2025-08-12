@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PasswordReset;
 use App\Http\Controllers\AdminDashboard;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\InstitutionController;
 use App\Http\Controllers\UserController;
 
 //admin registration and login  page route
@@ -52,5 +53,9 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('admin/logout', [AdminDashboard::class, 'logout']);
     Route::post('/admin/update-profile',[AdminDashboard::class, 'adminUpdateProfile']);
     Route::post('/admin/password/update',[AdminDashboard::class, 'adminUpdatePassword']);
+
+    //institution post
+    Route::post('/institution/details', [InstitutionController::class, 'institutionDetails']);
+    Route::post('/institution/create', [InstitutionController::class, 'institutionCreate']);
 
 });

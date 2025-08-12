@@ -37,6 +37,17 @@ class AdminDashboard extends Controller
         }
     }
 
+    /**
+     * Institution Page
+     */
+    public function adminInstitutionPage(){
+        try{
+            return view('pages.dashboard.admin.institution.institutioinPage');
+        }catch(Exception $ex){
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
+    }
+
     /***
      * Admin Details
      */
