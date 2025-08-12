@@ -57,5 +57,6 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     //institution post
     Route::post('/institution/details', [InstitutionController::class, 'institutionDetails']);
     Route::post('/institution/create', [InstitutionController::class, 'institutionCreate']);
+    Route::post('/institution/trash', [InstitutionController::class, 'institutionTrash']);
 
 });

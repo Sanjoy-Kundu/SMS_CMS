@@ -88,43 +88,44 @@
 
 
 <script>
-$(document).ready(function() {
-    getInstitutions();
+    $(document).ready(function() {
+        getInstitutions();
 
-    async function getInstitutions() {
-        let token = localStorage.getItem('token');
-        if (!token) {
-            window.location.href = "/admin/login";
-            return;
-        }
+        async function getInstitutions() {
+            let token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = "/admin/login";
+                return;
+            }
 
-        try {
-            const response = await axios.post('/institution/details', {}, {
-                headers: {
-                    'Authorization': 'Bearer ' + token
-                }
-            });
-
-            if (response.data.status === 'success') {
-                let institutions = response.data.data;
-                let tbody = '';
-
-                if (institutions && !Array.isArray(institutions) && typeof institutions === 'object') {
-                    // ফর্মে ডাটা সেট করা
-                    $('#name').val(institutions.name || '');
-                    $('#eiin').val(institutions.eiin || '');
-                    $('#address').val(institutions.address || '');
-
-                    if (institutions.type === 'school' || institutions.type === 'college' || institutions.type === 'combined') {
-                        $('#type').val(institutions.type);
-                    } else {
-                        $('#type').val('');
+            try {
+                const response = await axios.post('/institution/details', {}, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
                     }
+                });
 
-                    // ফর্ম disable করা
-                    $("#institutionForm :input").prop("disabled", true);
+                if (response.data.status === 'success') {
+                    let institutions = response.data.data;
+                    let tbody = '';
 
-                    tbody += `
+                    if (institutions && !Array.isArray(institutions) && typeof institutions === 'object') {
+                        // ফর্মে ডাটা সেট করা
+                        $('#name').val(institutions.name || '');
+                        $('#eiin').val(institutions.eiin || '');
+                        $('#address').val(institutions.address || '');
+
+                        if (institutions.type === 'school' || institutions.type === 'college' ||
+                            institutions.type === 'combined') {
+                            $('#type').val(institutions.type);
+                        } else {
+                            $('#type').val('');
+                        }
+
+                        // ফর্ম disable করা
+                        $("#institutionForm :input").prop("disabled", true);
+
+                        tbody += `
                     <tr>
                         <td>1</td>
                         <td>${institutions.name || 'N/A'}</td>
@@ -139,12 +140,13 @@ $(document).ready(function() {
                             </div>
                         </td>
                     </tr>`;
-                } else if (Array.isArray(institutions)) {
-                    if (institutions.length === 0) {
-                        tbody = `<tr><td colspan="6" class="text-center">No institutions found.</td></tr>`;
-                    } else {
-                        $.each(institutions, function(index, inst) {
-                            tbody += `
+                    } else if (Array.isArray(institutions)) {
+                        if (institutions.length === 0) {
+                            tbody =
+                                `<tr><td colspan="6" class="text-center">No institutions found.</td></tr>`;
+                        } else {
+                            $.each(institutions, function(index, inst) {
+                                tbody += `
                             <tr>
                                 <td>${index + 1}</td>
                                 <td>${inst.name || 'N/A'}</td>
@@ -159,135 +161,195 @@ $(document).ready(function() {
                                     </div>
                                 </td>
                             </tr>`;
-                        });
+                            });
+                        }
+                        // ফর্ম enable & reset করা
+                        $("#institutionForm :input").prop("disabled", false);
+                        $("#institutionForm")[0].reset();
+                    } else {
+                        tbody = `<tr><td colspan="6" class="text-center">No institutions found.</td></tr>`;
+                        $("#institutionForm :input").prop("disabled", false);
+                        $("#institutionForm")[0].reset();
                     }
-                    // ফর্ম enable & reset করা
-                    $("#institutionForm :input").prop("disabled", false);
-                    $("#institutionForm")[0].reset();
+
+                    $('table tbody').html(tbody);
+
+                    // TODO: এখানে button event listener লাগাও (EDIT, VIEW, DELETE)
+                    $('table').on('click', '.edit_btn', function() {
+                        let id = $(this).data('id');
+                        console.log('edit', id)
+                        // তোমার modal open করা বা edit ফাংশন কল করা
+                    });
+                    $('table').on('click', '.view_btn', function() {
+                        let id = $(this).data('id');
+                        console.log('view', id)
+                        // তোমার modal open করা বা edit ফাংশন কল করা
+                    });
+                    $('table').on('click', '.trash_btn', async function() {
+                        let token = localStorage.getItem('token');
+                        let id = $(this).data('id');
+                        console.log('trash', id);
+
+                        if (!token || !id) {
+                            Swal.fire({
+                                icon: 'warning',
+                                text: 'Invalid token or ID'
+                            });
+                            return false;
+                        }
+
+                        const result = await Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+                        });
+
+                        if (result.isConfirmed) {
+                            try {
+                                let res = await axios.post('/institution/trash', {
+                                    id: id
+                                }, {
+                                    headers: {
+                                        Authorization: `Bearer ${token}`
+                                    }
+                                });
+                                if (res.data.status === 'success') {
+                                    await getInstitutions();
+                                    Swal.fire(
+                                        'Deleted!',
+                                        'Your institution has been trashed.',
+                                        'success'
+                                    );
+                                } else {
+                                    Swal.fire(
+                                        'Failed!',
+                                        res.data.message || 'Failed to delete institution.',
+                                        'error'
+                                    );
+                                }
+                                // TODO: টেবিল থেকে ঐ row সরানো বা রিফ্রেশ করা
+                            } catch (error) {
+                                Swal.fire(
+                                    'Error!',
+                                    error.response && error.response.data && error.response
+                                    .data.message ?
+                                    error.response.data.message :
+                                    'Something went wrong.',
+                                    'error'
+                                );
+                            }
+                        }
+                    });
+
+
+
                 } else {
-                    tbody = `<tr><td colspan="6" class="text-center">No institutions found.</td></tr>`;
-                    $("#institutionForm :input").prop("disabled", false);
-                    $("#institutionForm")[0].reset();
+                    console.log(response.data);
                 }
-
-                $('table tbody').html(tbody);
-
-                // TODO: এখানে button event listener লাগাও (EDIT, VIEW, DELETE)
-                $('table').on('click', '.edit_btn', function() {
-                        let id = $(this).data('id');
-                        console.log('edit',id)
-                        // তোমার modal open করা বা edit ফাংশন কল করা
-                    });
-                $('table').on('click', '.view_btn', function() {
-                        let id = $(this).data('id');
-                        console.log('view',id)
-                        // তোমার modal open করা বা edit ফাংশন কল করা
-                    });
-                $('table').on('click', '.trash_btn', function() {
-                        let id = $(this).data('id');
-                        console.log('trash',id)
-                        // তোমার modal open করা বা edit ফাংশন কল করা
-                    });
-            } else {
-                console.log(response.data);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Something went wrong fetching institutions.'
-            });
-        }
-    }
-
-    $('#institutionForm').on('submit', async function(e) {
-        e.preventDefault();
-
-        let token = localStorage.getItem('token');
-        if (!token) {
-            window.location.href = "/admin/login";
-            return;
-        }
-
-        let name = $.trim($('#name').val());
-        let type = $('#type').val();
-        let eiin = $.trim($('#eiin').val());
-        let address = $.trim($('#address').val());
-
-        // Reset errors
-        $('#institution_name_error').text('');
-        $('#institution_type_error').text('');
-        $('#institution_eiin_error').text('');
-        $('#institution_address_error').text('');
-
-        if (!name) {
-            $('#institution_name_error').text('Please enter institution name');
-            return;
-        }
-        if (!type) {
-            $('#institution_type_error').text('Please select institution type');
-            return;
-        }
-
-        let data = { name, type, eiin, address };
-
-        try {
-            let res = await axios.post('/institution/create', data, {
-                headers: {
-                    'Authorization': 'Bearer ' + token
-                }
-            });
-
-            if (res.data.status === 'success') {
-                await getInstitutions();
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Institution Added!',
-                    text: res.data.message
-                });
-
-                $("#institutionForm :input").prop("disabled", true);
-                $("button[type='submit']")
-                    .text("Institution Added")
-                    .removeClass("btn-primary")
-                    .addClass("btn-success");
-            } else {
-                console.log(res.data);
-            }
-        } catch (error) {
-            if (error.response && error.response.status === 422) {
-                let errors = error.response.data.errors;
-                if (errors.name) {
-                    $('#institution_name_error').text(errors.name[0]);
-                }
-                if (errors.type) {
-                    $('#institution_type_error').text(errors.type[0]);
-                }
-                if (errors.eiin) {
-                    $('#institution_eiin_error').text(errors.eiin[0]);
-                }
-                if (errors.address) {
-                    $('#institution_address_error').text(errors.address[0]);
-                }
-                let allErrors = Object.values(errors).flat().join("\n");
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Validation Error',
-                    text: allErrors
-                });
-            } else {
+            } catch (error) {
+                console.error('Error:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Something went wrong!'
+                    text: 'Something went wrong fetching institutions.'
                 });
-                console.error(error);
             }
         }
+
+        $('#institutionForm').on('submit', async function(e) {
+            e.preventDefault();
+
+            let token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = "/admin/login";
+                return;
+            }
+
+            let name = $.trim($('#name').val());
+            let type = $('#type').val();
+            let eiin = $.trim($('#eiin').val());
+            let address = $.trim($('#address').val());
+
+            // Reset errors
+            $('#institution_name_error').text('');
+            $('#institution_type_error').text('');
+            $('#institution_eiin_error').text('');
+            $('#institution_address_error').text('');
+
+            if (!name) {
+                $('#institution_name_error').text('Please enter institution name');
+                return;
+            }
+            if (!type) {
+                $('#institution_type_error').text('Please select institution type');
+                return;
+            }
+
+            let data = {
+                name,
+                type,
+                eiin,
+                address
+            };
+
+            try {
+                let res = await axios.post('/institution/create', data, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+
+                if (res.data.status === 'success') {
+                    await getInstitutions();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Institution Added!',
+                        text: res.data.message
+                    });
+
+                    $("#institutionForm :input").prop("disabled", true);
+                    $("button[type='submit']")
+                        .text("Institution Added")
+                        .removeClass("btn-primary")
+                        .addClass("btn-success");
+                } else {
+                    console.log(res.data);
+                }
+            } catch (error) {
+                if (error.response && error.response.status === 422) {
+                    let errors = error.response.data.errors;
+                    if (errors.name) {
+                        $('#institution_name_error').text(errors.name[0]);
+                    }
+                    if (errors.type) {
+                        $('#institution_type_error').text(errors.type[0]);
+                    }
+                    if (errors.eiin) {
+                        $('#institution_eiin_error').text(errors.eiin[0]);
+                    }
+                    if (errors.address) {
+                        $('#institution_address_error').text(errors.address[0]);
+                    }
+                    let allErrors = Object.values(errors).flat().join("\n");
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validation Error',
+                        text: allErrors
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Something went wrong!'
+                    });
+                    console.error(error);
+                }
+            }
+        });
+
     });
-
-});
 </script>
-
-

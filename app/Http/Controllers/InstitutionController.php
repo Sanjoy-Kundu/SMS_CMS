@@ -14,23 +14,22 @@ class InstitutionController extends Controller
     /**
      * Display a listing of the resource.
      */
-public function institutionDetails()
-{
-    try {
-        $admin = Admin::where('user_id', auth()->id())->first();
+    public function institutionDetails()
+    {
+        try {
+            $admin = Admin::where('user_id', auth()->id())->first();
 
-        if ($admin) {
-            $institutions = Institution::where('admin_id', $admin->id)->first();
+            if ($admin) {
+                $institutions = Institution::where('admin_id', $admin->id)->first();
 
-            return response()->json(['status' => 'success', 'data' => $institutions]);
-        } else {
-            return response()->json(['status' => 'error', 'message' => 'You are not authorized to access this resource']);
+                return response()->json(['status' => 'success', 'data' => $institutions]);
+            } else {
+                return response()->json(['status' => 'error', 'message' => 'You are not authorized to access this resource']);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'fail', 'message' => $e->getMessage()]);
         }
-    } catch (\Exception $e) {
-        return response()->json(['status' => 'fail', 'message' => $e->getMessage()]);
     }
-}
-
 
     /**
      * Institution Create
@@ -86,9 +85,43 @@ public function institutionDetails()
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function institutionTrash(Request $request)
     {
-        //
+        $request->validate([
+            'id' => 'required|integer|exists:institutions,id',
+        ]);
+
+        $institution = Institution::find($request->id);
+
+        if (!$institution) {
+            return response()->json(
+                [
+                    'status' => 'error',
+                    'message' => 'Institution not found.',
+                ],
+                404,
+            );
+        }
+
+        try {
+            // ধরলাম তোমার ইনস্টিটিউশন soft delete করতে চাও:
+            $institution->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Institution trashed successfully.',
+            ]);
+        } catch (\Exception $e) {
+            // কোনো error হলে catch করবে
+            return response()->json(
+                [
+                    'status' => 'error',
+                    'message' => 'Failed to trash institution.',
+                    'error' => $e->getMessage(),
+                ],
+                500,
+            );
+        }
     }
 
     /**
