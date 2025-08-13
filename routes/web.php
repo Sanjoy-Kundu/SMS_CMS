@@ -47,16 +47,22 @@ Route::get('/admin/profile', [AdminDashboard::class, 'adminProfilePage']);
 Route::get('/institution', [AdminDashboard::class, 'adminInstitutionPage']);
 
 
-//admin protected route
+
+// admin protected route
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/auth/admin/details', [AdminDashboard::class, 'adminDetails']);
     Route::post('admin/logout', [AdminDashboard::class, 'logout']);
-    Route::post('/admin/update-profile',[AdminDashboard::class, 'adminUpdateProfile']);
-    Route::post('/admin/password/update',[AdminDashboard::class, 'adminUpdatePassword']);
-
-    //institution post
+    Route::post('/admin/update-profile', [AdminDashboard::class, 'adminUpdateProfile']);
+    Route::post('/admin/password/update', [AdminDashboard::class, 'adminUpdatePassword']);
+    
+    // Institution routes
     Route::post('/institution/details', [InstitutionController::class, 'institutionDetails']);
     Route::post('/institution/create', [InstitutionController::class, 'institutionCreate']);
+    
     Route::post('/institution/trash', [InstitutionController::class, 'institutionTrash']);
+    Route::post('/institution/restore', [InstitutionController::class, 'institutionRestore']);
+    Route::post('/institution/delete', [InstitutionController::class, 'institutionDelete']);
 
+    Route::post('/institution/edit-by-id', [InstitutionController::class, 'institutionEditById']);
+    Route::post('/institution/update', [InstitutionController::class, 'institutionUpdate']);
 });

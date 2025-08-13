@@ -8,7 +8,6 @@ use App\Models\Institution;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-
 class InstitutionController extends Controller
 {
     /**
@@ -18,11 +17,10 @@ class InstitutionController extends Controller
     {
         try {
             $admin = Admin::where('user_id', auth()->id())->first();
-
             if ($admin) {
                 $institutions = Institution::where('admin_id', $admin->id)->first();
-
-                return response()->json(['status' => 'success', 'data' => $institutions]);
+                $trashInstitutions = Institution::onlyTrashed()->where('admin_id', $admin->id)->get();
+                return response()->json(['status' => 'success', 'data' => $institutions, 'trashData' => $trashInstitutions]);
             } else {
                 return response()->json(['status' => 'error', 'message' => 'You are not authorized to access this resource']);
             }
@@ -44,16 +42,17 @@ class InstitutionController extends Controller
                 'address' => 'nullable|string|max:500',
             ]);
 
-            $exists = Institution::where('name', $validated['name'])->where('type', $validated['type'])->where('eiin', $validated['eiin'])->first();
+            $admin = Admin::where('user_id', auth()->id())->first();
+
+            // এখানে চেক করো ওই admin_id এর জন্য আগেই institution আছে কিনা
+            $exists = Institution::where('admin_id', $admin->id)->first();
 
             if ($exists) {
                 return response()->json([
                     'status' => 'fail',
-                    'message' => 'This institution already exists!',
+                    'message' => 'You can only add one institution!',
                 ]);
             }
-
-            $admin = Admin::where('user_id', auth()->id())->first();
 
             Institution::create([
                 'admin_id' => $admin->id,
@@ -83,7 +82,7 @@ class InstitutionController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Move institution to trash
      */
     public function institutionTrash(Request $request)
     {
@@ -92,7 +91,6 @@ class InstitutionController extends Controller
         ]);
 
         $institution = Institution::find($request->id);
-
         if (!$institution) {
             return response()->json(
                 [
@@ -104,15 +102,12 @@ class InstitutionController extends Controller
         }
 
         try {
-            // ধরলাম তোমার ইনস্টিটিউশন soft delete করতে চাও:
             $institution->delete();
-
             return response()->json([
                 'status' => 'success',
                 'message' => 'Institution trashed successfully.',
             ]);
         } catch (\Exception $e) {
-            // কোনো error হলে catch করবে
             return response()->json(
                 [
                     'status' => 'error',
@@ -125,34 +120,172 @@ class InstitutionController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Restore institution from trash
      */
-    public function show(Institution $institution)
+    public function institutionRestore(Request $request)
     {
-        //
+        $request->validate([
+            'id' => 'required|integer|exists:institutions,id',
+        ]);
+
+        $institution = Institution::onlyTrashed()->find($request->id);
+        if (!$institution) {
+            return response()->json(
+                [
+                    'status' => 'error',
+                    'message' => 'Institution not found in trash.',
+                ],
+                404,
+            );
+        }
+
+        try {
+            $institution->restore();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Institution restored successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(
+                [
+                    'status' => 'error',
+                    'message' => 'Failed to restore institution.',
+                    'error' => $e->getMessage(),
+                ],
+                500,
+            );
+        }
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Permanently delete institution
      */
-    public function edit(Institution $institution)
+    public function institutionDelete(Request $request)
     {
-        //
+        $request->validate([
+            'id' => 'required|integer|exists:institutions,id',
+        ]);
+
+        $institution = Institution::onlyTrashed()->find($request->id);
+        if (!$institution) {
+            return response()->json(
+                [
+                    'status' => 'error',
+                    'message' => 'Institution not found in trash.',
+                ],
+                404,
+            );
+        }
+
+        try {
+            $institution->forceDelete();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Institution permanently deleted.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(
+                [
+                    'status' => 'error',
+                    'message' => 'Failed to delete institution permanently.',
+                    'error' => $e->getMessage(),
+                ],
+                500,
+            );
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Institution $institution)
-    {
-        //
-    }
+    // Other methods (show, edit, update, destroy) remain empty as per original code
+public function institutionEditById(Request $request)
+{
+    try {
+        $request->validate([
+            'id' => 'required|integer|exists:institutions,id',
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Institution $institution)
-    {
-        //
+        $admin = Admin::where('user_id', auth()->id())->first();
+        $institution = Institution::where('id', $request->id)
+            ->where('admin_id', $admin->id)
+            ->first();
+
+        if (!$institution) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Institution not found or you do not have permission to access it.'
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'institution' => $institution
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'fail',
+            'message' => $e->getMessage()
+        ]);
     }
+}
+
+public function institutionUpdate(Request $request)
+{
+    try {
+        $request->validate([
+            'id' => 'required|integer|exists:institutions,id',
+            'name' => 'required|string|max:255',
+            'type' => 'required|in:school,college,combined',
+            'eiin' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+        ]);
+
+        $admin = Admin::where('user_id', auth()->id())->first();
+        $institution = Institution::where('id', $request->id)
+            ->where('admin_id', $admin->id)
+            ->first();
+
+        if (!$institution) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Institution not found or you do not have permission to update it.'
+            ]);
+        }
+
+        // Check if another institution with the same details already exists
+        $exists = Institution::where('name', $request->name)
+            ->where('type', $request->type)
+            ->where('eiin', $request->eiin)
+            ->where('id', '!=', $request->id)
+            ->first();
+
+        if ($exists) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Another institution with the same details already exists!'
+            ]);
+        }
+
+        // Update institution
+        $institution->update([
+            'name' => $request->name,
+            'type' => $request->type,
+            'eiin' => $request->eiin,
+            'address' => $request->address,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Institution updated successfully'
+        ]);
+    } catch (ValidationException $e) {
+        return response()->json([
+            'status' => 'fail',
+            'errors' => $e->errors()
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'fail',
+            'message' => $e->getMessage()
+        ]);
+    }
+}
 }
