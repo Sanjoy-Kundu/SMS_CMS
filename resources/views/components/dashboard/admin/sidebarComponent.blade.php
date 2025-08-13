@@ -43,7 +43,7 @@
                        <h6 class="collapse-header">Manage Academic Data:</h6>
                        <a class="collapse-item {{ Request::is('institution') ? 'active' : '' }}" href="{{ url('/institution') }}">Institutions</a>
                        <a class="collapse-item {{ Request::is('academic') ? 'active' : '' }}" href="{{url('/academic')}}">Academic Sections</a>
-                       <a class="collapse-item" href="#">Classes</a>
+                       <a class="collapse-item {{ Request::is('classes') ? 'active' : '' }}" href="{{url('/classes')}}">Classes</a>
                        <a class="collapse-item" href="#">Divisions</a>
                        <a class="collapse-item" href="#">Subjects</a>
                    </div>

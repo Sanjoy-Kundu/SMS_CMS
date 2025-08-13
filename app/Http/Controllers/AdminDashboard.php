@@ -58,6 +58,16 @@ class AdminDashboard extends Controller
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
         }
     }
+    /**
+     * Classes Page
+     */
+    public function adminClassPage(){
+        try{
+            return view('pages.dashboard.admin.classes.classesPage');
+        }catch(Exception $ex){
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
+    }
 
     /***
      * Admin Details

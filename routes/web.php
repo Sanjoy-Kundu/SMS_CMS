@@ -1,13 +1,14 @@
 <?php
 
-use App\Http\Controllers\AcademicSectionController;
+use App\Models\AcademicSection;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PasswordReset;
 use App\Http\Controllers\AdminDashboard;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\InstitutionController;
 use App\Http\Controllers\UserController;
-use App\Models\AcademicSection;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ClassModelController;
+use App\Http\Controllers\InstitutionController;
+use App\Http\Controllers\AcademicSectionController;
 
 //admin registration and login  page route
 Route::get('/admin/login', [AdminController::class, 'admin_login_page']);
@@ -48,6 +49,7 @@ Route::get('/admin/profile', [AdminDashboard::class, 'adminProfilePage']);
 //admin dashboard institutation page route
 Route::get('/institution', [AdminDashboard::class, 'adminInstitutionPage']);
 Route::get('/academic', [AdminDashboard::class, 'adminAcademicPage']);
+Route::get('/classes', [AdminDashboard::class, 'adminClassPage']);
 
 
 
@@ -58,7 +60,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/admin/update-profile', [AdminDashboard::class, 'adminUpdateProfile']);
     Route::post('/admin/password/update', [AdminDashboard::class, 'adminUpdatePassword']);
     
-    // Institution routes
+    // ::::::::::::::::::Institution routes::::::::::::::::::::::
     Route::post('/institution/details', [InstitutionController::class, 'institutionDetails']);
     Route::post('/institution/create', [InstitutionController::class, 'institutionCreate']);
 
@@ -68,9 +70,9 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
     Route::post('/institution/edit-by-id', [InstitutionController::class, 'institutionEditById']);
     Route::post('/institution/update', [InstitutionController::class, 'institutionUpdate']);
-    // Institution routes end
+    //:::::::::::::::::::::Institution routes end:::::::::::::::::::::::
 
-    // Academic routes
+    // ::::::::::::::::::::Academic routes:::::::::::::::::::::::::::::::
     Route::post('/institution/lists', [AcademicSectionController::class, 'academicSectionInstitutionLists']);
     Route::post('/academic/section/lists', [AcademicSectionController::class, 'academicSectionLists']);
     Route::post('/academic/section/trash', [AcademicSectionController::class, 'academicSectionTrash']);
@@ -81,5 +83,22 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/academic/section/delete', [AcademicSectionController::class, 'academicSectionDelete']);
     Route::post('/academic/section/edit-by-id', [AcademicSectionController::class, 'academicSectionEditById']);
     Route::post('/academic/section/update', [AcademicSectionController::class, 'academicSectionUpdate']);
-    // Academic routes end
+    //::::::::::::::::::::::Academic routes end:::::::::::::::::::::::::
+
+    //::::::::::::::::::::::Academic Class routes start:::::::::::::::::::::::::
+    Route::post('/class-model/lists', [ClassModelController::class, 'classModelLists']);
+    Route::post('/class-model/create', [ClassModelController::class, 'classModelCreate']);
+    Route::post('/class-model/trash', [ClassModelController::class, 'classModelTrash']);
+    Route::post('/class-model/trashed-list', [ClassModelController::class, 'classModelTrashedList']);
+    Route::post('/class-model/restore', [ClassModelController::class, 'classModelRestore']);
+    Route::post('/class-model/delete', [ClassModelController::class, 'classModelDelete']);
+    Route::post('/class-model/edit-by-id', [ClassModelController::class, 'classModelEditById']);
+    Route::post('/class-model/update', [ClassModelController::class, 'classModelUpdate']);
+
+    Route::post('/class-model/search', [ClassModelController::class, 'classModelSearch']);
+    Route::post('/class-model/trashed-search', [ClassModelController::class, 'classModelTrashedSearch']);
+    //::::::::::::::::::::::Academic Class routes end:::::::::::::::::::::::::
+
+
+
 });
