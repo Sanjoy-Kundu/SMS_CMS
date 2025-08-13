@@ -3,8 +3,9 @@
         <!-- Left Column: Subject Form -->
         <div class="col-xl-5 col-md-6 mb-4">
             <div class="card border-left-primary shadow h-100">
-                <div class="card-header bg-white py-3">
+                <div class="card-header bg-white py-3" style="display: flex; justify-content: space-between; align-items: center;">
                     <h5 class="m-0 text-primary font-weight-bold">ADD SUBJECT</h5>
+                    <button class="btn btn-primary text-white"><a href="{{url('/subject/overview')}}" style="color: white; text-decoration: none;">Subject Overview</a></button>
                 </div>
                 <div class="card-body">
                     <form id="subjectForm">
