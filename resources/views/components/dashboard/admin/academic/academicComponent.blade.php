@@ -1,6 +1,5 @@
 <div class="container-fluid">
   <div class="row">
-
     <!-- Left Column: Academic Section Form -->
     <div class="col-xl-5 col-md-6 mb-4">
       <div class="card border-left-primary shadow h-100">
@@ -17,7 +16,6 @@
               </select>
               <span id="institution_id_error" class="text-danger small">--</span>
             </div>
-
             <div class="form-group">
               <label for="section_type">Section Type</label>
               <select class="form-control" id="section_type" name="section_type" required>
@@ -27,38 +25,35 @@
               </select>
               <span id="section_type_error" class="text-danger small">--</span>
             </div>
-
             <div class="form-group">
               <label for="approval_letter_no">Approval Letter No (optional)</label>
               <input type="text" class="form-control" id="approval_letter_no" name="approval_letter_no" placeholder="Enter approval letter no">
             </div>
-
             <div class="form-group">
               <label for="approval_date">Approval Date (optional)</label>
               <input type="date" class="form-control" id="approval_date" name="approval_date">
             </div>
-
             <div class="form-group">
               <label for="approval_stage">Approval Stage (optional)</label>
               <input type="text" class="form-control" id="approval_stage" name="approval_stage" placeholder="Enter approval stage">
             </div>
-
             <div class="form-group">
               <label for="level">Level (optional)</label>
               <input type="text" class="form-control" id="level" name="level" placeholder="e.g. নিম্ন মাধ্যমিক, মাধ্যমিক, একাদশ">
             </div>
-
             <button type="submit" class="btn btn-primary btn-block">Add Academic Section</button>
           </form>
         </div>
       </div>
     </div>
-
     <!-- Right Column: Academic Sections Table -->
     <div class="col-xl-7 col-md-6 mb-4">
       <div class="card border-left-success shadow">
-        <div class="card-header bg-white py-3">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
           <h5 class="m-0 text-success font-weight-bold">Academic Sections List</h5>
+          <div class="spinner-border spinner-border-sm text-success d-none" id="sectionsLoader" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
         </div>
         <div class="card-body">
           <div class="table-responsive">
@@ -83,18 +78,69 @@
         </div>
       </div>
     </div>
-
   </div>
 </div>
+
+<!-- Edit Academic Section Modal -->
+<div class="modal fade" id="editAcademicSectionModal" tabindex="-1" role="dialog" aria-labelledby="editAcademicSectionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header border-primary">
+        <h5 class="modal-title text-primary font-weight-bold" id="editAcademicSectionModalLabel">Edit Academic Section</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="editAcademicSectionForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="edit_institution_id">Select Institution</label>
+            <select class="form-control" id="edit_institution_id" name="institution_id" required>
+              <option value="" disabled selected>-- Select Institution --</option>
+            </select>
+            <span id="edit_institution_id_error" class="text-danger small"></span>
+          </div>
+          <div class="form-group">
+            <label for="edit_section_type">Section Type</label>
+            <select class="form-control" id="edit_section_type" name="section_type" required>
+              <option value="" disabled selected>-- Select Section Type --</option>
+              <option value="school">School</option>
+              <option value="college">College</option>
+            </select>
+            <span id="edit_section_type_error" class="text-danger small"></span>
+          </div>
+          <div class="form-group">
+            <label for="edit_approval_letter_no">Approval Letter No (optional)</label>
+            <input type="text" class="form-control" id="edit_approval_letter_no" name="approval_letter_no" placeholder="Enter approval letter no">
+          </div>
+          <div class="form-group">
+            <label for="edit_approval_date">Approval Date (optional)</label>
+            <input type="date" class="form-control" id="edit_approval_date" name="approval_date">
+          </div>
+          <div class="form-group">
+            <label for="edit_approval_stage">Approval Stage (optional)</label>
+            <input type="text" class="form-control" id="edit_approval_stage" name="approval_stage" placeholder="Enter approval stage">
+          </div>
+          <div class="form-group">
+            <label for="edit_level">Level (optional)</label>
+            <input type="text" class="form-control" id="edit_level" name="level" placeholder="e.g. নিম্ন মাধ্যমিক, মাধ্যমিক, একাদশ">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Academic Section</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- jQuery CDN -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
 <!-- Axios CDN -->
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
 <!-- SweetAlert2 CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 
 <script>
     $(document).ready(function() {
@@ -112,7 +158,20 @@
             e.preventDefault();
             await updateAcademicSection();
         });
+        
+        // Reset modal when it's closed
+        $('#editAcademicSectionModal').on('hidden.bs.modal', function () {
+            $('#editAcademicSectionForm')[0].reset();
+            $('.text-danger').text('');
+        });
     });
+
+    // Format date for display
+    function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('bn-BD');
+    }
 
     // Get Institutions for dropdown
     async function getInstitutions() {
@@ -128,9 +187,11 @@
                     'Authorization': 'Bearer ' + token
                 }
             });
-            
+              //console.log(response.data);
             if (response.data.status === 'success') {
-                populateInstitutionDropdowns(response.data.data);
+              let institutions = response.data.data;
+             // console.log(institutions);
+                populateInstitutionDropdowns(institutions);
             }
         } catch (error) {
             console.error('Error fetching institutions:', error);
@@ -145,9 +206,11 @@
     // Populate institution dropdowns
     function populateInstitutionDropdowns(institutions) {
         let options = '<option value="" disabled selected>-- প্রতিষ্ঠান নির্বাচন করুন --</option>';
-        
+          console.log(institutions);
         if (institutions && institutions.length > 0) {
             institutions.forEach(inst => {
+              console.log(inst);
+
                 options += `<option value="${inst.id}">${inst.name}</option>`;
             });
         } else {
@@ -166,6 +229,9 @@
             return;
         }
         
+        // Show loader
+        $('#sectionsLoader').removeClass('d-none');
+        
         try {
             const response = await axios.post('/academic/section/details', {}, {
                 headers: {
@@ -183,6 +249,9 @@
                 title: 'Error',
                 text: 'একাডেমিক সেকশনের তালিকা আনতে সমস্যা হয়েছে'
             });
+        } finally {
+            // Hide loader
+            $('#sectionsLoader').addClass('d-none');
         }
     }
 
@@ -194,13 +263,16 @@
             tbody = `<tr><td colspan="8" class="text-center">কোনো একাডেমিক সেকশন পাওয়া যায়নি</td></tr>`;
         } else {
             sections.forEach((section, index) => {
+                // Use institution name from relationship
+                const institutionName = section.institution ? section.institution.name : 'N/A';
+                
                 tbody += `
                     <tr>
                         <td>${index + 1}</td>
-                        <td>${section.institution_name || 'N/A'}</td>
+                        <td>${institutionName}</td>
                         <td>${section.section_type ? section.section_type.charAt(0).toUpperCase() + section.section_type.slice(1) : 'N/A'}</td>
                         <td>${section.approval_letter_no || 'N/A'}</td>
-                        <td>${section.approval_date || 'N/A'}</td>
+                        <td>${formatDate(section.approval_date)}</td>
                         <td>${section.approval_stage || 'N/A'}</td>
                         <td>${section.level || 'N/A'}</td>
                         <td>
