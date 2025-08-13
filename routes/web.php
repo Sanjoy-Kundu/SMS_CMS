@@ -71,6 +71,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     // Institution routes end
 
     // Academic routes
+    Route::post('/academic/details-lists', [AcademicSectionController::class, 'academicSectionLists']);
     Route::post('/academic/section/details', [AcademicSectionController::class, 'academicSectionDetails']);
     Route::post('/academic/section/create', [AcademicSectionController::class, 'academicSectionCreate']);
     Route::post('/academic/section/trash', [AcademicSectionController::class, 'academicSectionTrash']);

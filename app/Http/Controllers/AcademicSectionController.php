@@ -39,6 +39,24 @@ class AcademicSectionController extends Controller
             ]);
         }
     }
+    /**
+     * Display a listing of the resource.
+     */
+    public function academicSectionLists()
+    {
+           try {
+            $admin = Admin::where('user_id', auth()->id())->first();
+            if ($admin) {
+                $institutions = AcademicSection::where('admin_id', $admin->id)->first();
+                $trashInstitutions = AcademicSection::onlyTrashed()->where('admin_id', $admin->id)->get();
+                return response()->json(['status' => 'success', 'data' => $institutions, 'trashData' => $trashInstitutions]);
+            } else {
+                return response()->json(['status' => 'error', 'message' => 'You are not authorized to access this resource']);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'fail', 'message' => $e->getMessage()]);
+        }
+    }
 
     /**
      * Academic Section Create
