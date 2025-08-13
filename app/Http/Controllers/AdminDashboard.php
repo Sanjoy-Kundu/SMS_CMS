@@ -48,6 +48,17 @@ class AdminDashboard extends Controller
         }
     }
 
+    /**
+     * Institution Page
+     */
+    public function adminAcademicPage(){
+        try{
+            return view('pages.dashboard.admin.academic.academicPage');
+        }catch(Exception $ex){
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
+    }
+
     /***
      * Admin Details
      */

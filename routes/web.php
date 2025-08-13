@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\AcademicSectionController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PasswordReset;
 use App\Http\Controllers\AdminDashboard;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\InstitutionController;
 use App\Http\Controllers\UserController;
+use App\Models\AcademicSection;
 
 //admin registration and login  page route
 Route::get('/admin/login', [AdminController::class, 'admin_login_page']);
@@ -45,6 +47,7 @@ Route::get('/admin/profile', [AdminDashboard::class, 'adminProfilePage']);
 
 //admin dashboard institutation page route
 Route::get('/institution', [AdminDashboard::class, 'adminInstitutionPage']);
+Route::get('/academic', [AdminDashboard::class, 'adminAcademicPage']);
 
 
 
@@ -58,11 +61,22 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     // Institution routes
     Route::post('/institution/details', [InstitutionController::class, 'institutionDetails']);
     Route::post('/institution/create', [InstitutionController::class, 'institutionCreate']);
-    
+
     Route::post('/institution/trash', [InstitutionController::class, 'institutionTrash']);
     Route::post('/institution/restore', [InstitutionController::class, 'institutionRestore']);
     Route::post('/institution/delete', [InstitutionController::class, 'institutionDelete']);
 
     Route::post('/institution/edit-by-id', [InstitutionController::class, 'institutionEditById']);
     Route::post('/institution/update', [InstitutionController::class, 'institutionUpdate']);
+    // Institution routes end
+
+    // Academic routes
+    Route::post('/academic/section/details', [AcademicSectionController::class, 'academicSectionDetails']);
+    Route::post('/academic/section/create', [AcademicSectionController::class, 'academicSectionCreate']);
+    Route::post('/academic/section/trash', [AcademicSectionController::class, 'academicSectionTrash']);
+    Route::post('/academic/section/restore', [AcademicSectionController::class, 'academicSectionRestore']);
+    Route::post('/academic/section/delete', [AcademicSectionController::class, 'academicSectionDelete']);
+    Route::post('/academic/section/edit-by-id', [AcademicSectionController::class, 'academicSectionEditById']);
+    Route::post('/academic/section/update', [AcademicSectionController::class, 'academicSectionUpdate']);
+    // Academic routes end
 });
