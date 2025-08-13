@@ -443,8 +443,8 @@
                 tbody += `
                     <tr>
                         <td>${index + 1}</td>
-                        <td>${classModel.academic_section.section_type || 'N/A'}</td>
-                        <td>${classModel.name || 'N/A'}</td>
+                        <td>${classModel.academic_section.section_type.toUpperCase() || 'N/A'}</td>
+                        <td>${classModel.name.toUpperCase() || 'N/A'}</td>
                         <td>
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-sm btn-primary edit-class-model-btn" data-id="${classModel.id}">EDIT</button>
@@ -727,7 +727,7 @@
                 tbody += `
                     <tr>
                         <td>${index + 1}</td>
-                        <td>${trashData.name || 'N/A'}</td>
+                        <td>${trashData.name.toUpperCase() || 'N/A'}</td>
                         <td>${trashData.deleted_at ? trashData.deleted_at.split('T')[0] : 'N/A'}</td>
                         <td>
                             <div class="btn-group" role="group">

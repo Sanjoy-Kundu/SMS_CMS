@@ -59,7 +59,7 @@ class ClassModelController extends Controller
                 ]);
             }
 
-            // চেক করো একই নামের ক্লাস মডেল আছে কিনা
+            
             $existingClassModel = ClassModel::where('academic_section_id', $validated['academic_section_id'])->where('name', $validated['name'])->where('admin_id', $admin->id)->first();
 
             if ($existingClassModel) {
