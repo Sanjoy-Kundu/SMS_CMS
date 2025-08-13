@@ -10,6 +10,7 @@ use App\Http\Controllers\ClassModelController;
 use App\Http\Controllers\InstitutionController;
 use App\Http\Controllers\AcademicSectionController;
 use App\Http\Controllers\DivisionController;
+use App\Http\Controllers\SubjectController;
 
 //admin registration and login  page route
 Route::get('/admin/login', [AdminController::class, 'admin_login_page']);
@@ -52,6 +53,8 @@ Route::get('/institution', [AdminDashboard::class, 'adminInstitutionPage']);
 Route::get('/academic', [AdminDashboard::class, 'adminAcademicPage']);
 Route::get('/classes', [AdminDashboard::class, 'adminClassPage']);
 Route::get('/class/division', [AdminDashboard::class, 'adminDivisionPage']);
+Route::get('/class/subject', [AdminDashboard::class, 'adminSubjectPage']);
+Route::get('/subject/overview', [AdminDashboard::class, 'subjectOverview']);
 
 
 
@@ -115,5 +118,19 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     //:::::::::::::::::::::Division Class routes end:::::::::::::::::::::
    
 
+    //::::::::::::::: Subject Class routes Start :::::::::::::::::::::::
+    Route::post('/subject/lists', [SubjectController::class, 'subjectLists']);
+    Route::post('/subject/get-divisions-by-class', [SubjectController::class, 'getDivisionsByClass']);
+    Route::post('/subject/create', [SubjectController::class, 'subjectCreate']);
+    Route::post('/subject/trash', [SubjectController::class, 'subjectTrash']);
+    Route::post('/subject/trashed-list', [SubjectController::class, 'subjectTrashedList']);
+    Route::post('/subject/restore', [SubjectController::class, 'subjectRestore']);
+    Route::post('/subject/delete', [SubjectController::class, 'subjectDelete']);
+    Route::post('/subject/edit-by-id', [SubjectController::class, 'subjectEditById']);
+    Route::post('/subject/update', [SubjectController::class, 'subjectUpdate']);
+    Route::post('/subject/search', [SubjectController::class, 'subjectSearch']);
+    Route::post('/subject/trashed-search', [SubjectController::class, 'subjectTrashedSearch']);
 
+    Route::post('/subject/overview-data', [SubjectController::class, 'subjectOverviewData']);
+    //::::::::::::::: Subject Class routes End :::::::::::::::::::::::
 });

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Exception;
 use App\Models\User;
 use App\Models\Admin;
+use App\Models\Institution;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -77,6 +78,26 @@ class AdminDashboard extends Controller
         }catch(Exception $ex){
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
         }
+    }
+    /**
+     * Subject Page
+     */
+    public function adminSubjectPage(){
+        try{
+            return view('pages.dashboard.admin.subject.subjectPage');
+        }catch(Exception $ex){
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
+    }
+        /**
+     * Subject Overview 
+     */
+
+    // Subject Overview Page
+    public function subjectOverview()
+    {
+        // Get institution info for header
+        return view('pages.dashboard.admin.subject.overViewPage');
     }
 
     /***
