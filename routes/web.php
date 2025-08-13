@@ -9,6 +9,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ClassModelController;
 use App\Http\Controllers\InstitutionController;
 use App\Http\Controllers\AcademicSectionController;
+use App\Http\Controllers\DivisionController;
 
 //admin registration and login  page route
 Route::get('/admin/login', [AdminController::class, 'admin_login_page']);
@@ -50,6 +51,7 @@ Route::get('/admin/profile', [AdminDashboard::class, 'adminProfilePage']);
 Route::get('/institution', [AdminDashboard::class, 'adminInstitutionPage']);
 Route::get('/academic', [AdminDashboard::class, 'adminAcademicPage']);
 Route::get('/classes', [AdminDashboard::class, 'adminClassPage']);
+Route::get('/class/division', [AdminDashboard::class, 'adminDivisionPage']);
 
 
 
@@ -99,6 +101,19 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/class-model/trashed-search', [ClassModelController::class, 'classModelTrashedSearch']);
     //::::::::::::::::::::::Academic Class routes end:::::::::::::::::::::::::
 
+    //:::::::::::::::::::::Division Class routes start:::::::::::::::::::::
+    Route::post('/division-class/lists', [DivisionController::class, 'divisionClassLists']);
+    Route::post('/division-class/create', [DivisionController::class, 'divisionClassCreate']);
+    Route::post('/division-class/trash', [DivisionController::class, 'divisionClassTrash']);
+    Route::post('/division-class/trashed-list', [DivisionController::class, 'divisionClassTrashedList']);
+    Route::post('/division-class/restore', [DivisionController::class, 'divisionClassRestore']);
+    Route::post('/division-class/delete', [DivisionController::class, 'divisionClassDelete']);
+    Route::post('/division-class/edit-by-id', [DivisionController::class, 'divisionClassEditById']);
+    Route::post('/division-class/update', [DivisionController::class, 'divisionClassUpdate']);
+    Route::post('/division-class/search', [DivisionController::class, 'divisionClassSearch']);
+    Route::post('/division-class/trashed-search', [DivisionController::class, 'divisionClassTrashedSearch']);
+    //:::::::::::::::::::::Division Class routes end:::::::::::::::::::::
+   
 
 
 });

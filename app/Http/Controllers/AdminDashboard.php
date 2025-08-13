@@ -68,6 +68,16 @@ class AdminDashboard extends Controller
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
         }
     }
+    /**
+     * Division Page
+     */
+    public function adminDivisionPage(){
+        try{
+            return view('pages.dashboard.admin.division.divisionPage');
+        }catch(Exception $ex){
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
+    }
 
     /***
      * Admin Details

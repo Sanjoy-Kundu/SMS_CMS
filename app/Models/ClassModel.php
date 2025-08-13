@@ -15,8 +15,10 @@ class ClassModel extends Model
         'name',
     ];
 
-    public function academicSection()
-    {
+    public function academicSection(){
         return $this->belongsTo(AcademicSection::class, 'academic_section_id');
+    }
+    public function divisions(){
+        return $this->hasMany(Division::class, 'class_id');
     }
 }
