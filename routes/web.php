@@ -71,10 +71,12 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     // Institution routes end
 
     // Academic routes
-    Route::post('/academic/details-lists', [AcademicSectionController::class, 'academicSectionLists']);
-    Route::post('/academic/section/details', [AcademicSectionController::class, 'academicSectionDetails']);
-    Route::post('/academic/section/create', [AcademicSectionController::class, 'academicSectionCreate']);
+    Route::post('/institution/lists', [AcademicSectionController::class, 'academicSectionInstitutionLists']);
+    Route::post('/academic/section/lists', [AcademicSectionController::class, 'academicSectionLists']);
     Route::post('/academic/section/trash', [AcademicSectionController::class, 'academicSectionTrash']);
+    Route::post('/academic/section/trashed-lists', [AcademicSectionController::class, 'academicSectionTrashedLists']);
+
+    Route::post('/academic/section/create', [AcademicSectionController::class, 'academicSectionCreate']);
     Route::post('/academic/section/restore', [AcademicSectionController::class, 'academicSectionRestore']);
     Route::post('/academic/section/delete', [AcademicSectionController::class, 'academicSectionDelete']);
     Route::post('/academic/section/edit-by-id', [AcademicSectionController::class, 'academicSectionEditById']);

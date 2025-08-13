@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Institution;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class AcademicSection extends Model
 {
@@ -18,5 +19,10 @@ class AcademicSection extends Model
         'approval_stage',
         'level',
     ];
+
+
+    public function institution(){
+        return $this->belongsTo(Institution::class, 'institution_id');
+    }
 
 }

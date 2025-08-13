@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Admin;
+use App\Models\AcademicSection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -35,5 +36,10 @@ class Institution extends Model
     public function children()
     {
         return $this->hasMany(Institution::class, 'parent_id');
+    }
+
+     public function academicSections()
+    {
+        return $this->hasMany(AcademicSection::class, 'institution_id');
     }
 }

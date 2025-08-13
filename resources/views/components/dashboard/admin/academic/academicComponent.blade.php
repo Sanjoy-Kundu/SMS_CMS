@@ -81,6 +81,36 @@
                     </div>
                 </div>
             </div>
+
+
+            <!-- Trashed Academic Sections Card -->
+            <div class="card border-left-warning shadow mt-3">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="m-0 text-warning font-weight-bold">Trashed Academic Sections</h5>
+                    <div class="spinner-border spinner-border-sm text-warning d-none" id="trashedSectionsLoader"
+                        role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover table-sm" id="trashed-academic-sections-table">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Institution</th>
+                                    <th>Section Type</th>
+                                    <th>Deleted At</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- ডাইনামিক ডাটা আসবে এখানে -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -119,20 +149,24 @@
                         <label for="edit_approval_letter_no">Approval Letter No (optional)</label>
                         <input type="text" class="form-control" id="edit_approval_letter_no"
                             name="approval_letter_no" placeholder="Enter approval letter no">
+                        <span id="edit_approval_letter_no_error" class="text-danger small"></span>
                     </div>
                     <div class="form-group">
                         <label for="edit_approval_date">Approval Date (optional)</label>
                         <input type="date" class="form-control" id="edit_approval_date" name="approval_date">
+                        <span id="edit_approval_date_error" class="text-danger small"></span>
                     </div>
                     <div class="form-group">
                         <label for="edit_approval_stage">Approval Stage (optional)</label>
                         <input type="text" class="form-control" id="edit_approval_stage" name="approval_stage"
                             placeholder="Enter approval stage">
+                        <span id="edit_approval_stage_error" class="text-danger small"></span>
                     </div>
                     <div class="form-group">
                         <label for="edit_level">Level (optional)</label>
                         <input type="text" class="form-control" id="edit_level" name="level"
                             placeholder="e.g. নিম্ন মাধ্যমিক, মাধ্যমিক, একাদশ">
+                        <span id="edit_level_error" class="text-danger small"></span>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -155,6 +189,7 @@
     $(document).ready(function() {
         getAcademics();
         getAcademicSections();
+        getTrashedAcademicSections();
 
         // Academic Section Form Submit
         $('#academicSectionForm').on('submit', async function(e) {
@@ -191,33 +226,15 @@
         }
 
         try {
-            const response = await axios.post('/academic/details-list', {}, {
+            const response = await axios.post('/institution/lists', {}, {
                 headers: {
                     'Authorization': 'Bearer ' + token
                 }
             });
 
             if (response.data.status === 'success') {
-                let data = response.data.data;
-
- 
-                // console.log('Data type:', typeof data);
-                // console.log('Is array:', Array.isArray(data));
-                // console.log('Data:', data);
-
-          
-                let institutionsArray;
-
-                if (Array.isArray(data)) {
-                    institutionsArray = data;
-                } else if (data && typeof data === 'object') {
-                   
-                    institutionsArray = [data];
-                } else {
-                    institutionsArray = [];
-                }
-
-                populateInstitutionDropdowns(institutionsArray);
+                let institutionLists = response.data.data;
+                populateInstitutionDropdowns(institutionLists);
             }
         } catch (error) {
             console.error('Error fetching institutions:', error);
@@ -230,12 +247,14 @@
     }
 
     // Populate institution dropdowns
-    function populateInstitutionDropdowns(institutions) {
+    function populateInstitutionDropdowns(institutionLists) {
+
         let options = '<option value="" disabled selected>-- প্রতিষ্ঠান নির্বাচন করুন --</option>';
 
-        if (institutions && institutions.length > 0) {
-            institutions.forEach(inst => {
-                options += `<option value="${inst.id}">${inst.name}</option>`;
+        if (institutionLists && institutionLists.length > 0) {
+            institutionLists.forEach(inst => {
+                //console.log(inst.institution.name)
+                options += `<option value="${inst.id}">${inst.name?inst.name:'N/A'}</option>`;
             });
         } else {
             options += '<option value="" disabled>কোনো প্রতিষ্ঠান পাওয়া যায়নি</option>';
@@ -257,7 +276,7 @@
         $('#sectionsLoader').removeClass('d-none');
 
         try {
-            const response = await axios.post('/academic/section/details', {}, {
+            const response = await axios.post('/academic/section/lists', {}, {
                 headers: {
                     'Authorization': 'Bearer ' + token
                 }
@@ -296,13 +315,13 @@
                         <td>${institutionName}</td>
                         <td>${section.section_type ? section.section_type.charAt(0).toUpperCase() + section.section_type.slice(1) : 'N/A'}</td>
                         <td>${section.approval_letter_no || 'N/A'}</td>
-                        <td>${formatDate(section.approval_date)}</td>
+                        <td>${section.approval_date}</td>
                         <td>${section.approval_stage || 'N/A'}</td>
                         <td>${section.level || 'N/A'}</td>
                         <td>
                             <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-sm btn-primary edit-section-btn" data-id="${section.id}">সম্পাদনা</button>
-                                <button type="button" class="btn btn-sm btn-danger trash-section-btn" data-id="${section.id}">ট্র্যাশ</button>
+                                <button type="button" class="btn btn-sm btn-primary edit-section-btn" data-id="${section.id}">EDIT</button>
+                                <button type="button" class="btn btn-sm btn-danger trash-section-btn" data-id="${section.id}">TRASH</button>
                             </div>
                         </td>
                     </tr>`;
@@ -343,7 +362,7 @@
             $('#section_type_error').text('সেকশন টাইপ নির্বাচন করুন');
             return;
         }
-
+        //console.log(formData);
         try {
             const response = await axios.post('/academic/section/create', formData, {
                 headers: {
@@ -382,8 +401,8 @@
             } else {
                 Swal.fire({
                     icon: 'error',
-                    title: 'এরর!',
-                    text: 'কিছু একটা ভুল হয়েছে'
+                    title: 'ERROR!',
+                    text: 'Something is Wrong'
                 });
             }
         }
@@ -393,7 +412,6 @@
     $(document).on('click', '.edit-section-btn', async function() {
         const sectionId = $(this).data('id');
         await getAcademicSectionForEdit(sectionId);
-        $('#editAcademicSectionModal').modal('show');
     });
 
     // Get Academic Section for Edit
@@ -403,7 +421,6 @@
             window.location.href = "/admin/login";
             return;
         }
-
         try {
             const response = await axios.post('/academic/section/edit-by-id', {
                 id
@@ -412,7 +429,6 @@
                     'Authorization': 'Bearer ' + token
                 }
             });
-
             if (response.data.status === 'success') {
                 const section = response.data.section;
 
@@ -420,7 +436,16 @@
                 $('#edit_institution_id').val(section.institution_id);
                 $('#edit_section_type').val(section.section_type);
                 $('#edit_approval_letter_no').val(section.approval_letter_no || '');
-                $('#edit_approval_date').val(section.approval_date || '');
+
+                // Format date for input field (YYYY-MM-DD format required by date input)
+                if (section.approval_date) {
+                    const date = new Date(section.approval_date);
+                    const formattedDate = date.toISOString().split('T')[0];
+                    $('#edit_approval_date').val(formattedDate);
+                } else {
+                    $('#edit_approval_date').val('');
+                }
+
                 $('#edit_approval_stage').val(section.approval_stage || '');
                 $('#edit_level').val(section.level || '');
 
@@ -429,6 +454,9 @@
 
                 // Clear errors
                 $('.text-danger').text('');
+
+                // Open modal after populating data
+                $('#editAcademicSectionModal').modal('show');
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -437,10 +465,11 @@
                 });
             }
         } catch (error) {
+            console.error('Error fetching academic section for edit:', error);
             Swal.fire({
                 icon: 'error',
-                title: 'এরর!',
-                text: 'কিছু একটা ভুল হয়েছে'
+                title: 'ERROR!',
+                text: 'Something is Wrong'
             });
         }
     }
@@ -452,10 +481,8 @@
             window.location.href = "/admin/login";
             return;
         }
-
         // Reset errors
         $('.text-danger').text('');
-
         // Get form data
         const formData = {
             id: $('#editAcademicSectionForm').data('id'),
@@ -466,44 +493,38 @@
             approval_stage: $('#edit_approval_stage').val(),
             level: $('#edit_level').val()
         };
-
         // Validation
         if (!formData.institution_id) {
-            $('#edit_institution_id_error').text('প্রতিষ্ঠান নির্বাচন করুন');
+            $('#edit_institution_id_error').text('Select Institution');
             return;
         }
-
         if (!formData.section_type) {
-            $('#edit_section_type_error').text('সেকশন টাইপ নির্বাচন করুন');
+            $('#edit_section_type_error').text('Select Section Type');
             return;
         }
-
         try {
             const response = await axios.post('/academic/section/update', formData, {
                 headers: {
                     'Authorization': 'Bearer ' + token
                 }
             });
-
             if (response.data.status === 'success') {
                 Swal.fire({
                     icon: 'success',
-                    title: 'সফল!',
-                    text: response.data.message || 'একাডেমিক সেকশন সফলভাবে আপডেট করা হয়েছে'
+                    title: 'SUCCESS!',
+                    text: response.data.message
                 });
-
                 // Close modal
                 $('#editAcademicSectionModal').modal('hide');
-
                 // Refresh table
                 await getAcademicSections();
             } else {
                 Swal.fire({
                     icon: 'error',
                     title: 'ব্যর্থ!',
-                    text: response.data.message || 'একাডেমিক সেকশন আপডেট করতে ব্যর্থ হয়েছে'
+                    text: response.data.message || 'Fail To Updte Accademic Section'
                 });
-                console.log(response.data)
+                console.log(response.data);
             }
         } catch (error) {
             if (error.response && error.response.status === 422) {
@@ -516,22 +537,24 @@
                 if (errors.approval_stage) $('#edit_approval_stage_error').text(errors.approval_stage[0]);
                 if (errors.level) $('#edit_level_error').text(errors.level[0]);
             } else {
+                console.error('Error updating academic section:', error);
                 Swal.fire({
                     icon: 'error',
-                    title: 'এরর!',
-                    text: 'কিছু একটা ভুল হয়েছে'
+                    title: 'ERROR!',
+                    text: 'Something is Wrong'
                 });
             }
         }
     }
+
 
     // Trash Academic Section
     $(document).on('click', '.trash-section-btn', async function() {
         const sectionId = $(this).data('id');
 
         const result = await Swal.fire({
-            title: 'আপনি কি নিশ্চিত?',
-            text: "আপনি এই সেকশনটি ট্র্যাশে পাঠাতে চান?",
+            title: 'Are You Sure?',
+            text: "Are You Sure that You want to get data trash?",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -565,25 +588,214 @@
             if (response.data.status === 'success') {
                 Swal.fire({
                     icon: 'success',
-                    title: 'ট্র্যাশে পাঠানো হয়েছে!',
-                    text: response.data.message || 'একাডেমিক সেকশন ট্র্যাশে পাঠানো হয়েছে'
+                    title: 'Trash Succesfully',
+                    text: response.data.message
                 });
 
                 // Refresh table
                 await getAcademicSections();
+                await getTrashedAcademicSections();
             } else {
                 Swal.fire({
                     icon: 'error',
                     title: 'ব্যর্থ!',
-                    text: response.data.message || 'একাডেমিক সেকশন ট্র্যাশে পাঠাতে ব্যর্থ হয়েছে'
+                    text: response.data.message
                 });
             }
         } catch (error) {
             Swal.fire({
                 icon: 'error',
-                title: 'এরর!',
-                text: 'কিছু একটা ভুল হয়েছে'
+                title: 'ERROR!',
+                text: 'Something is Wrong'
             });
         }
     }
+
+
+
+
+    /* Trash lists start */
+    // Get Trashed Academic Sections
+    async function getTrashedAcademicSections() {
+        let token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = "/admin/login";
+            return;
+        }
+
+        // Show loader
+        $('#trashedSectionsLoader').removeClass('d-none');
+
+        try {
+            const response = await axios.post('/academic/section/trashed-lists', {}, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            if (response.data.status === 'success') {
+                populateTrashedSectionsTable(response.data.data);
+            }
+        } catch (error) {
+            console.error('Error fetching trashed academic sections:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error in Trash Lists'
+            });
+        } finally {
+            // Hide loader
+            $('#trashedSectionsLoader').addClass('d-none');
+        }
+    }
+
+    // Populate Trashed Sections Table
+    function populateTrashedSectionsTable(sections) {
+        let tbody = '';
+        if (!sections || sections.length === 0) {
+            tbody = `<tr><td colspan="9" class="text-center">Data Not Found</td></tr>`;
+        } else {
+            sections.forEach((section, index) => {
+                const institutionName = section.institution ? section.institution.name : 'N/A';
+                tbody += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${institutionName}</td>
+                    <td>${section.section_type ? section.section_type.charAt(0).toUpperCase() + section.section_type.slice(1) : 'N/A'}</td>
+                    <td>${section.deleted_at}</td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-success restore-section-btn" data-id="${section.id}">RESTORE</button>
+                            <button type="button" class="btn btn-sm btn-danger delete-section-btn" data-id="${section.id}">PERMANENT DELETE</button>
+                        </div>
+                    </td>
+                </tr>`;
+            });
+        }
+        $('#trashed-academic-sections-table tbody').html(tbody);
+    }
+
+    // Restore Academic Section
+    $(document).on('click', '.restore-section-btn', async function() {
+        const sectionId = $(this).data('id');
+        const result = await Swal.fire({
+            title: 'Are You Sure?',
+            text: "Do you want to restore this section?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'YES, RESTORE',
+            cancelButtonText: 'CANCEL'
+        });
+
+        if (result.isConfirmed) {
+            await restoreAcademicSection(sectionId);
+        }
+    });
+
+    // Restore Academic Section Function
+    async function restoreAcademicSection(id) {
+        let token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = "/admin/login";
+            return;
+        }
+
+        try {
+            const response = await axios.post('/academic/section/restore', {
+                id
+            }, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            if (response.data.status === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Restored',
+                    text: response.data.message || 'একাডেমিক সেকশন সফলভাবে পুনরুদ্ধার করা হয়েছে'
+                });
+
+                // Refresh both tables
+                await getAcademicSections();
+                await getTrashedAcademicSections();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ব্যর্থ!',
+                    text: response.data.message || 'একাডেমিক সেকশন পুনরুদ্ধার করতে ব্যর্থ হয়েছে'
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'ERROR',
+                text: 'Something is Wrong'
+            });
+        }
+    }
+
+    // Permanently Delete Academic Section
+    $(document).on('click', '.delete-section-btn', async function() {
+        const sectionId = $(this).data('id');
+        const result = await Swal.fire({
+            title: 'Are You Sure?',
+            text: "Are you sure you want to permanently delete this section? This action cannot be undone!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#28a745',
+            confirmButtonText: 'YES, DELETE IT!',
+            cancelButtonText: 'CANCEL'
+        });
+
+        if (result.isConfirmed) {
+            await deleteAcademicSection(sectionId);
+        }
+    });
+
+    // Delete Academic Section Function
+    async function deleteAcademicSection(id) {
+        let token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = "/admin/login";
+            return;
+        }
+
+        try {
+            const response = await axios.post('/academic/section/delete', {
+                id
+            }, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            if (response.data.status === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'মুছে ফেলা হয়েছে!',
+                    text: response.data.message || 'একাডেমিক সেকশন স্থায়ীভাবে মুছে ফেলা হয়েছে'
+                });
+
+                // Refresh trashed sections table
+                await getTrashedAcademicSections();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ব্যর্থ!',
+                    text: response.data.message || 'একাডেমিক সেকশন মুছতে ব্যর্থ হয়েছে'
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'ERROR',
+                text: 'Something is Wrong!'
+            });
+        }
+    }
+    /* Trash lists end*/
 </script>

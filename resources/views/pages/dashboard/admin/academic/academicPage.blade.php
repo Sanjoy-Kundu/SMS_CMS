@@ -4,5 +4,5 @@
     @include('components.dashboard.admin.navComponent')
     @include('components.dashboard.admin.academic.academicComponent')
     @include('components.dashboard.admin.footerComponent')
-    @include('components.dashboard.admin.academic.modal.academicSectionEditModalComponent')
+    {{--@include('components.dashboard.admin.academic.modal.academicSectionEditModalComponent')--}}
 @endsection
