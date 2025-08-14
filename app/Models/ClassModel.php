@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Subject;
+use App\Models\Division;
+use App\Models\AcademicSection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ClassModel extends Model
 {
@@ -20,5 +23,9 @@ class ClassModel extends Model
     }
     public function divisions(){
         return $this->hasMany(Division::class, 'class_id');
+    }
+
+    public function subjects(){
+        return $this->hasMany(Subject::class, 'class_id');
     }
 }

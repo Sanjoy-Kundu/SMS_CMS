@@ -7,6 +7,7 @@ use App\Models\Division;
 use App\Models\ClassModel;
 use App\Models\Institution;
 use Illuminate\Http\Request;
+use App\Models\AcademicSection;
 use Illuminate\Support\Facades\Validator;
 
 class SubjectController extends Controller
@@ -430,7 +431,7 @@ class SubjectController extends Controller
     }
 
 
-    /**
+   /**
      * Subject OverView
      */
     // Get data for subject overview
@@ -498,4 +499,73 @@ public function subjectOverviewData(Request $request)
     }
 }
 
+// Add these methods to your SubjectController
+
+public function getAcademicSections(Request $request)
+{
+    try {
+        $adminId = auth()->user()->admin->id;
+        $sections = AcademicSection::where('admin_id', $adminId)
+            ->select('id', 'section_type')
+            ->distinct()
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $sections
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Failed to load academic sections: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+public function getClassesBySection(Request $request)
+{
+    try {
+        $adminId = auth()->user()->admin->id;
+        $academicSectionId = $request->academic_section_id;
+
+        $classes = ClassModel::where('academic_section_id', $academicSectionId)
+            ->where('admin_id', $adminId)
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $classes
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Failed to load classes: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+public function getSubjectDetailsByClass(Request $request)
+{
+    try {
+        $adminId = auth()->user()->admin->id;
+        $classId = $request->class_id;
+        
+        $subjects = Subject::with(['classModel', 'division', 'admin.user'])
+            ->where('class_id', $classId)
+            ->where('admin_id', $adminId)
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $subjects
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Failed to load subject details: ' . $e->getMessage()
+        ], 500);
+    }
+}
 }

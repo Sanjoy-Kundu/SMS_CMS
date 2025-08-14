@@ -132,5 +132,10 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/subject/trashed-search', [SubjectController::class, 'subjectTrashedSearch']);
 
     Route::post('/subject/overview-data', [SubjectController::class, 'subjectOverviewData']);
+    // Add these routes to your routes file
+    Route::post('/subject/get-academic-sections', [SubjectController::class, 'getAcademicSections']);
+    Route::post('/subject/get-classes-by-section', [SubjectController::class, 'getClassesBySection']);
+    Route::post('/subject/get-subject-details', [SubjectController::class, 'getSubjectDetailsByClass']);
+    // Route::post('/class/lists', [SubjectController::class, 'classListsForSubjectOverview']);
     //::::::::::::::: Subject Class routes End :::::::::::::::::::::::
 });

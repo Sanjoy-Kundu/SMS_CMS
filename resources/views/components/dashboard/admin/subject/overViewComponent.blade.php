@@ -1,4 +1,4 @@
-
+{{-- 
 
 <style>
     .overview-card {
@@ -109,6 +109,12 @@
         <div class="col-xl-10 col-md-10 mx-auto">
             <div class="overview-card">
                 <div class="overview-header">
+                    <select class="form-control class-filter" id="academic_section_id" name="academic_section_id">
+                        <option value="">Chooose Your Academic</option>
+                        <option value="">School</option> 
+                        <option value="">College</option>
+                    </select>
+
                     <select class="form-control class-filter" id="class_id" name="class_id">
                         <option value="">All Classes</option>
                     </select>
@@ -330,6 +336,390 @@ function generateSubjectRows(subjects, isFirstRow) {
                             </span>
                         </div>
                     </td>
+                    <td>${subject.code || 'N/A'}</td>
+                    <td>
+                        <span class="subject-badge badge-${subject.type}">${subject.type}</span>
+                    </td>
+                    <td>
+                        <span class="subject-badge badge-${subject.is_active ? 'active' : 'inactive'}">
+                            ${subject.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }
+    });
+    
+    return html;
+}
+
+// Display error message
+function displayError(message) {
+    const container = $('#subjectTableContainer');
+    container.html(`
+        <div class="no-data">
+            <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+            <h4>Error</h4>
+            <p>${message}</p>
+        </div>
+    `);
+}
+</script> --}}
+<style>
+    .overview-card {
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+    
+    .overview-header {
+        background-color: #f8f9fc;
+        padding: 15px;
+        border-bottom: 1px solid #e3e6f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .institution-info {
+        text-align: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e3e6f0;
+    }
+    
+    .institution-logo {
+        height: 50px;
+        margin-right: 15px;
+    }
+    
+    .subject-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    
+    .subject-table th, 
+    .subject-table td {
+        border: 1px solid #e3e6f0;
+        padding: 10px;
+        text-align: left;
+    }
+    
+    .subject-table th {
+        background-color: #f8f9fc;
+        font-weight: 600;
+        text-align: center;
+    }
+    
+    .division-row td {
+        background-color: #f1f5f9;
+        font-weight: 600;
+    }
+    
+    .subject-row td:first-child {
+        padding-left: 30px;
+    }
+    
+    .class-filter {
+        width: 300px;
+    }
+    
+    .no-data {
+        text-align: center;
+        padding: 30px;
+        color: #858796;
+    }
+    
+    .subject-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-weight: 600;
+        display: inline-block;
+        margin-right: 5px;
+    }
+    
+    .badge-compulsory {
+        background-color: #4e73df;
+        color: white;
+    }
+    
+    .badge-optional {
+        background-color: #1cc88a;
+        color: white;
+    }
+    
+    .badge-additional {
+        background-color: #f6c23e;
+        color: white;
+    }
+    
+    .badge-active {
+        background-color: #1cc88a;
+        color: white;
+    }
+    
+    .badge-inactive {
+        background-color: #e74a3b;
+        color: white;
+    }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-10 col-md-10 mx-auto">
+            <div class="overview-card">
+                <div class="overview-header">
+                    <select class="form-control class-filter" id="academic_section_id" name="academic_section_id">
+                        <option value="">Choose Your Academic</option>
+                    </select>
+                    <select class="form-control class-filter" id="class_id" name="class_id">
+                        <option value="">All Classes</option>
+                    </select>
+                    <h5 class="m-0 text-primary font-weight-bold">SUBJECT OVERVIEW</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Institution Info -->
+                    <div class="institution-info" id="institutionInfo">
+                        <div>
+                            <img src="{{ asset('images/govt_logo.png') }}" alt="Govt Logo" class="institution-logo">
+                            <img src="{{ asset('images/school_logo.png') }}" alt="School Logo" class="institution-logo">
+                            <h2 id="institutionName">Govt. High School, Dhaka</h2>
+                            <p id="institutionDetails">EIIN: 123456 | Academic Year: 2025-2026</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Subject Table Container -->
+                    <div id="subjectTableContainer">
+                        <div class="no-data">
+                            <i class="fas fa-book fa-3x mb-3"></i>
+                            <h4>Select an academic section and class to view subjects</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<!-- Axios CDN -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<script>
+    $(document).ready(function() {
+    let token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = "/admin/login";
+        return;
+    }
+    
+    // Load academic sections on page load
+    loadAcademicSections();
+    
+    // Academic section change event
+    $('#academic_section_id').on('change', function() {
+        const sectionId = $(this).val();
+        if (sectionId) {
+            loadClassesBySection(sectionId);
+        } else {
+            // Clear class dropdown and subject details
+            $('#class_id').empty().append('<option value="">All Classes</option>');
+            $('#subjectTableContainer').html('<div class="no-data"><i class="fas fa-book fa-3x mb-3"></i><h4>Select a class to view subjects</h4></div>');
+        }
+    });
+    
+    // Class change event
+    $('#class_id').on('change', function() {
+        const classId = $(this).val();
+        if (classId) {
+            loadSubjectDetails(classId);
+        } else {
+            $('#subjectTableContainer').html('<div class="no-data"><i class="fas fa-book fa-3x mb-3"></i><h4>Select a class to view subjects</h4></div>');
+        }
+    });
+});
+
+// Load academic sections
+async function loadAcademicSections() {
+    let token = localStorage.getItem('token');
+    try {
+        const response = await axios.post('/subject/get-academic-sections', {}, {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        
+        if (response.data.status === 'success') {
+            const sections = response.data.data;
+            const sectionDropdown = $('#academic_section_id');
+            sectionDropdown.empty();
+            sectionDropdown.append('<option value="">Choose Your Academic</option>');
+            
+            sections.forEach(section => {
+                sectionDropdown.append(`<option value="${section.id}">${section.section_type}</option>`);
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching academic sections:', error);
+    }
+}
+
+// Load classes by section
+async function loadClassesBySection(sectionId) {
+    let token = localStorage.getItem('token');
+    try {
+        const response = await axios.post('/subject/get-classes-by-section', {
+            academic_section_id: sectionId
+        }, {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        
+        if (response.data.status === 'success') {
+            const classes = response.data.data;
+            const classDropdown = $('#class_id');
+            classDropdown.empty();
+            classDropdown.append('<option value="">All Classes</option>');
+            
+            classes.forEach(classModel => {
+                classDropdown.append(`<option value="${classModel.id}">${classModel.name}</option>`);
+            });
+            
+            // Clear subject details
+            $('#subjectTableContainer').html('<div class="no-data"><i class="fas fa-book fa-3x mb-3"></i><h4>Select a class to view subjects</h4></div>');
+        }
+    } catch (error) {
+        console.error('Error fetching classes:', error);
+    }
+}
+
+// Load subject details
+async function loadSubjectDetails(classId) {
+    let token = localStorage.getItem('token');
+    try {
+        const response = await axios.post('/subject/get-subject-details', {
+            class_id: classId
+        }, {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        
+        if (response.data.status === 'success') {
+            //console.log(response.data.data);
+            displaySubjectDetails(response.data.data);
+        }
+    } catch (error) {
+        console.error('Error fetching subject details:', error);
+        displayError('Failed to load subject details');
+    }
+}
+
+// Display subject details
+function displaySubjectDetails(subjects) {
+    const container = $('#subjectTableContainer');
+    container.empty();
+    
+    if (subjects.length === 0) {
+        container.html(`
+            <div class="no-data">
+                <i class="fas fa-book fa-3x mb-3"></i>
+                <h4>No subjects found for this class</h4>
+            </div>
+        `);
+        return;
+    }
+    
+    // Group subjects by division
+    const groupedSubjects = {};
+    subjects.forEach(subject => {
+        const divisionName = subject.division ? subject.division.name : 'General';
+        if (!groupedSubjects[divisionName]) {
+            groupedSubjects[divisionName] = [];
+        }
+        groupedSubjects[divisionName].push(subject);
+    });
+    
+    let tableHtml = `
+        <table class="subject-table">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Code</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    // Iterate through each division
+    Object.keys(groupedSubjects).forEach(divisionName => {
+        const divisionSubjects = groupedSubjects[divisionName];
+        const subjectCount = divisionSubjects.length;
+            console.log(divisionName);
+        //Add division row if it's not "General"
+        if (divisionName !== 'General') {
+            tableHtml += `
+                <tr class="division-row">
+                    <td rowspan="${subjectCount}">${divisionName}</td>
+                    ${subjectCount > 0 ? generateSubjectRows(divisionSubjects, true) : '<td colspan="3">No subjects in this division</td>'}
+                </tr>
+            `;
+        } else {
+            // For General division, just add the subject rows
+            tableHtml += generateSubjectRows(divisionSubjects, false);
+        }
+    });
+    
+    tableHtml += `
+            </tbody>
+        </table>
+    `;
+    
+    container.html(tableHtml);
+}
+
+// Generate subject rows HTML
+function generateSubjectRows(subjects, isFirstRow) {
+    let html = '';
+    
+    subjects.forEach((subject, index) => {
+        if (index === 0 && isFirstRow) {
+            // First subject in a division with rowspan
+            html += `
+                <td class="subject-row">
+                    ${subject.name}
+                    <div>
+                        <span class="subject-badge badge-${subject.type}">${subject.type}</span>
+                        <span class="subject-badge badge-${subject.is_active ? 'active' : 'inactive'}">
+                            ${subject.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                    </div>
+                </td>
+                <td>${subject.code || 'N/A'}</td>
+                <td>
+                    <span class="subject-badge">${subject.type}</span>
+                </td>
+                <td>
+                    <span class="subject-badge badge-${subject.is_active ? 'active' : 'inactive'}">
+                        ${subject.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                </td>
+            </tr>
+            `;
+        } else {
+            // Subsequent subjects in a division
+            html += `
+                <tr class="subject-row">
+                    <td>
+                        ${subject.name}
+                        <div>
+                            <span class="subject-badge badge-${subject.type}">${subject.type}</span>
+                            <span class="subject-badge badge-${subject.is_active ? 'active' : 'inactive'}">
+                                ${subject.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                        </div>
+                    </td>
+                    
                     <td>${subject.code || 'N/A'}</td>
                     <td>
                         <span class="subject-badge badge-${subject.type}">${subject.type}</span>
