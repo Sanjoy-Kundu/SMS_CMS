@@ -614,6 +614,7 @@ async function loadSubjectDetails(classId) {
 }
 
 // Display subject details
+// Display subject details
 function displaySubjectDetails(subjects) {
     const container = $('#subjectTableContainer');
     container.empty();
@@ -651,23 +652,26 @@ function displaySubjectDetails(subjects) {
             <tbody>
     `;
     
-    // Iterate through each division
+    // First display General division subjects
+    if (groupedSubjects['General']) {
+        const generalSubjects = groupedSubjects['General'];
+        tableHtml += generateSubjectRows(generalSubjects, false);
+        // Remove General from the groupedSubjects object so we don't process it again
+        delete groupedSubjects['General'];
+    }
+    
+    // Then display the rest of the divisions
     Object.keys(groupedSubjects).forEach(divisionName => {
         const divisionSubjects = groupedSubjects[divisionName];
         const subjectCount = divisionSubjects.length;
-            console.log(divisionName);
-        //Add division row if it's not "General"
-        if (divisionName !== 'General') {
-            tableHtml += `
-                <tr class="division-row">
-                    <td rowspan="${subjectCount}">${divisionName}</td>
-                    ${subjectCount > 0 ? generateSubjectRows(divisionSubjects, true) : '<td colspan="3">No subjects in this division</td>'}
-                </tr>
-            `;
-        } else {
-            // For General division, just add the subject rows
-            tableHtml += generateSubjectRows(divisionSubjects, false);
-        }
+        
+        // Add division row with rowspan
+        tableHtml += `
+            <tr class="division-row">
+                <td rowspan="${subjectCount}">${divisionName}</td>
+                ${subjectCount > 0 ? generateSubjectRows(divisionSubjects, true) : '<td colspan="3">No subjects in this division</td>'}
+            </tr>
+        `;
     });
     
     tableHtml += `
@@ -697,7 +701,7 @@ function generateSubjectRows(subjects, isFirstRow) {
                 </td>
                 <td>${subject.code || 'N/A'}</td>
                 <td>
-                    <span class="subject-badge">${subject.type}</span>
+                    <span class="subject-badge badge-${subject.type}">${subject.type}</span>
                 </td>
                 <td>
                     <span class="subject-badge badge-${subject.is_active ? 'active' : 'inactive'}">
@@ -719,7 +723,6 @@ function generateSubjectRows(subjects, isFirstRow) {
                             </span>
                         </div>
                     </td>
-                    
                     <td>${subject.code || 'N/A'}</td>
                     <td>
                         <span class="subject-badge badge-${subject.type}">${subject.type}</span>
