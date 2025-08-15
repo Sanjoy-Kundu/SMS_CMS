@@ -11,36 +11,37 @@ use Illuminate\Validation\ValidationException;
 
 class ClassModelController extends Controller
 {
-public function classModelLists()
-{
-    try {
-        $admin = Admin::where('user_id', auth()->id())->first();
+    public function classModelLists()
+    {
+        try {
+            $admin = Admin::where('user_id', auth()->id())->first();
 
-        if (!$admin) {
+            if (!$admin) {
+                return response()->json(
+                    [
+                        'status' => 'error',
+                        'message' => 'You are not authorized to access this resource',
+                    ],
+                    403,
+                );
+            }
+
+            $classModels = ClassModel::where('admin_id', $admin->id)->with('academicSection')->orderBy('id', 'asc')->get();
+
             return response()->json([
-                'status' => 'error',
-                'message' => 'You are not authorized to access this resource',
-            ], 403);
+                'status' => 'success',
+                'data' => $classModels,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(
+                [
+                    'status' => 'fail',
+                    'message' => config('app.debug') ? $e->getMessage() : 'Something went wrong.',
+                ],
+                500,
+            );
         }
-
-        $classModels = ClassModel::where('admin_id', $admin->id)
-            ->with('academicSection')
-            ->orderBy('id', 'asc')
-            ->get();
-
-        return response()->json([
-            'status' => 'success',
-            'data' => $classModels,
-        ]);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'fail',
-            'message' => config('app.debug') ? $e->getMessage() : 'Something went wrong.',
-        ], 500);
     }
-}
-
 
     /**
      * Class Model Create
@@ -65,7 +66,6 @@ public function classModelLists()
                 ]);
             }
 
-            
             $existingClassModel = ClassModel::where('academic_section_id', $validated['academic_section_id'])->where('name', $validated['name'])->where('admin_id', $admin->id)->first();
 
             if ($existingClassModel) {

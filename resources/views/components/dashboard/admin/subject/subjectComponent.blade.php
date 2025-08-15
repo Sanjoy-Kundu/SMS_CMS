@@ -72,6 +72,14 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    <!-- Class Filter -->
+                    <div class="form-group mb-3">
+                        <label for="classFilter">Filter by Class</label>
+                        <select class="form-control" id="classFilter">
+                            <option value="">All Classes</option>
+                        </select>
+                    </div>
+                    
                     <!-- Search Box -->
                     <div class="form-group mb-3">
                         <div class="input-group">
@@ -92,11 +100,11 @@
                                 <tr>
                                     <th>Sr No.</th>
                                     <th>Class Name</th>
-                                    <th>Division Name</th>
+                                    {{-- <th>Division Name</th> --}}
                                     <th>Subject Name</th>
-                                    <th>Code</th>
+                                    {{-- <th>Code</th>
                                     <th>Type</th>
-                                    <th>Status</th>
+                                    <th>Status</th> --}}
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -229,7 +237,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Font Awesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
 <script>
 $(document).ready(function() {
     let token = localStorage.getItem('token');
@@ -267,6 +274,16 @@ $(document).ready(function() {
         }
     });
     
+    // Class filter change event
+    $('#classFilter').on('change', function() {
+        const classId = $(this).val();
+        if (classId) {
+            filterSubjectsByClass(classId);
+        } else {
+            getSubjects();
+        }
+    });
+    
     // Subject Form Submit
     $('#subjectForm').on('submit', async function(e) {
         e.preventDefault();
@@ -294,7 +311,12 @@ $(document).ready(function() {
     // Clear search functionality
     $('#clearSubjectSearchBtn').on('click', function() {
         $('#subjectSearch').val('');
-        getSubjects();
+        const classId = $('#classFilter').val();
+        if (classId) {
+            filterSubjectsByClass(classId);
+        } else {
+            getSubjects();
+        }
     });
     
     // Search on Enter key press
@@ -308,7 +330,12 @@ $(document).ready(function() {
     $('#subjectSearch').on('input', function() {
         const searchTerm = $(this).val().trim();
         if (searchTerm === '') {
-            getSubjects();
+            const classId = $('#classFilter').val();
+            if (classId) {
+                filterSubjectsByClass(classId);
+            } else {
+                getSubjects();
+            }
         } else {
             filterSubjectsClientSide(searchTerm);
         }
@@ -360,6 +387,7 @@ async function getClasses() {
         
         if (response.data.status === 'success') {
             populateClassDropdowns(response.data.data);
+            populateClassFilter(response.data.data);
         }
     } catch (error) {
         console.error('Error fetching classes:', error);
@@ -385,6 +413,19 @@ function populateClassDropdowns(classes) {
     
     $('#class_id').html(options);
     $('#edit_class_id').html(options);
+}
+
+// Populate Class Filter dropdown
+function populateClassFilter(classes) {
+    let options = '<option value="">All Classes</option>';
+    
+    if (classes && classes.length > 0) {
+        classes.forEach(classModel => {
+            options += `<option value="${classModel.id}">${classModel.name}</option>`;
+        });
+    }
+    
+    $('#classFilter').html(options);
 }
 
 // Get divisions by class ID
@@ -487,16 +528,15 @@ function populateSubjectsTable(subjects) {
             const statusBadge = subject.is_active ? 
                 '<span class="badge badge-success">Active</span>' : 
                 '<span class="badge badge-danger">Inactive</span>';
-            
+                 //<td>${subject.division ? subject.division.name : 'N/A'}</td>
+                // <td>${subject.code || 'N/A'}</td>
+                //     <td>${typeBadge}</td>
+                //     <td>${statusBadge}</td>
             tbody += `
                 <tr>
                     <td>${index + 1}</td>
-                    <td>${subject.class_model ? subject.class_model.name : 'N/A'}</td>
-                    <td>${subject.division ? subject.division.name : 'N/A'}</td>
+                    <td data-class-id="${subject.class_id}">${subject.class_model ? subject.class_model.name : 'N/A'}</td>
                     <td>${subject.name}</td>
-                    <td>${subject.code || 'N/A'}</td>
-                    <td>${typeBadge}</td>
-                    <td>${statusBadge}</td>
                     <td>
                         <div class="btn-group" role="group">
                             <button type="button" class="btn btn-sm btn-primary edit-subject-btn" data-id="${subject.id}">EDIT</button>
@@ -508,6 +548,42 @@ function populateSubjectsTable(subjects) {
     }
     
     $('#subjects-table tbody').html(tbody);
+}
+
+// Filter subjects by class
+async function filterSubjectsByClass(classId) {
+    let token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = "/admin/login";
+        return;
+    }
+    
+    // Show loader
+    $('#subjectsLoader').removeClass('d-none');
+    
+    try {
+        const response = await axios.post('/subject/lists', {}, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+        
+        if (response.data.status === 'success') {
+            // Filter subjects by class
+            const filteredSubjects = response.data.data.filter(subject => subject.class_id == classId);
+            populateSubjectsTable(filteredSubjects);
+        }
+    } catch (error) {
+        console.error('Error fetching subjects:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load subjects. Please try again later.'
+        });
+    } finally {
+        // Hide loader
+        $('#subjectsLoader').addClass('d-none');
+    }
 }
 
 // Create Subject
@@ -560,8 +636,12 @@ async function createSubject() {
             // Reset form
             $('#subjectForm')[0].reset();
             $('#divisionDropdownContainer').hide();
-            // Refresh table
-            await getSubjects();
+            
+            // Set class filter to the selected class
+            $('#classFilter').val(formData.class_id);
+            
+            // Refresh table with filtered subjects
+            await filterSubjectsByClass(formData.class_id);
         } else {
             Swal.fire({
                 icon: 'error',
@@ -583,7 +663,7 @@ async function createSubject() {
             //     icon: 'error',
             //     title: 'ERROR!',
             //     text: 'Something went wrong. Please try again laterppppp.'
-            // });
+            // );
             console.log(error)
         }
     }
@@ -706,8 +786,12 @@ async function updateSubject() {
             
             // Close modal
             $('#editSubjectModal').modal('hide');
-            // Refresh table
-            await getSubjects();
+            
+            // Set class filter to the selected class
+            $('#classFilter').val(formData.class_id);
+            
+            // Refresh table with filtered subjects
+            await filterSubjectsByClass(formData.class_id);
         } else {
             Swal.fire({
                 icon: 'error',
@@ -777,8 +861,15 @@ async function trashSubject(id) {
                 text: response.data.message
             });
             
+            // Get current class filter
+            const classId = $('#classFilter').val();
+            
             // Refresh tables
-            await getSubjects();
+            if (classId) {
+                await filterSubjectsByClass(classId);
+            } else {
+                await getSubjects();
+            }
             await getTrashedSubjects();
         } else {
             Swal.fire({
@@ -901,8 +992,15 @@ async function restoreSubject(id) {
                 text: response.data.message
             });
             
+            // Get current class filter
+            const classId = $('#classFilter').val();
+            
             // Refresh both tables
-            await getSubjects();
+            if (classId) {
+                await filterSubjectsByClass(classId);
+            } else {
+                await getSubjects();
+            }
             await getTrashedSubjects();
         } else {
             Swal.fire({
@@ -991,6 +1089,7 @@ async function filterSubjects() {
     }
     
     const searchTerm = $('#subjectSearch').val().trim();
+    const classId = $('#classFilter').val();
     
     // Show loader
     $('#subjectsLoader').removeClass('d-none');
@@ -1005,7 +1104,12 @@ async function filterSubjects() {
         });
         
         if (response.data.status === 'success') {
-            populateSubjectsTable(response.data.data);
+            // If class filter is applied, filter the results
+            let subjects = response.data.data;
+            if (classId) {
+                subjects = subjects.filter(subject => subject.class_id == classId);
+            }
+            populateSubjectsTable(subjects);
         } else {
             Swal.fire({
                 icon: 'error',
@@ -1026,6 +1130,7 @@ async function filterSubjects() {
 // Client-side filtering for Subjects
 function filterSubjectsClientSide(searchTerm) {
     const term = searchTerm.toLowerCase();
+    const classId = $('#classFilter').val();
     
     $('#subjects-table tbody tr').each(function() {
         const row = $(this);
@@ -1033,9 +1138,13 @@ function filterSubjectsClientSide(searchTerm) {
         const subjectCode = row.find('td:nth-child(5)').text().toLowerCase();
         const className = row.find('td:nth-child(2)').text().toLowerCase();
         const divisionName = row.find('td:nth-child(3)').text().toLowerCase();
+        const rowClassId = row.find('td:nth-child(2)').data('class-id');
         
-        if (subjectName.includes(term) || subjectCode.includes(term) || 
-            className.includes(term) || divisionName.includes(term)) {
+        // Check if class filter is applied and matches
+        const classMatch = !classId || rowClassId == classId;
+        
+        if (classMatch && (subjectName.includes(term) || subjectCode.includes(term) || 
+            className.includes(term) || divisionName.includes(term))) {
             row.show();
         } else {
             row.hide();
