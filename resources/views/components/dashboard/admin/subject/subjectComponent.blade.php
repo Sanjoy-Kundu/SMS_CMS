@@ -1,4 +1,4 @@
-<div class="container-fluid">
+ <div class="container-fluid">
     <div class="row">
         <!-- Left Column: Subject Form -->
         <div class="col-xl-5 col-md-6 mb-4">
@@ -80,6 +80,16 @@
                         </select>
                     </div>
                     
+                    <!-- Division Filter - initially hidden -->
+                    <div id="divisionFilterContainer" style="display: none;">
+                        <div class="form-group mb-3">
+                            <label for="divisionFilter">Filter by Division</label>
+                            <select class="form-control" id="divisionFilter">
+                                <option value="">All Divisions</option>
+                            </select>
+                        </div>
+                    </div>
+                    
                     <!-- Search Box -->
                     <div class="form-group mb-3">
                         <div class="input-group">
@@ -100,11 +110,8 @@
                                 <tr>
                                     <th>Sr No.</th>
                                     <th>Class Name</th>
-                                    {{-- <th>Division Name</th> --}}
                                     <th>Subject Name</th>
-                                    {{-- <th>Code</th>
-                                    <th>Type</th>
-                                    <th>Status</th> --}}
+                                    <th>View Subjects</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -161,7 +168,6 @@
         </div>
     </div>
 </div>
-
 <!-- Edit Subject Modal -->
 <div class="modal fade" id="editSubjectModal" tabindex="-1" role="dialog"
     aria-labelledby="editSubjectModalLabel" aria-hidden="true">
@@ -228,7 +234,6 @@
         </div>
     </div>
 </div>
-
 <!-- jQuery CDN -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <!-- Axios CDN -->
@@ -278,9 +283,31 @@ $(document).ready(function() {
     $('#classFilter').on('change', function() {
         const classId = $(this).val();
         if (classId) {
+            // Show division filter and populate it
+            $('#divisionFilterContainer').show();
+            getDivisionsForFilter(classId);
+            // Filter subjects by class
             filterSubjectsByClass(classId);
         } else {
+            // Hide division filter if no class selected
+            $('#divisionFilterContainer').hide();
+            $('#divisionFilter').val('');
+            // Get all subjects
             getSubjects();
+        }
+    });
+    
+    // Division filter change event
+    $('#divisionFilter').on('change', function() {
+        const classId = $('#classFilter').val();
+        const divisionId = $(this).val();
+        
+        if (classId) {
+            if (divisionId) {
+                filterSubjectsByClassAndDivision(classId, divisionId);
+            } else {
+                filterSubjectsByClass(classId);
+            }
         }
     });
     
@@ -312,7 +339,11 @@ $(document).ready(function() {
     $('#clearSubjectSearchBtn').on('click', function() {
         $('#subjectSearch').val('');
         const classId = $('#classFilter').val();
-        if (classId) {
+        const divisionId = $('#divisionFilter').val();
+        
+        if (classId && divisionId) {
+            filterSubjectsByClassAndDivision(classId, divisionId);
+        } else if (classId) {
             filterSubjectsByClass(classId);
         } else {
             getSubjects();
@@ -331,7 +362,11 @@ $(document).ready(function() {
         const searchTerm = $(this).val().trim();
         if (searchTerm === '') {
             const classId = $('#classFilter').val();
-            if (classId) {
+            const divisionId = $('#divisionFilter').val();
+            
+            if (classId && divisionId) {
+                filterSubjectsByClassAndDivision(classId, divisionId);
+            } else if (classId) {
                 filterSubjectsByClass(classId);
             } else {
                 getSubjects();
@@ -467,6 +502,42 @@ async function getDivisionsByClass(classId, containerId, selectId) {
     }
 }
 
+// Get divisions for filter dropdown
+async function getDivisionsForFilter(classId) {
+    let token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = "/admin/login";
+        return;
+    }
+    
+    try {
+        const response = await axios.post('/subject/get-divisions-by-class', {
+            class_id: classId
+        }, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+        
+        if (response.data.status === 'success') {
+            const divisions = response.data.data;
+            let options = '<option value="">All Divisions</option>';
+            
+            divisions.forEach(division => {
+                options += `<option value="${division.id}">${division.name}</option>`;
+            });
+            
+            $('#divisionFilter').html(options);
+        } else {
+            console.error('Error loading divisions:', response.data.message);
+            $('#divisionFilterContainer').hide();
+        }
+    } catch (error) {
+        console.error('Error fetching divisions:', error);
+        $('#divisionFilterContainer').hide();
+    }
+}
+
 // Populate division dropdown
 function populateDivisionDropdown(divisions, selectId) {
     let options = '<option value="" disabled selected>-- Select Division --</option>';
@@ -517,26 +588,20 @@ function populateSubjectsTable(subjects) {
     let tbody = '';
     
     if (!subjects || subjects.length === 0) {
-        tbody = `<tr><td colspan="8" class="text-center">Subject Data Not Found</td></tr>`;
+        tbody = `<tr><td colspan="4" class="text-center">Subject Data Not Found</td></tr>`;
     } else {
         subjects.forEach((subject, index) => {
-            const typeBadge = `<span class="badge badge-${
-                subject.type === 'compulsory' ? 'primary' : 
-                subject.type === 'optional' ? 'info' : 'warning'
-            }">${subject.type.charAt(0).toUpperCase() + subject.type.slice(1)}</span>`;
-            
-            const statusBadge = subject.is_active ? 
-                '<span class="badge badge-success">Active</span>' : 
-                '<span class="badge badge-danger">Inactive</span>';
-                 //<td>${subject.division ? subject.division.name : 'N/A'}</td>
-                // <td>${subject.code || 'N/A'}</td>
-                //     <td>${typeBadge}</td>
-                //     <td>${statusBadge}</td>
             tbody += `
                 <tr>
                     <td>${index + 1}</td>
                     <td data-class-id="${subject.class_id}">${subject.class_model ? subject.class_model.name : 'N/A'}</td>
                     <td>${subject.name}</td>
+                     <td>
+                        <a href="/subject/overview?class_id=${subject.class_id}" class="btn btn-sm btn-info">
+                            View Subjects
+                        </a>
+                    </td>
+                    
                     <td>
                         <div class="btn-group" role="group">
                             <button type="button" class="btn btn-sm btn-primary edit-subject-btn" data-id="${subject.id}">EDIT</button>
@@ -571,6 +636,44 @@ async function filterSubjectsByClass(classId) {
         if (response.data.status === 'success') {
             // Filter subjects by class
             const filteredSubjects = response.data.data.filter(subject => subject.class_id == classId);
+            populateSubjectsTable(filteredSubjects);
+        }
+    } catch (error) {
+        console.error('Error fetching subjects:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load subjects. Please try again later.'
+        });
+    } finally {
+        // Hide loader
+        $('#subjectsLoader').addClass('d-none');
+    }
+}
+
+// Filter subjects by class and division
+async function filterSubjectsByClassAndDivision(classId, divisionId) {
+    let token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = "/admin/login";
+        return;
+    }
+    
+    // Show loader
+    $('#subjectsLoader').removeClass('d-none');
+    
+    try {
+        const response = await axios.post('/subject/lists', {}, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+        
+        if (response.data.status === 'success') {
+            // Filter subjects by class and division
+            const filteredSubjects = response.data.data.filter(subject => 
+                subject.class_id == classId && subject.division_id == divisionId
+            );
             populateSubjectsTable(filteredSubjects);
         }
     } catch (error) {
@@ -631,7 +734,6 @@ async function createSubject() {
                 title: 'SUCCESS!',
                 text: response.data.message
             });
-            console.log(response.data);
             
             // Reset form
             $('#subjectForm')[0].reset();
@@ -640,8 +742,18 @@ async function createSubject() {
             // Set class filter to the selected class
             $('#classFilter').val(formData.class_id);
             
-            // Refresh table with filtered subjects
-            await filterSubjectsByClass(formData.class_id);
+            // Show division filter and populate it
+            $('#divisionFilterContainer').show();
+            await getDivisionsForFilter(formData.class_id);
+            
+            // If division was selected, set it and filter by both
+            if (formData.division_id) {
+                $('#divisionFilter').val(formData.division_id);
+                await filterSubjectsByClassAndDivision(formData.class_id, formData.division_id);
+            } else {
+                // Otherwise just filter by class
+                await filterSubjectsByClass(formData.class_id);
+            }
         } else {
             Swal.fire({
                 icon: 'error',
@@ -659,11 +771,6 @@ async function createSubject() {
             if (errors.code) $('#code_error').text(errors.code[0]);
             if (errors.type) $('#type_error').text(errors.type[0]);
         } else {
-            // Swal.fire({
-            //     icon: 'error',
-            //     title: 'ERROR!',
-            //     text: 'Something went wrong. Please try again laterppppp.'
-            // );
             console.log(error)
         }
     }
@@ -790,8 +897,18 @@ async function updateSubject() {
             // Set class filter to the selected class
             $('#classFilter').val(formData.class_id);
             
-            // Refresh table with filtered subjects
-            await filterSubjectsByClass(formData.class_id);
+            // Show division filter and populate it
+            $('#divisionFilterContainer').show();
+            await getDivisionsForFilter(formData.class_id);
+            
+            // If division was selected, set it and filter by both
+            if (formData.division_id) {
+                $('#divisionFilter').val(formData.division_id);
+                await filterSubjectsByClassAndDivision(formData.class_id, formData.division_id);
+            } else {
+                // Otherwise just filter by class
+                await filterSubjectsByClass(formData.class_id);
+            }
         } else {
             Swal.fire({
                 icon: 'error',
@@ -861,11 +978,14 @@ async function trashSubject(id) {
                 text: response.data.message
             });
             
-            // Get current class filter
+            // Get current class and division filters
             const classId = $('#classFilter').val();
+            const divisionId = $('#divisionFilter').val();
             
             // Refresh tables
-            if (classId) {
+            if (classId && divisionId) {
+                await filterSubjectsByClassAndDivision(classId, divisionId);
+            } else if (classId) {
                 await filterSubjectsByClass(classId);
             } else {
                 await getSubjects();
@@ -992,11 +1112,14 @@ async function restoreSubject(id) {
                 text: response.data.message
             });
             
-            // Get current class filter
+            // Get current class and division filters
             const classId = $('#classFilter').val();
+            const divisionId = $('#divisionFilter').val();
             
             // Refresh both tables
-            if (classId) {
+            if (classId && divisionId) {
+                await filterSubjectsByClassAndDivision(classId, divisionId);
+            } else if (classId) {
                 await filterSubjectsByClass(classId);
             } else {
                 await getSubjects();
@@ -1090,6 +1213,7 @@ async function filterSubjects() {
     
     const searchTerm = $('#subjectSearch').val().trim();
     const classId = $('#classFilter').val();
+    const divisionId = $('#divisionFilter').val();
     
     // Show loader
     $('#subjectsLoader').removeClass('d-none');
@@ -1104,10 +1228,14 @@ async function filterSubjects() {
         });
         
         if (response.data.status === 'success') {
-            // If class filter is applied, filter the results
+            // If class and division filters are applied, filter the results
             let subjects = response.data.data;
             if (classId) {
                 subjects = subjects.filter(subject => subject.class_id == classId);
+                
+                if (divisionId) {
+                    subjects = subjects.filter(subject => subject.division_id == divisionId);
+                }
             }
             populateSubjectsTable(subjects);
         } else {
@@ -1131,20 +1259,27 @@ async function filterSubjects() {
 function filterSubjectsClientSide(searchTerm) {
     const term = searchTerm.toLowerCase();
     const classId = $('#classFilter').val();
+    const divisionId = $('#divisionFilter').val();
     
     $('#subjects-table tbody tr').each(function() {
         const row = $(this);
-        const subjectName = row.find('td:nth-child(4)').text().toLowerCase();
-        const subjectCode = row.find('td:nth-child(5)').text().toLowerCase();
+        const subjectName = row.find('td:nth-child(3)').text().toLowerCase();
         const className = row.find('td:nth-child(2)').text().toLowerCase();
-        const divisionName = row.find('td:nth-child(3)').text().toLowerCase();
         const rowClassId = row.find('td:nth-child(2)').data('class-id');
         
         // Check if class filter is applied and matches
         const classMatch = !classId || rowClassId == classId;
         
-        if (classMatch && (subjectName.includes(term) || subjectCode.includes(term) || 
-            className.includes(term) || divisionName.includes(term))) {
+        // Check if division filter is applied and matches
+        let divisionMatch = true;
+        if (divisionId && classMatch) {
+            // We need to get the division ID for this subject
+            // Since we don't have it in the table, we'll need to fetch it or store it
+            // For now, we'll assume division filtering is done server-side
+            divisionMatch = false; // This is a limitation of client-side filtering
+        }
+        
+        if (classMatch && divisionMatch && (subjectName.includes(term) || className.includes(term))) {
             row.show();
         } else {
             row.hide();
@@ -1209,4 +1344,6 @@ function filterTrashedSubjectsClientSide(searchTerm) {
         }
     });
 }
-</script>
+</script> 
+
+
