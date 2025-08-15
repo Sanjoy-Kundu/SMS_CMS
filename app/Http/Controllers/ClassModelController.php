@@ -11,30 +11,36 @@ use Illuminate\Validation\ValidationException;
 
 class ClassModelController extends Controller
 {
-    public function classModelLists()
-    {
-        try {
-            $admin = Admin::where('user_id', auth()->id())->first();
-            if ($admin) {
-                $classModels = ClassModel::where('admin_id', $admin->id)->with('academicSection')->get();
+public function classModelLists()
+{
+    try {
+        $admin = Admin::where('user_id', auth()->id())->first();
 
-                return response()->json([
-                    'status' => 'success',
-                    'data' => $classModels,
-                ]);
-            } else {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'You are not authorized to access this resource',
-                ]);
-            }
-        } catch (\Exception $e) {
+        if (!$admin) {
             return response()->json([
-                'status' => 'fail',
-                'message' => $e->getMessage(),
-            ]);
+                'status' => 'error',
+                'message' => 'You are not authorized to access this resource',
+            ], 403);
         }
+
+        $classModels = ClassModel::where('admin_id', $admin->id)
+            ->with('academicSection')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $classModels,
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'fail',
+            'message' => config('app.debug') ? $e->getMessage() : 'Something went wrong.',
+        ], 500);
     }
+}
+
 
     /**
      * Class Model Create

@@ -434,116 +434,57 @@ class SubjectController extends Controller
    /**
      * Subject OverView
      */
-    // Get data for subject overview
-public function subjectOverviewData(Request $request)
-{
-    try {
-        $query = Subject::with(['classModel', 'division', 'admin.user']);
 
-        // Apply class filter if provided
-        if ($request->class_id) {
-            $query->where('class_id', $request->class_id);
-        }
-
-        $subjects = $query->orderBy('class_id')->orderBy('division_id')->get();
-
-        // Group subjects by class and division
-        $groupedSubjects = [];
-        
-        foreach ($subjects as $subject) {
-            $className = $subject->classModel->name;
-            $divisionName = $subject->division ? $subject->division->name : 'General';
-            
-            if (!isset($groupedSubjects[$className])) {
-                $groupedSubjects[$className] = [
-                    'class_id' => $subject->class_id,
-                    'divisions' => []
-                ];
-            }
-            
-            if (!isset($groupedSubjects[$className]['divisions'][$divisionName])) {
-                $groupedSubjects[$className]['divisions'][$divisionName] = [
-                    'division_id' => $subject->division_id,
-                    'subjects' => []
-                ];
-            }
-            
-            $groupedSubjects[$className]['divisions'][$divisionName]['subjects'][] = [
-                'id' => $subject->id,
-                'name' => $subject->name,
-                'code' => $subject->code,
-                'type' => $subject->type,
-                'is_active' => $subject->is_active
-            ];
-        }
-
-        // Get all classes for the filter dropdown
-        $classes = ClassModel::orderBy('name')->get();
-        
-        // Get institution info
-        $institution = Institution::with('admin.user')->first();
-
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'grouped_subjects' => $groupedSubjects,
-                'classes' => $classes,
-                'institution' => $institution
-            ]
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Failed to load overview data: ' . $e->getMessage()
-        ], 500);
-    }
-}
 
 // Add these methods to your SubjectController
 
-public function getAcademicSections(Request $request)
-{
-    try {
-        $adminId = auth()->user()->admin->id;
-        $sections = AcademicSection::where('admin_id', $adminId)
-            ->select('id', 'section_type')
-            ->distinct()
-            ->get();
-
-        return response()->json([
-            'status' => 'success',
-            'data' => $sections
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Failed to load academic sections: ' . $e->getMessage()
-        ], 500);
-    }
+ public function getAcademicSections(Request $request){
+        try {
+            $adminId = auth()->user()->admin->id;
+            $institution = Institution::where('admin_id', $adminId)->first();
+            
+            $sections = AcademicSection::where('admin_id', $adminId)
+                ->select('id', 'section_type')
+                ->distinct()
+                ->get();
+                
+            return response()->json([
+                'status' => 'success',
+                'data' => $sections,
+                'institution' => $institution
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to load academic sections: ' . $e->getMessage()
+            ], 500);
+        }
 }
+
 
 public function getClassesBySection(Request $request)
-{
-    try {
-        $adminId = auth()->user()->admin->id;
-        $academicSectionId = $request->academic_section_id;
-
-        $classes = ClassModel::where('academic_section_id', $academicSectionId)
-            ->where('admin_id', $adminId)
-            ->orderBy('name')
-            ->get();
-
-        return response()->json([
-            'status' => 'success',
-            'data' => $classes
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Failed to load classes: ' . $e->getMessage()
-        ], 500);
+    {
+        try {
+            $adminId = auth()->user()->admin->id;
+            $academicSectionId = $request->academic_section_id;
+            
+            $classes = ClassModel::where('academic_section_id', $academicSectionId)
+                ->where('admin_id', $adminId)
+                ->orderBy('name')
+                ->get();
+                
+            return response()->json([
+                'status' => 'success',
+                'data' => $classes
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to load classes: ' . $e->getMessage()
+            ], 500);
+        }
     }
-}
+
 
 public function getSubjectDetailsByClass(Request $request)
 {
@@ -568,4 +509,70 @@ public function getSubjectDetailsByClass(Request $request)
         ], 500);
     }
 }
+
+
+    // Get data for subject overview
+public function subjectOverviewData(Request $request)
+    {
+        try {
+            $query = Subject::with(['classModel', 'division', 'admin.user']);
+            
+            // Apply class filter if provided
+            if ($request->class_id) {
+                $query->where('class_id', $request->class_id);
+            }
+            
+            $subjects = $query->orderBy('class_id')->orderBy('division_id')->get();
+            
+            // Group subjects by class and division
+            $groupedSubjects = [];
+            
+            foreach ($subjects as $subject) {
+                $className = $subject->classModel->name;
+                $divisionName = $subject->division ? $subject->division->name : 'General';
+                
+                if (!isset($groupedSubjects[$className])) {
+                    $groupedSubjects[$className] = [
+                        'class_id' => $subject->class_id,
+                        'divisions' => []
+                    ];
+                }
+                
+                if (!isset($groupedSubjects[$className]['divisions'][$divisionName])) {
+                    $groupedSubjects[$className]['divisions'][$divisionName] = [
+                        'division_id' => $subject->division_id,
+                        'subjects' => []
+                    ];
+                }
+                
+                $groupedSubjects[$className]['divisions'][$divisionName]['subjects'][] = [
+                    'id' => $subject->id,
+                    'name' => $subject->name,
+                    'code' => $subject->code,
+                    'type' => $subject->type,
+                    'is_active' => $subject->is_active
+                ];
+            }
+            
+            // Get all classes for the filter dropdown
+            $classes = ClassModel::orderBy('name')->get();
+            
+            // Get institution info
+            $institution = Institution::with('admin.user')->first();
+            
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'grouped_subjects' => $groupedSubjects,
+                    'classes' => $classes,
+                    'institution' => $institution
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to load overview data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

@@ -403,35 +403,61 @@
     }
     
     // Get Class Models
-    async function getClassModels() {
-        let token = localStorage.getItem('token');
-        if (!token) {
+async function getClassModels() {
+    let token = localStorage.getItem('token');
+
+    // Token না থাকলে সরাসরি লগইন পেইজে পাঠানো
+    if (!token) {
+        alert('Unauthorized Access. Please login first.');
+        window.location.href = "/admin/login";
+        return;
+    }
+
+    // Loader show
+    $('#classModelsLoader').removeClass('d-none');
+
+    try {
+        const response = await axios.get('/class-model/lists', {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+        if (response.data.status === 'success') {
+            const sortedData = response.data.data.sort((a, b) => a.id - b.id);
+
+            // Table populate
+            populateClassModelsTable(sortedData);
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning',
+                text: response.data.message || 'No data found'
+            });
+        }
+
+    } catch (error) {
+        console.error('Error fetching class models:', error);
+
+        // Token expire হলে লগআউট
+        if (error.response && error.response.status === 401) {
+            localStorage.removeItem('token');
             window.location.href = "/admin/login";
             return;
         }
-        // Show loader
-        $('#classModelsLoader').removeClass('d-none');
-        try {
-            const response = await axios.post('/class-model/lists', {}, {
-                headers: {
-                    'Authorization': 'Bearer ' + token
-                }
-            });
-            if (response.data.status === 'success') {
-                populateClassModelsTable(response.data.data);
-            }
-        } catch (error) {
-            console.error('Error fetching class models:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Fail to load class models. Please try again later'
-            });
-        } finally {
-            // Hide loader
-            $('#classModelsLoader').addClass('d-none');
-        }
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Fail to load class models. Please try again later'
+        });
+
+    } finally {
+        // Loader hide
+        $('#classModelsLoader').addClass('d-none');
     }
+}
+
     
     // Populate Class Models Table
     function populateClassModelsTable(classModels) {
