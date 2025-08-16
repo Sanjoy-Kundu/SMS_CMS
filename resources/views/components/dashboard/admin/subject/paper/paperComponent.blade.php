@@ -1160,7 +1160,7 @@ async function filterPapers() {
                 'Authorization': 'Bearer ' + token
             }
         });
-        if (response.data.success) {  // Fixed: changed from status to success
+        if (response.data.success) {  //
             populatePapersTable(response.data.data);
         } else {
             Swal.fire({
