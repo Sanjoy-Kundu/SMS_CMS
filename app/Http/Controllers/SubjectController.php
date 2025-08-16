@@ -16,7 +16,7 @@ class SubjectController extends Controller
     public function subjectLists(Request $request)
     {
         try {
-            $subjects = Subject::with(['classModel', 'division', 'admin'])
+            $subjects = Subject::with(['classModel', 'division', 'admin','papers'])
                 ->latest()
                 ->get();
             return response()->json([
@@ -156,7 +156,7 @@ class SubjectController extends Controller
     {
         try {
             $subjects = Subject::onlyTrashed()
-                ->with(['classModel', 'division'])->latest()->get();
+                ->with(['classModel', 'division','papers'])->latest()->get();
             return response()->json([
                 'status' => 'success',
                 'data' => $subjects,

@@ -55,7 +55,7 @@ Route::get('/academic', [AdminDashboard::class, 'adminAcademicPage']);
 Route::get('/classes', [AdminDashboard::class, 'adminClassPage']);
 Route::get('/class/division', [AdminDashboard::class, 'adminDivisionPage']);
 Route::get('/class/subject', [AdminDashboard::class, 'adminSubjectPage']);
-Route::get('/subject/overview', [AdminDashboard::class, 'subjectOverview']);
+Route::get('/class/overview', [AdminDashboard::class, 'classOverview']);
 Route::get('/subject/paper', [AdminDashboard::class, 'adminSubjectPaperPage']);
 
 

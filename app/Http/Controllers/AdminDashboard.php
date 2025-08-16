@@ -104,7 +104,7 @@ class AdminDashboard extends Controller
      */
 
     // Subject Overview Page
-    public function subjectOverview()
+    public function classOverview()
     {
         // Get institution info for header
         return view('pages.dashboard.admin.subject.overViewPage');

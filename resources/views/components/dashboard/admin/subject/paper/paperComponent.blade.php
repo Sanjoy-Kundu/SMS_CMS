@@ -6,8 +6,6 @@
                  <div class="card-header bg-white py-3"
                      style="display: flex; justify-content: space-between; align-items: center;">
                      <h5 class="m-0 text-primary font-weight-bold">ADD PAPER</h5>
-                     <button class="btn btn-primary text-white"><a href="{{ url('/paper/overview') }}"
-                             style="color: white; text-decoration: none;">Paper Overview</a></button>
                  </div>
                  <div class="card-body">
                      <form id="PaperForm">

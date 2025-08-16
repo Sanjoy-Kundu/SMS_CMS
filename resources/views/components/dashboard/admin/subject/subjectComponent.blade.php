@@ -6,8 +6,6 @@
                  <div class="card-header bg-white py-3"
                      style="display: flex; justify-content: space-between; align-items: center;">
                      <h5 class="m-0 text-primary font-weight-bold">ADD SUBJECT</h5>
-                     <button class="btn btn-primary text-white"><a href="{{ url('/subject/overview') }}"
-                             style="color: white; text-decoration: none;">Subject Overview</a></button>
                  </div>
                  <div class="card-body">
                      <form id="subjectForm">
@@ -115,7 +113,7 @@
                                      <th>Sr No.</th>
                                      <th>Class Name</th>
                                      <th>Subject Name</th>
-                                     <th>View Subjects</th>
+                                     <th>Code</th>
                                      <th>Action</th>
                                  </tr>
                              </thead>
@@ -159,7 +157,6 @@
                                  <tr>
                                      <th>Sr No.</th>
                                      <th>Subject Name</th>
-                                     <th>Code</th>
                                      <th>Deleted At</th>
                                      <th>Action</th>
                                  </tr>
@@ -591,34 +588,95 @@
      }
 
      // Populate Subjects Table
-     function populateSubjectsTable(subjects) {
-         let tbody = '';
+    function populateSubjectsTable(subjects) {
+        let tbody = '';
 
-         if (!subjects || subjects.length === 0) {
-             tbody = `<tr><td colspan="4" class="text-center">Subject Data Not Found</td></tr>`;
-         } else {
-             subjects.forEach((subject, index) => {
-                 tbody += `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td data-class-id="${subject.class_id}">${subject.class_model ? subject.class_model.name : 'N/A'}</td>
-                    <td>${subject.name} (${subject.code ? subject.code : 'N/A'})</td>
-                     <td>
-                        <a href="/subject/overview?class_id=${subject.class_id}" class="text-primary">View Class</a>
-                    </td>
-                    
-                    <td>
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-sm btn-primary edit-subject-btn" data-id="${subject.id}">EDIT</button>
-                            <button type="button" class="btn btn-sm btn-danger trash-subject-btn" data-id="${subject.id}">TRASH</button>
-                        </div>
-                    </td>
-                </tr>`;
-             });
-         }
+        if (!subjects || subjects.length === 0) {
+            tbody = `<tr><td colspan="5" class="text-center">Subject Data Not Found</td></tr>`;
+        } else {
+            subjects.forEach((subject, index) => {
+                let paperLists = '';
 
-         $('#subjects-table tbody').html(tbody);
-     }
+                if (subject.papers && subject.papers.length > 0) {
+                    paperLists = `<ol style="margin:0; padding-left:18px;">` +
+                        subject.papers.map(paper =>
+                            `<li>${paper.name} ${paper.code ? paper.code : '--'}</li>`
+                        ).join('') +
+                        `</ol>`;
+                } else {
+                    paperLists = `<span class="text-danger">PLEASE ADD SUBJECT PAPER.</span>`;
+                }
+
+                // যদি subject.code থাকে তাহলে শুধু code দেখাবে
+                // না থাকলে পুরো paper list দেখাবে
+                let codeOrPaperList = subject.code
+                    ? subject.code
+                    : paperLists;
+
+                tbody += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td data-class-id="${subject.class_id}">
+                            ${subject.class_model ? subject.class_model.name : 'N/A'}
+                        </td>
+                        <td>
+                            ${subject.name} <br>
+                            Code: 
+                        </td>
+                        <td>
+                            ${codeOrPaperList}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-primary edit-subject-btn" data-id="${subject.id}">EDIT</button>
+                                <button type="button" class="btn btn-sm btn-danger trash-subject-btn" data-id="${subject.id}">TRASH</button>
+                            </div>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        $('#subjects-table tbody').html(tbody);
+    }
+
+
+     //  function populateSubjectsTable(subjects) {
+     //      let tbody = '';
+
+     //      if (!subjects || subjects.length === 0) {
+     //          tbody = `<tr><td colspan="4" class="text-center">Subject Data Not Found</td></tr>`;
+     //      } else {
+     //          subjects.forEach((subject, index) => {
+     //             let paperLists = subject.papers.length;
+     //             if(subject.papers.length > 0){
+     //                 console.log('paper ace');
+     //                 paperLists = subject.papers;
+     //             }else{
+     //                 paperLists = "PLEASE ADDED SUBJECT PAPER."
+     //             }
+     //             //console.log(paperLists);
+     //          console.log(subject);
+     //              tbody += `
+    //             <tr>
+    //                 <td>${index + 1}</td>
+    //                 <td data-class-id="${subject.class_id}">${subject.class_model ? subject.class_model.name : 'N/A'}</td>
+    //                 <td>${subject.name} (${subject.code ? subject.code : '-- paperlist bosao '})</td>
+    //                  <td>
+    //                     <a href="/subject/overview?class_id=${subject.class_id}" class="text-primary">View Class</a>
+    //                 </td>
+
+    //                 <td>
+    //                     <div class="btn-group" role="group">
+    //                         <button type="button" class="btn btn-sm btn-primary edit-subject-btn" data-id="${subject.id}">EDIT</button>
+    //                         <button type="button" class="btn btn-sm btn-danger trash-subject-btn" data-id="${subject.id}">TRASH</button>
+    //                     </div>
+    //                 </td>
+    //             </tr>`;
+     //          });
+     //      }
+
+     //      $('#subjects-table tbody').html(tbody);
+     //  }
 
      // Filter subjects by class
      async function filterSubjectsByClass(classId) {
@@ -1049,17 +1107,18 @@
 
      // Populate Trashed Subjects Table
      function populateTrashedSubjectsTable(trashLists) {
-         let tbody = '';
+    let tbody = '';
 
-         if (!trashLists || trashLists.length === 0) {
-             tbody = `<tr><td colspan="5" class="text-center">No Trash Data Found.</td></tr>`;
-         } else {
-             trashLists.forEach((trashData, index) => {
-                 tbody += `
+    if (!trashLists || trashLists.length === 0) {
+        tbody = `<tr><td colspan="6" class="text-center">No Trash Data Found.</td></tr>`;
+    } else {
+        trashLists.forEach((trashData, index) => {
+         
+
+            tbody += `
                 <tr>
                     <td>${index + 1}</td>
                     <td>${trashData.name}</td>
-                    <td>${trashData.code || 'N/A'}</td>
                     <td>${trashData.deleted_at ? trashData.deleted_at.split('T')[0] : 'N/A'}</td>
                     <td>
                         <div class="btn-group" role="group">
@@ -1068,11 +1127,37 @@
                         </div>
                     </td>
                 </tr>`;
-             });
-         }
+        });
+    }
 
-         $('#trashed-subjects-table tbody').html(tbody);
-     }
+    $('#trashed-subjects-table tbody').html(tbody);
+}
+
+    //  function populateTrashedSubjectsTable(trashLists) {
+    //      let tbody = '';
+
+    //      if (!trashLists || trashLists.length === 0) {
+    //          tbody = `<tr><td colspan="5" class="text-center">No Trash Data Found.</td></tr>`;
+    //      } else {
+    //          trashLists.forEach((trashData, index) => {
+    //              tbody += `
+    //             <tr>
+    //                 <td>${index + 1}</td>
+    //                 <td>${trashData.name}</td>
+    //                 <td>${trashData.code || 'N/A'}</td>
+    //                 <td>${trashData.deleted_at ? trashData.deleted_at.split('T')[0] : 'N/A'}</td>
+    //                 <td>
+    //                     <div class="btn-group" role="group">
+    //                         <button type="button" class="btn btn-sm btn-success restore-subject-btn" data-id="${trashData.id}">RESTORE</button>
+    //                         <button type="button" class="btn btn-sm btn-danger delete-subject-btn" data-id="${trashData.id}">PER. DELETE</button>
+    //                     </div>
+    //                 </td>
+    //             </tr>`;
+    //          });
+    //      }
+
+    //      $('#trashed-subjects-table tbody').html(tbody);
+    //  }
 
      // Restore Subject
      $(document).on('click', '.restore-subject-btn', async function() {
