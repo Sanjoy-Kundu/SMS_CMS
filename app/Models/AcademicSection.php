@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\ClassModel;
 use App\Models\Institution;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -23,6 +24,11 @@ class AcademicSection extends Model
 
     public function institution(){
         return $this->belongsTo(Institution::class, 'institution_id');
+    }
+        
+    public function classes()
+    {
+        return $this->hasMany(ClassModel::class, 'academic_section_id');
     }
 
 }

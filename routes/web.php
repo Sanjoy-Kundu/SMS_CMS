@@ -6,11 +6,12 @@ use App\Http\Controllers\PasswordReset;
 use App\Http\Controllers\AdminDashboard;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PaperController;
+use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\ClassModelController;
 use App\Http\Controllers\InstitutionController;
 use App\Http\Controllers\AcademicSectionController;
-use App\Http\Controllers\DivisionController;
-use App\Http\Controllers\SubjectController;
 
 //admin registration and login  page route
 Route::get('/admin/login', [AdminController::class, 'admin_login_page']);
@@ -55,6 +56,8 @@ Route::get('/classes', [AdminDashboard::class, 'adminClassPage']);
 Route::get('/class/division', [AdminDashboard::class, 'adminDivisionPage']);
 Route::get('/class/subject', [AdminDashboard::class, 'adminSubjectPage']);
 Route::get('/subject/overview', [AdminDashboard::class, 'subjectOverview']);
+Route::get('/subject/paper', [AdminDashboard::class, 'adminSubjectPaperPage']);
+
 
 
 
@@ -137,4 +140,21 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/subject/get-classes-by-section', [SubjectController::class, 'getClassesBySection']);
     Route::post('/subject/get-subject-details', [SubjectController::class, 'getSubjectDetailsByClass']);
     //::::::::::::::: Subject Class routes End :::::::::::::::::::::::
+
+
+
+    //::::::::::::::: Paper Class Route Start :::::::::::::::::::::
+    Route::post('/paper/list', [PaperController::class, 'list']);
+    Route::post('/paper/create', [PaperController::class, 'create']);
+    Route::post('/paper/edit-by-id', [PaperController::class, 'editById']);
+    Route::post('/paper/update', [PaperController::class, 'update']);
+    Route::post('/paper/trash', [PaperController::class, 'trash']);
+    Route::post('/paper/trashed-list', [PaperController::class, 'trashedList']);
+    Route::post('/paper/restore', [PaperController::class, 'restore']);
+    Route::post('/paper/delete', [PaperController::class, 'delete']);
+    Route::post('/paper/search', [PaperController::class, 'search']);
+    Route::post('/paper/trashed-search', [PaperController::class, 'trashedSearch']);
+    Route::post('/paper/get-divisions-by-class', [PaperController::class, 'getDivisionsByClass']);
+    Route::post('/paper/get-subjects-by-class-and-division', [PaperController::class, 'getSubjectsByClassAndDivision']);
+    Route::post('/paper/check-code-exists', [PaperController::class, 'checkCodeExists']);
 });

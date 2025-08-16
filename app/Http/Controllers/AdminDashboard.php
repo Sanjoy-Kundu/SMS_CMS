@@ -89,6 +89,16 @@ class AdminDashboard extends Controller
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
         }
     }
+    /**
+     * Subject Page
+     */
+    public function adminSubjectPaperPage(){
+        try{
+            return view('pages.dashboard.admin.subject.paperPage');
+        }catch(Exception $ex){
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
+    }
         /**
      * Subject Overview 
      */

@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use App\Models\Admin;
+use App\Models\Paper;
 use App\Models\Division;
 use App\Models\ClassModel;
+use App\Models\AcademicSection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -24,6 +26,14 @@ class Subject extends Model
         return $this->belongsTo(Division::class, 'division_id');
     }
 
+
+      
+    public function academicSection()
+    {
+        return $this->belongsTo(AcademicSection::class);
+    }
+
+
     public function admin()
     {
         return $this->belongsTo(Admin::class);
@@ -36,6 +46,7 @@ class Subject extends Model
 
     public function papers()
     {
-        return $this->hasMany(SubjectPaper::class);
+        return $this->hasMany(Paper::class);
     }
+ 
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Admin;
+use App\Models\Subject;
 use App\Models\ClassModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -21,5 +22,10 @@ class Division extends Model
     public function admin()
     {
         return $this->belongsTo(Admin::class);
+    }
+      
+    public function subjects()
+    {
+        return $this->hasMany(Subject::class);
     }
 }
