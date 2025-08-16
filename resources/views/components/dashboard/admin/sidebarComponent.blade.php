@@ -47,7 +47,7 @@
                        <a class="collapse-item {{ Request::is('class/division') ? 'active' : '' }}" href="{{ url('/class/division') }}">Divisions</a>
 
                        <a class="collapse-item {{ Request::is('class/subject') ? 'active' : '' }}" href="{{url('/class/subject')}}">Subjects</a>
-                       <a class="collapse-item {{ Request::is('/subject/paper') ? 'active' : '' }}" href="{{url('/subject/paper')}}">Subject Paper</a>
+                       <a class="collapse-item {{ Request::is('subject/paper') ? 'active' : '' }}" href="{{url('/subject/paper')}}">Subject Paper</a>
                    </div>
                </div>
            </li>

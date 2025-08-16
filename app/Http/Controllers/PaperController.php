@@ -400,7 +400,7 @@ class PaperController extends Controller
         }
 
         try {
-            $query = Subject::where('class_id', $request->class_id);
+            $query = Subject::where('class_id', $request->class_id)->whereNull('code');
             
             if ($request->division_id) {
                 $query->where('division_id', $request->division_id);
