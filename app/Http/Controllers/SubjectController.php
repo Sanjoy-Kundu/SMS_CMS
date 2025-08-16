@@ -492,7 +492,7 @@ public function getSubjectDetailsByClass(Request $request)
         $adminId = auth()->user()->admin->id;
         $classId = $request->class_id;
         
-        $subjects = Subject::with(['classModel', 'division', 'admin.user'])
+        $subjects = Subject::with(['classModel', 'division', 'admin.user','papers'])
             ->where('class_id', $classId)
             ->where('admin_id', $adminId)
             ->orderBy('name')
@@ -515,7 +515,7 @@ public function getSubjectDetailsByClass(Request $request)
 public function subjectOverviewData(Request $request)
     {
         try {
-            $query = Subject::with(['classModel', 'division', 'admin.user']);
+            $query = Subject::with(['classModel', 'division', 'admin.user','papers']);
             
             // Apply class filter if provided
             if ($request->class_id) {
@@ -550,7 +550,8 @@ public function subjectOverviewData(Request $request)
                     'name' => $subject->name,
                     'code' => $subject->code,
                     'type' => $subject->type,
-                    'is_active' => $subject->is_active
+                    'is_active' => $subject->is_active,
+                    'papers' => $subject->papers
                 ];
             }
             
