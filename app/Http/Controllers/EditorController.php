@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\User;
 use App\Models\Editor;
 use Illuminate\Support\Str;
@@ -10,16 +11,115 @@ use App\Mail\EditorCreatedMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 
 class EditorController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a Editor LoginFrom
      */
-    public function index()
+        public function editorLoginPage()
     {
-        //
+        try {
+            return view('form.editor.editor_login_form');
+        } catch (Exception $ex) {
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
     }
+
+
+        /**
+     * Editor Login Store
+     */
+    public function editor_login_store(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'email' => 'required|email',
+                'password' => 'required|string|min:8',
+                'role' => 'required|in:editor',
+            ]);
+
+            $user = User::where('email', $validated['email'])->first();
+
+            if (!$user) {
+                return response()->json(
+                    [
+                        'status' => 'error',
+                        'message' => 'Email not found',
+                    ],
+                    404,
+                );
+            }
+
+            if (!Hash::check($validated['password'], $user->password)) {
+                return response()->json(
+                    [
+                        'status' => 'error',
+                        'message' => 'Invalid password',
+                    ],
+                    401,
+                );
+            }
+
+            if ($user->role !== 'editor') {
+                return response()->json(
+                    [
+                        'status' => 'fail',
+                        'message' => 'Access denied! Only Editor can login.',
+                    ],
+                    403,
+                );
+            }
+
+            // Clear old tokens and create new token
+            //$user->tokens()->delete();
+            $token = $user->createToken('token')->plainTextToken;
+
+            return response()->json(
+                [
+                    'status' => 'success',
+                    'message' => 'Login successful',
+                    'token' => $token,
+                    'email' => $user->email,
+                ],
+                200,
+            );
+        } catch (ValidationException $ex) {
+            return response()->json(
+                [
+                    'status' => 'fail',
+                    'errors' => $ex->errors(),
+                ],
+                422,
+            );
+        } catch (\Exception $ex) {
+            return response()->json(
+                [
+                    'status' => 'fail',
+                    'message' => $ex->getMessage(),
+                ],
+                500,
+            );
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Editor Create By Admin Dashboard Form
@@ -108,13 +208,7 @@ class EditorController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+
 
     /**
      * Display the specified resource.

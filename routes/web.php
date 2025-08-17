@@ -13,6 +13,7 @@ use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\ClassModelController;
 use App\Http\Controllers\InstitutionController;
 use App\Http\Controllers\AcademicSectionController;
+use App\Http\Controllers\EditorDashboardController;
 
 //admin registration and login  page route
 Route::get('/admin/login', [AdminController::class, 'admin_login_page']);
@@ -61,6 +62,24 @@ Route::get('/subject/paper', [AdminDashboard::class, 'adminSubjectPaperPage']);
 
 //admin dashboard editor Creation page route
 Route::get('/editor/create', [AdminDashboard::class, 'adminEditorCreatePage']);
+
+
+
+
+
+
+
+
+//editor Dashboard page Route
+Route::get('/editor/login', [EditorController::class, 'editorLoginPage']);
+Route::post('/editor/login/store', [EditorController::class, 'editor_login_store']);
+
+//editor dashboard page
+Route::get('/editor/dashboard', [EditorDashboardController::class, 'editorDashboardPage']);
+
+
+
+
 
 
 
@@ -162,10 +181,11 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/paper/get-subjects-by-class-and-division', [PaperController::class, 'getSubjectsByClassAndDivision']);
     Route::post('/paper/check-code-exists', [PaperController::class, 'checkCodeExists']);
 
-
-
-
-
     //::::::::::::::: Editor Create By Admin :::::::::::::::::::::::
     Route::post('/editor/store', [EditorController::class, 'editorStore']);
+});
+
+
+Route::middleware(['auth:sanctum', 'editor'])->group(function () {
+    
 });
