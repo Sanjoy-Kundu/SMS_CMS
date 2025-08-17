@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminDashboard;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PaperController;
+use App\Http\Controllers\EditorController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\ClassModelController;
@@ -57,6 +58,9 @@ Route::get('/class/division', [AdminDashboard::class, 'adminDivisionPage']);
 Route::get('/class/subject', [AdminDashboard::class, 'adminSubjectPage']);
 Route::get('/class/overview', [AdminDashboard::class, 'classOverview']);
 Route::get('/subject/paper', [AdminDashboard::class, 'adminSubjectPaperPage']);
+
+//admin dashboard editor Creation page route
+Route::get('/editor/create', [AdminDashboard::class, 'adminEditorCreatePage']);
 
 
 
@@ -157,4 +161,11 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/paper/get-divisions-by-class', [PaperController::class, 'getDivisionsByClass']);
     Route::post('/paper/get-subjects-by-class-and-division', [PaperController::class, 'getSubjectsByClassAndDivision']);
     Route::post('/paper/check-code-exists', [PaperController::class, 'checkCodeExists']);
+
+
+
+
+
+    //::::::::::::::: Editor Create By Admin :::::::::::::::::::::::
+    Route::post('/editor/store', [EditorController::class, 'editorStore']);
 });

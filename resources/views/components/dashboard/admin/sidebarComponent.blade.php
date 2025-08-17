@@ -30,7 +30,7 @@
                 Interface
             </div> --}}
 
-           <!-- Nav Item - Pages Collapse Menu -->
+           <!-- Nav Item - Institutioin Collapse Menu -->
            <li class="nav-item {{ Request::is('institution') ? 'active' : '' }}">
                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAcademic"
                    aria-expanded="false" aria-controls="collapseAcademic">
@@ -41,14 +41,43 @@
                    data-parent="#accordionSidebar">
                    <div class="bg-white py-2 collapse-inner rounded">
                        <h6 class="collapse-header">Manage Academic Data:</h6>
-                       <a class="collapse-item {{ Request::is('institution') ? 'active' : '' }}" href="{{ url('/institution') }}">Institutions</a>
-                       <a class="collapse-item {{ Request::is('academic') ? 'active' : '' }}" href="{{url('/academic')}}">Academic Sections</a>
-                       <a class="collapse-item {{ Request::is('classes') ? 'active' : '' }}" href="{{url('/classes')}}">Classes</a>
-                       <a class="collapse-item {{ Request::is('class/division') ? 'active' : '' }}" href="{{ url('/class/division') }}">Divisions</a>
+                       <a class="collapse-item {{ Request::is('institution') ? 'active' : '' }}"
+                           href="{{ url('/institution') }}">Institutions</a>
+                       <a class="collapse-item {{ Request::is('academic') ? 'active' : '' }}"
+                           href="{{ url('/academic') }}">Academic Sections</a>
+                       <a class="collapse-item {{ Request::is('classes') ? 'active' : '' }}"
+                           href="{{ url('/classes') }}">Classes</a>
+                       <a class="collapse-item {{ Request::is('class/division') ? 'active' : '' }}"
+                           href="{{ url('/class/division') }}">Divisions</a>
 
-                       <a class="collapse-item {{ Request::is('class/subject') ? 'active' : '' }}" href="{{url('/class/subject')}}">Subjects</a>
-                       <a class="collapse-item {{ Request::is('subject/paper') ? 'active' : '' }}" href="{{url('/subject/paper')}}">Subject Paper</a>
-                       <a class="collapse-item {{ Request::is('class/overview') ? 'active' : '' }}" href="{{url('/class/overview')}}">Over View</a>
+                       <a class="collapse-item {{ Request::is('class/subject') ? 'active' : '' }}"
+                           href="{{ url('/class/subject') }}">Subjects</a>
+                       <a class="collapse-item {{ Request::is('subject/paper') ? 'active' : '' }}"
+                           href="{{ url('/subject/paper') }}">Subject Paper</a>
+                       <a class="collapse-item {{ Request::is('class/overview') ? 'active' : '' }}"
+                           href="{{ url('/class/overview') }}" target="_blank">Over View</a>
+                   </div>
+               </div>
+           </li>
+
+           {{-- Nav Item  - Editor Collapse Menu --}}
+           <li class="nav-item {{ Request::is('editor/create') ? 'active' : '' }}">
+               <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseEditor"
+                   aria-expanded="false" aria-controls="collapseEditor">
+                   <i class="fas fa-fw fa-user-edit"></i>
+                   <span>Editor Management</span>
+               </a>
+               <div id="collapseEditor" class="collapse {{ Request::is('editor/create') ? 'show' : '' }}"
+                   data-parent="#accordionSidebar">
+                   <div class="bg-white py-2 collapse-inner rounded">
+                       <h6 class="collapse-header">Manage Editors:</h6>
+
+                       <a class="collapse-item {{ Request::is('editors') ? 'active' : '' }}"
+                           href="{{ url('/editors') }}">All Editors</a>
+                       <a class="collapse-item {{ Request::is('editor/create') ? 'active' : '' }}"
+                           href="{{ url('/editor/create') }}">Create Editor</a>
+                       <a class="collapse-item {{ Request::is('editors/control/panel') ? 'active' : '' }}"
+                           href="{{ url('/editors/permissions') }}">Control Panel</a>
                    </div>
                </div>
            </li>

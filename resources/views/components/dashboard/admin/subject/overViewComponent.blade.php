@@ -348,7 +348,7 @@ function displaySubjectDetails(subjects) {
             tableHtml += `
                 <tr>
                     <td rowspan="${totalRows}" class="division-row">${divisionName}</td>
-                    ${generateDivisionRows(division, true)}
+                    ${generateDivisionRows(division, true, true)}
                 </tr>
             `;
         });
@@ -388,11 +388,12 @@ function displaySubjectDetails(subjects) {
             
             // Add type row with rowspan
             tableHtml += `
-                <tr>
-                    <td rowspan="${totalRows}" class="type-row">${type.charAt(0).toUpperCase() + type.slice(1)}</td>
-                    ${generateSubjectRowsWithPapers(subjectsOfType, true)}
-                </tr>
-            `;
+                    <tr>
+                        <td rowspan="${totalRows}" class="type-row">${type.charAt(0).toUpperCase() + type.slice(1)}</td>
+                        ${generateSubjectRowsWithPapers(subjectsOfType, true, false)}
+                    </tr>
+                `;
+
         });
         
         tableHtml += `
@@ -404,7 +405,7 @@ function displaySubjectDetails(subjects) {
     container.html(tableHtml);
 }
 // Generate division rows with all types
-function generateDivisionRows(division, isFirstRow) {
+function generateDivisionRows(division, isFirstRow, isDivisionCase) {
     let html = '';
     let firstTypeProcessed = false;
     
@@ -424,7 +425,7 @@ function generateDivisionRows(division, isFirstRow) {
             // First type in the division
             html += `
                 <td rowspan="${totalRows}" class="type-row">${type.charAt(0).toUpperCase() + type.slice(1)}</td>
-                ${generateSubjectRowsWithPapers(subjectsOfType, true)}
+                ${generateSubjectRowsWithPapers(subjectsOfType, true, isDivisionCase)}
             `;
             firstTypeProcessed = true;
         } else {
@@ -432,7 +433,7 @@ function generateDivisionRows(division, isFirstRow) {
             html += `
                 <tr>
                     <td rowspan="${totalRows}" class="type-row">${type.charAt(0).toUpperCase() + type.slice(1)}</td>
-                    ${generateSubjectRowsWithPapers(subjectsOfType, false)}
+                    ${generateSubjectRowsWithPapers(subjectsOfType, false, isDivisionCase)}
                 </tr>
             `;
         }
@@ -442,7 +443,7 @@ function generateDivisionRows(division, isFirstRow) {
 }
 
 // Generate subject rows with papers
-function generateSubjectRowsWithPapers(subjects, isFirstRow) {
+function generateSubjectRowsWithPapers(subjects, isFirstRow, isDivisionCase) {
     let html = '';
     
     subjects.forEach((subject, subjectIndex) => {
@@ -507,13 +508,28 @@ function generateSubjectRowsWithPapers(subjects, isFirstRow) {
                     }
                 } else {
                     // Subsequent paper rows for this subject
-                    html += `
-                        <tr>
-                            <td>${paper.name}</td>
-                            <td>${paper.code}</td>
-                            <td></td>
-                        </tr>
-                    `;
+                    if (isDivisionCase) {
+                        // For division tables (6 columns)
+                        html += `
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td>${paper.name}</td>
+                                <td>${paper.code}</td>
+                                <td></td>
+                            </tr>
+                        `;
+                    } else {
+                        // For non-division tables (5 columns)
+                        html += `
+                            <tr>
+                                <td></td>
+                                <td>${paper.name}</td>
+                                <td>${paper.code}</td>
+                                <td></td>
+                            </tr>
+                        `;
+                    }
                 }
             });
         }

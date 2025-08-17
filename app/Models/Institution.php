@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Admin;
+use App\Models\Editor;
 use App\Models\AcademicSection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -41,5 +42,12 @@ class Institution extends Model
      public function academicSections()
     {
         return $this->hasMany(AcademicSection::class, 'institution_id');
+    }
+    /**
+     * Relation: Institution has many Editors
+     */
+    public function editors()
+    {
+        return $this->hasMany(Editor::class);
     }
 }
