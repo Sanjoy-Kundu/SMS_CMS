@@ -1,8 +1,29 @@
+<style>
+    /* HTML: <div class="loader"></div> */
+/* Loader bar animation */
+.loader {
+  display: none; /* hidden initially */
+  height: 4px;
+  width: 100%;
+  --c:no-repeat linear-gradient(#6100ee 0 0);
+  background: var(--c),var(--c),#d7b8fc;
+  background-size: 60% 100%;
+  animation: l16 3s infinite;
+  margin-bottom: 10px; /* space above the form */
+}
+@keyframes l16 {
+  0%   {background-position:-150% 0,-150% 0}
+  66%  {background-position: 250% 0,-150% 0}
+  100% {background-position: 250% 0, 250% 0}
+}
+</style>
+
 <div class="container-fluid">
     <div class="row">
 
         <!-- Left Column: editor Form -->
         <div class="col-xl-5 col-md-6 mb-4">
+            <div class="loader" id="loader"></div>
             <div class="card border-left-primary shadow h-100">
                 <div class="card-header bg-white py-3">
                     <h5 class="m-0 text-primary font-weight-bold">Create A New Editor</h5>
@@ -29,14 +50,9 @@
                             <span id="editor_email_error" class="text-danger small"></span>
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-block" onclick="EditorCreate(event)">Add
+                        <button type="submit" class="btn btn-primary btn-block" id="submitBtn" onclick="EditorCreate(event)">Add
                             Editor</button>
                     </form>
-                    <div id="loader"style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="sr-only">Loading...</span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -99,6 +115,7 @@
 
 
 
+
 <!-- jQuery CDN -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
@@ -135,84 +152,66 @@
 
 
 
-    async function EditorCreate(event) {
-        event.preventDefault();
+async function EditorCreate(event) {
+    event.preventDefault();
 
-        let token = localStorage.getItem('token');
-        if (!token) {
-            alert('Unauthorized Access');
-            return;
+    let token = localStorage.getItem('token');
+    if (!token) { alert('Unauthorized Access'); return; }
+
+    // Clear previous errors
+    document.getElementById('editor_name_error').innerText = '';
+    document.getElementById('editor_email_error').innerText = '';
+    document.getElementById('institution_id_error').innerText = '';
+
+    let name = document.getElementById('name').value.trim();
+    let email = document.getElementById('email').value.trim();
+    let institution_id = document.getElementById('institution_id').value.trim();
+
+    let isError = false;
+    if (name === '') { document.getElementById('editor_name_error').innerText = 'Name is required'; isError = true; }
+    if (email === '') { document.getElementById('editor_email_error').innerText = 'Email is required'; isError = true; }
+    if (institution_id === '') { document.getElementById('institution_id_error').innerText = 'Institution is required'; isError = true; }
+    if (isError) return;
+
+    let data = { name, email, institution_id };
+
+    // Show loader
+    document.getElementById('loader').style.display = 'block';
+    const formElements = document.getElementById('editorForm').elements;
+    for (let el of formElements) el.disabled = true;
+
+    try {
+        let res = await axios.post('/editor/store', data, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.data.status === 'success') {
+            Swal.fire('Success', res.data.message, 'success');
+            // Reset form
+            document.getElementById('name').value = '';
+            document.getElementById('email').value = '';
         }
+    } catch (error) {
+        if (error.response) {
+            if (error.response.status === 422) {
+                let errors = error.response.data.errors || {};
+                document.getElementById('editor_name_error').innerText = errors.name ? errors.name[0] : '';
+                document.getElementById('editor_email_error').innerText = errors.email ? errors.email[0] : '';
+                document.getElementById('institution_id_error').innerText = errors.institution_id ? errors.institution_id[0] : '';
 
-        // Clear previous errors
-        document.getElementById('editor_name_error').innerText = '';
-        document.getElementById('editor_email_error').innerText = '';
-        document.getElementById('institution_id_error').innerText = '';
-
-        let name = document.getElementById('name').value.trim();
-        let email = document.getElementById('email').value.trim();
-        let institution_id = document.getElementById('institution_id').value.trim();
-
-        let isError = false;
-        if (name === '') {
-            document.getElementById('editor_name_error').innerText = 'Name is required';
-            isError = true;
-        }
-        if (email === '') {
-            document.getElementById('editor_email_error').innerText = 'Email is required';
-            isError = true;
-        }
-        if (institution_id === '') {
-            document.getElementById('institution_id_error').innerText = 'Institution is required';
-            isError = true;
-        }
-        if (isError) return;
-
-        let data = {
-            name: name,
-            email: email,
-            institution_id: institution_id
-        };
-
-        // Show loader
-        document.getElementById('loader').style.display = 'flex';
-
-        try {
-            let res = await axios.post('/editor/store', data, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (res.data.status === 'success') {
-                Swal.fire('Success', res.data.message, 'success');
-                // Reset form
-                document.getElementById('name').value = '';
-                document.getElementById('email').value = '';
-            }
-        } catch (error) {
-            if (error.response) {
-                // Validation or duplicate error
-                if (error.response.status === 422) {
-                    let errors = error.response.data.errors || {};
-                    document.getElementById('editor_name_error').innerText = errors.name ? errors.name[0] : '';
-                    document.getElementById('editor_email_error').innerText = errors.email ? errors.email[0] : '';
-                    document.getElementById('institution_id_error').innerText = errors.institution_id ? errors
-                        .institution_id[0] : '';
-
-                    // Duplicate editor error
-                    if (error.response.data.message && !errors.name && !errors.email) {
-                        Swal.fire('Error', error.response.data.message, 'error');
-                    }
-                } else {
-                    Swal.fire('Error', 'Something went wrong', 'error');
+                if (error.response.data.message && !errors.name && !errors.email && !errors.institution_id) {
+                    Swal.fire('Error', error.response.data.message, 'error');
                 }
             } else {
-                Swal.fire('Error', 'Network or server error', 'error');
+                Swal.fire('Error', 'Something went wrong', 'error');
             }
-        } finally {
-            // Hide loader
-            document.getElementById('loader').style.display = 'none';
+        } else {
+            Swal.fire('Error', 'Network or server error', 'error');
         }
+    } finally {
+        // Hide loader after request finished
+        document.getElementById('loader').style.display = 'none';
+        for (let el of formElements) el.disabled = false;
     }
+}
 </script>
