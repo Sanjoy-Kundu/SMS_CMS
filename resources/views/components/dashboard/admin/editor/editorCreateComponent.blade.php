@@ -30,7 +30,7 @@
                 </div>
                 <div class="card-body">
                     <form id="editorForm">
-                        <div class="form-group">
+                        <div class="form-group" hidden>
                             <label for="name">Institution Id</label>
                             <input type="text" class="form-control" id="institution_id" name="institution_id"
                                 placeholder="Enter institution id">
