@@ -179,14 +179,9 @@ Route::get('/editor/dashboard', [EditorDashboardController::class, 'editorDashbo
 Route::get('/editor/profile', [EditorDashboardController::class, 'editorProfilePage']);
 
 
-
-
-
-
 Route::middleware(['auth:sanctum', 'editor'])->group(function () {
     Route::post('/auth/editor/details', [EditorDashboardController::class, 'editorDetails']);
     Route::post('/editor/update-profile', [EditorDashboardController::class, 'editorUpdateProfile']);
     Route::post('/editor/password/update', [EditorDashboardController::class, 'editorUpdatePassword']);
-
     Route::post('/editor/logout', [EditorDashboardController::class, 'logout']);
 });
