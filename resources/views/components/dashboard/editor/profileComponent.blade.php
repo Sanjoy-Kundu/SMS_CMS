@@ -233,7 +233,7 @@
             });
 
             if (res.data.status === 'success') {
-                console.log(res.data.data.editors[0]);
+               // console.log(res.data.data.editors[0]);
                 let editorDetails = res.data.data.editors[0]
                 document.querySelector('.profile_name').innerHTML = res.data.data.name || 'N/A';
                 document.querySelector('.profile_email').innerHTML = res.data.data.email || 'N/A';

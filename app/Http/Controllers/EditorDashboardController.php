@@ -140,7 +140,7 @@ class EditorDashboardController extends Controller
             $uploadPath = 'uploads/editor/profile/';
 
             $image->move(public_path($uploadPath), $imageName);
-            $editor->image = $uploadPath . $imageName;
+            $editor->image = $imageName;
         }
 
         $editor->save();

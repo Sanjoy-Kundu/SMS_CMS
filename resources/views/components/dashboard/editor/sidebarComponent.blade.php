@@ -16,11 +16,13 @@
            <hr class="sidebar-divider my-0">
 
            <!-- Nav Item - Dashboard -->
-           <li class="nav-item active">
-               <a class="nav-link" href="{{ url('/editor/dashboard') }}">
-                   <i class="fas fa-fw fa-tachometer-alt"></i>
-                   <span>Dashboard</span></a>
-           </li>
+            <li class="nav-item {{ Request::is('editor/dashboard') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ url('/editor/dashboard') }}">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
 
            <!-- Divider -->
            <hr class="sidebar-divider">
@@ -32,22 +34,25 @@
 
 
            {{-- Nav Item  - Editor Collapse Menu --}}
-           <li class="nav-item">
+           <li class="nav-item {{ Request::is('editor/profile') ? 'active' : '' }}">
                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseEditor"
-                   aria-expanded="false" aria-controls="collapseEditor">
+                   aria-expanded="{{ Request::is('editor/profile') ? 'true' : 'false' }}"
+                   aria-controls="collapseEditor">
                    <i class="fas fa-fw fa-user-edit"></i>
                    <span>My Profile</span>
                </a>
-               <div id="collapseEditor" class="collapse"
+               <div id="collapseEditor" class="collapse {{ Request::is('editor/profile') ? 'show' : '' }}"
                    data-parent="#accordionSidebar">
                    <div class="bg-white py-2 collapse-inner rounded">
                        <h6 class="collapse-header">Manage Profile:</h6>
-
-                       <a class="collapse-item" href="">View Profile</a>
-                       <a class="collapse-item"href="">Update Profile</a>
+                       <a class="collapse-item {{ Request::is('editor/profile') ? 'active' : '' }}"
+                           href="{{ url('/editor/profile') }}">
+                           View Profile
+                       </a>
                    </div>
                </div>
            </li>
+
 
 
 

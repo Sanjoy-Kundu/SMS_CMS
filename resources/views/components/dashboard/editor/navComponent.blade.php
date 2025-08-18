@@ -81,7 +81,6 @@
                     window.location.href = '/editor/login';
                     return;
                 }
-                let profileDefault = '/uploads/editor/profile/default.png'
                 try {
                     let res = await axios.post('/auth/editor/details', {}, {
                         headers: {
@@ -92,9 +91,13 @@
 
                     if (res.data.status === 'success') {
                         //console.log('==',)
+                        let editorImage = res.data.data.editors[0].image;
+                        //console.log(editorImage);
                         document.querySelector('.dashboard_name').innerHTML = res.data.data.name ? res.data.data.name :'Not Found';
                         document.querySelector('.dashboard_email').innerHTML = res.data.data.email ? res.data.data.email :'Not Found';
-                        document.querySelector('.nav_profile_image').src = `/uploads/editor/profile/${res.data.data.editors[0].image}`;
+                       document.querySelector('.nav_profile_image').src = editorImage
+                        ? `/uploads/editor/profile/${editorImage}`
+                        : '/uploads/editor/profile/default.png';
                     }
 
                     if (res.data.status === 'error') {
