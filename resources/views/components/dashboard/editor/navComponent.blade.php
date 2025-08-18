@@ -46,19 +46,19 @@
                 <li class="nav-item dropdown no-arrow">
                     <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span class="mr-2 d-none d-lg-inline text-white-800" id="dashboard_name" style="font-size:20px;"></span>
-                        <img class="img-profile rounded-circle" id="nav_profile_image" src="">
+                        <span class="mr-2 d-none d-lg-inline text-white-800 dashboard_name"  style="font-size:20px;"></span>
+                        <img class="img-profile rounded-circle nav_profile_image" src="">
                     </a>
                     <!-- Dropdown - User Information -->
                     <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                         aria-labelledby="userDropdown">
-                        <a class="dropdown-item" href="{{url('/admin/profile')}}" target="_blank">
+                        <a class="dropdown-item" href="{{url('/editor/profile')}}" target="_blank">
                             <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                             Profile
                         </a>
                         <a class="dropdown-item" href="#">
                             <i class="fas fa-envelope fa-sm fa-fw mr-2 text-gray-400"></i>
-                            <span id="dashboard_email"></span>
+                            <span class="dashboard_email"></span>
                         </a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" onclick="logout(event)" style="cursor: pointer">
@@ -81,35 +81,35 @@
                     window.location.href = '/editor/login';
                     return;
                 }
-                let profileDefault = '/uploads/admin/profile/default.png'
-                // try {
-                //     // let res = await axios.post('/auth/admin/details', {}, {
-                //     //     headers: {
-                //     //         'Authorization': `Bearer ${token}`
-                //     //     }
-                //     // });
-                // //      if (res.data.data.admin.image) {
-                // //     document.querySelector('#profile_img_preview').src = res.data.data.admin.image;
-                // // }  
+                let profileDefault = '/uploads/editor/profile/default.png'
+                try {
+                    let res = await axios.post('/auth/editor/details', {}, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
 
-                //     // if (res.data.status === 'success') {
-                //     //     document.querySelector('#dashboard_name').innerHTML = res.data.data.name ? res.data.data.name :'Not Found';
-                //     //     document.querySelector('#dashboard_email').innerHTML = res.data.data.email ? res.data.data.email :'Not Found';
-                //     //     document.querySelector('#nav_profile_image').src = res.data.data.admin.image?res.data.data.admin.image :profileDefault;
-                //     // }
 
-                //     // if (res.data.status === 'error') {
-                //     //     localStorage.removeItem('token');
-                //     //     window.location.href = '/admin/login';
-                //     //     return;
-                //     // }
-                // } catch (error) {
-                //     // console.error('error', error);
-                //     // Swal.fire('Error', 'Authentication failed. Please login again.', 'error').then(() => {
-                //     //     localStorage.removeItem('token');
-                //     //     window.location.href = '/admin/login';
-                //     // });
-                // }
+                    if (res.data.status === 'success') {
+                        //console.log('==',)
+                        document.querySelector('.dashboard_name').innerHTML = res.data.data.name ? res.data.data.name :'Not Found';
+                        document.querySelector('.dashboard_email').innerHTML = res.data.data.email ? res.data.data.email :'Not Found';
+                        document.querySelector('.nav_profile_image').src = `/uploads/editor/profile/${res.data.data.editors[0].image}`;
+                    }
+
+                    if (res.data.status === 'error') {
+                        localStorage.removeItem('token');
+                        alet('Error', res.data.message);
+                        window.location.href = '/editor/login';
+                        return;
+                    }
+                } catch (error) {
+                    console.error('error', error);
+                    Swal.fire('Error', 'Authentication failed. Please login again.', 'error').then(() => {
+                        localStorage.removeItem('token');
+                        window.location.href = '/editor/login';
+                    });
+                }
             }
 
 
@@ -146,7 +146,7 @@
                         });
 
                         try {
-                            let res = await axios.post('/admin/logout',{},{
+                            let res = await axios.post('/editor/logout',{},{
                                 headers: {
                                     'Authorization': `Bearer ${token}`
                                 }
@@ -161,7 +161,7 @@
                                     timer: 1500,
                                     showConfirmButton: false
                                 }).then(() => {
-                                    window.location.href = '/admin/login';
+                                    window.location.href = '/editor/login';
                                 });
                             } else {
                                 Swal.fire('Error', 'Logout failed. Please try again.', 'error');

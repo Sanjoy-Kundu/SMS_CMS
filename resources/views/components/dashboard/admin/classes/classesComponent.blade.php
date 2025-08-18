@@ -417,7 +417,7 @@ async function getClassModels() {
     $('#classModelsLoader').removeClass('d-none');
 
     try {
-        const response = await axios.get('/class-model/lists', {
+        const response = await axios.post('/class-model/lists', {},{
             headers: {
                 'Authorization': 'Bearer ' + token
             }
@@ -440,11 +440,11 @@ async function getClassModels() {
         console.error('Error fetching class models:', error);
 
         // Token expire হলে লগআউট
-        if (error.response && error.response.status === 401) {
-            localStorage.removeItem('token');
-            window.location.href = "/admin/login";
-            return;
-        }
+        // if (error.response && error.response.status === 401) {
+        //     localStorage.removeItem('token');
+        //     window.location.href = "/admin/login";
+        //     return;
+        // }
 
         Swal.fire({
             icon: 'error',

@@ -15,6 +15,17 @@ class Editor extends Model
         'designation',
         'joined_at',
         'is_active',
+        'father_name',
+        'mother_name',
+        'nationality',
+        'religion',
+        'marital_status',
+        'phone',
+        'address',
+        'image',
+        'birth_date',
+        'nid',
+        'gender',
     ];
     protected $dates = [
         'joined_at',

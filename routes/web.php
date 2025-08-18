@@ -66,24 +66,6 @@ Route::get('/editor/create', [AdminDashboard::class, 'adminEditorCreatePage']);
 
 
 
-
-
-
-
-//editor Dashboard page Route
-Route::get('/editor/login', [EditorController::class, 'editorLoginPage']);
-Route::post('/editor/login/store', [EditorController::class, 'editor_login_store']);
-
-//editor dashboard page
-Route::get('/editor/dashboard', [EditorDashboardController::class, 'editorDashboardPage']);
-
-
-
-
-
-
-
-
 // admin protected route
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/auth/admin/details', [AdminDashboard::class, 'adminDetails']);
@@ -186,6 +168,25 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 });
 
 
+
+
+//editor Dashboard page Route
+Route::get('/editor/login', [EditorController::class, 'editorLoginPage']);
+Route::post('/editor/login/store', [EditorController::class, 'editor_login_store']);
+
+//editor dashboard page
+Route::get('/editor/dashboard', [EditorDashboardController::class, 'editorDashboardPage']);
+Route::get('/editor/profile', [EditorDashboardController::class, 'editorProfilePage']);
+
+
+
+
+
+
 Route::middleware(['auth:sanctum', 'editor'])->group(function () {
-    
+    Route::post('/auth/editor/details', [EditorDashboardController::class, 'editorDetails']);
+    Route::post('/editor/update-profile', [EditorDashboardController::class, 'editorUpdateProfile']);
+    Route::post('/editor/password/update', [EditorDashboardController::class, 'editorUpdatePassword']);
+
+    Route::post('/editor/logout', [EditorDashboardController::class, 'logout']);
 });

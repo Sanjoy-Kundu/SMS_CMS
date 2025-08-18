@@ -163,9 +163,20 @@ class EditorController extends Controller
             $editor = Editor::create([
                 'user_id' => $user->id,
                 'institution_id' => $request->institution_id,
-                'designation' => null, // Can be updated later
+                'designation' => null, 
                 'joined_at' => now(),
                 'is_active' => true,
+                'father_name' => null, 
+                'mother_name' => null, 
+                'nationality'=>null,
+                'religion'=>null,
+                'marital_status'=>null,
+                'phone' => null,
+                'address' => null, 
+                'image'=>null,
+                'date_of_birth' => null,
+                'nid' => null, 
+                'gender' => null, 
             ]);
 
             // Commit the transaction
