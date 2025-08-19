@@ -198,7 +198,7 @@
                 <div class="card-body">
                     <form action="" id="editorEducaionl_qualificationForm">
                         <!-- Editor select if needed -->
-                        <input type="number" readonly name="editor_id" class="editor_id">
+                        <input type="number" readonly name="editor_id" class="editor_id form-control" hidden>
 
                         <div class="mb-3">
                             <div class="col-md-12">
@@ -242,14 +242,15 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-success" onclick="editorEducation(event)">Save Education</button>
+                        <button type="submit" class="btn btn-success" onclick="editorEducation(event)">Save
+                            Education</button>
                     </form>
 
 
                     <!-- Education List (View) -->
                     <hr>
                     <h6 class="section-title">Educational Qualifications</h6>
-                    <table class="table table-striped">
+                    <table class="table table-bordered table-striped">
                         <thead>
                             <tr>
                                 <th>Level</th>
@@ -293,35 +294,74 @@
             <div class="card shadow mb-4">
                 <div class="card-header">Addresses</div>
                 <div class="card-body">
-                    <form>
+                    <form id="editor_address_Form">
+                        <!-- Editor ID (hidden or readonly) -->
+                        <input type="number" name="editor_id" class="form-control address_editor_id" readonly hidden>
+
+                        <!-- Address Type -->
                         <div class="mb-3">
                             <label class="form-label">Address Type</label>
-                            <select class="form-control">
-                                <option>Present</option>
-                                <option>Permanent</option>
+                            <select name="type" class="form-control" required>
+                                <option value="">---Select Type---</option>
+                                <option value="present">Present</option>
+                                <option value="permanent">Permanent</option>
                             </select>
                         </div>
+
+                        <!-- Village -->
                         <div class="mb-3">
                             <label class="form-label">Village</label>
-                            <input type="text" class="form-control" placeholder="Village">
+                            <input type="text" name="village" class="form-control" placeholder="Village"
+                                required>
                         </div>
-                        <button class="btn btn-success">Save Address</button>
+
+                        <!-- District -->
+                        <div class="mb-3">
+                            <label class="form-label">District</label>
+                            <input type="text" name="district" class="form-control" placeholder="District">
+                        </div>
+
+                        <!-- Upazila -->
+                        <div class="mb-3">
+                            <label class="form-label">Upazila</label>
+                            <input type="text" name="upazila" class="form-control" placeholder="Upazila">
+                        </div>
+
+                        <!-- Post Office -->
+                        <div class="mb-3">
+                            <label class="form-label">Post Office</label>
+                            <input type="text" name="post_office" class="form-control" placeholder="Post Office">
+                        </div>
+
+                        <!-- Postal Code -->
+                        <div class="mb-3">
+                            <label class="form-label">Postal Code</label>
+                            <input type="text" name="postal_code" class="form-control" placeholder="Postal Code">
+                        </div>
+
+                        <!-- Submit -->
+                        <button type="submit" class="btn btn-success" onclick="EditorAddress(event)">Save
+                            Address</button>
                     </form>
 
                     <!-- Address List (View) -->
                     <hr>
-                    <h6 class="section-title">Saved Addresses</h6>
-                    <table class="table table-bordered">
-                        <tr>
-                            <th>Type</th>
-                            <th>Village</th>
-                            <th>District</th>
-                        </tr>
-                        <tr>
-                            <td>Present</td>
-                            <td>Dhanmondi</td>
-                            <td>Dhaka</td>
-                        </tr>
+                    <h6 class="section-title">Address List</h6>
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Village</th>
+                                <th>District</th>
+                                <th>Upazila</th>
+                                <th>Post Office</th>
+                                <th>Postal Code</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="editorAddressTableBody">
+                            <!-- Data will be injected here via JS -->
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -369,6 +409,7 @@
                 // console.log(res.data.data.editors[0]);
                 let editorDetails = res.data.data.editors[0]
                 document.querySelector('.editor_id').value = editorDetails.id;
+                document.querySelector('.address_editor_id').value = editorDetails.id;
                 document.querySelector('.profile_name').innerHTML = res.data.data.name || 'N/A';
                 document.querySelector('.profile_email').innerHTML = res.data.data.email || 'N/A';
                 document.querySelector('.profile_phone').innerHTML = res.data.data.editors[0].phone || 'N/A';
@@ -559,10 +600,10 @@
     }
 
     //edior eductoin
-    async function editorEducation(event){
+    async function editorEducation(event) {
         event.preventDefault();
         let token = localStorage.getItem('token');
-        if(!token){
+        if (!token) {
             alert('Unauthorized user');
             return;
         }
@@ -577,16 +618,16 @@
         let course_duration = document.querySelector('input[name="course_duration"]').value;
 
         let data = {
-            editor_id:editor_id,
-            level:level,
-            roll_number:roll_number,
-            board_university:board_university,
-            result:result,
-            passing_year:passing_year,
-            course_duration:course_duration
+            editor_id: editor_id,
+            level: level,
+            roll_number: roll_number,
+            board_university: board_university,
+            result: result,
+            passing_year: passing_year,
+            course_duration: course_duration
         }
         //console.log(data);
-           try {
+        try {
             const res = await axios.post('/editor/education', data, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -601,7 +642,7 @@
                 await getEdiorEducationLists(); // Refresh Education Table
                 document.getElementById('editorEducaionl_qualificationForm').reset();
 
-       
+
 
                 //getUserInfo(); // Refresh profile info
             } else {
@@ -634,32 +675,32 @@
                 Swal.fire('Error', 'Network or unknown error occurred', 'error');
             }
         }
-        
+
     }
 
-        //editor educatoin lists
+    //editor educatoin lists
     getEdiorEducationLists();
-    async function getEdiorEducationLists(){
+    async function getEdiorEducationLists() {
         let token = localStorage.getItem('token');
-        if(!token){
+        if (!token) {
             alert('Unauthorized user');
-            return; 
+            return;
         }
-        try{
-            let res = await axios.post('/editor/education/list',{},{
-                headers:{
-                    Authorization:`Bearer ${token}`
+        try {
+            let res = await axios.post('/editor/education/list', {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`
                 }
             })
             console.log(res.data.educationLists)
             let educationLists = res.data.educationLists;
             let tbody = document.querySelector('.educationTableBody');
             tbody.innerHTML = ''; // Clear old rows
-        if(educationLists.length > 0){
-            educationLists.forEach((education) => {
-                let tr = document.createElement('tr');
+            if (educationLists.length > 0) {
+                educationLists.forEach((education) => {
+                    let tr = document.createElement('tr');
 
-                tr.innerHTML = `
+                    tr.innerHTML = `
                     <td>${education.level || ''}</td>
                     <td>${education.board_university || ''}</td>
                     <td>${education.roll_number || 'N/A'}</td>
@@ -668,28 +709,166 @@
                     <td>${education.course_duration || 'N/A'}</td>
                     <td>
                         <div class="btn-group" role="group" aria-label="Basic example">
-                            <button type="button" class="btn btn-info editEducationEdit" data-id="${education.id}">EDIT</button>
+                            <button type="button" class="btn btn-info editorEducationEdit" data-id="${education.id}">EDIT</button>
                         </div>
                     </td>
                 `;
 
-                tbody.appendChild(tr);
+                    tbody.appendChild(tr);
+                });
+
+
+                $('.editorEducationEdit').on('click', async function(e) {
+                    e.preventDefault();
+                    let id = $(this).data('id');
+                    await fillUpdateEducationForm(id);
+                    $('#editEducationModal').modal('show');
+
+                    console.log(id);
+                })
+            } else {
+                // No data
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center">No education found</td></tr>`;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+
+
+    //editor Address
+    async function EditorAddress(event) {
+        event.preventDefault();
+        let token = localStorage.getItem('token');
+        if (!token) {
+            alert('Unauthorized user');
+            return;
+        }
+
+        // Get values
+        let editor_id = document.querySelector('input[name="editor_id"]').value;
+        let type = document.querySelector('select[name="type"]').value;
+        let village = document.querySelector('input[name="village"]').value;
+        let district = document.querySelector('input[name="district"]').value;
+        let upazila = document.querySelector('input[name="upazila"]').value;
+        let post_office = document.querySelector('input[name="post_office"]').value;
+        let postal_code = document.querySelector('input[name="postal_code"]').value;
+
+        let data = {
+            editor_id: editor_id,
+            type: type,
+            village: village,
+            district: district,
+            upazila: upazila,
+            post_office: post_office,
+            postal_code: postal_code
+        };
+
+        try {
+            const res = await axios.post('/editor/address', data, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
             });
 
+            document.getElementById('loader').style.display = 'none';
 
-            $('.editEducationEdit').on('click', async function(e){
-                e.preventDefault();
-                let id = $(this).data('id');
-                await fillUpdateEducationForm(id);
-                $('#editEducationModal').modal('show');
+            if (res.data.status === 'success') {
+                await getEdiorAddressLists();
+                Swal.fire('Success', res.data.message || 'Address added successfully', 'success');
+                let type = document.querySelector('select[name="type"]').value = "";
+                document.querySelector('input[name="village"]').value = "";
+                document.querySelector('input[name="district"]').value = "";
+                document.querySelector('input[name="upazila"]').value = "";
+                document.querySelector('input[name="post_office"]').value = "";
+                document.querySelector('input[name="postal_code"]').value = "";
 
-                console.log(id);
-            })
-        } else {
-            // No data
-            tbody.innerHTML = `<tr><td colspan="4" class="text-center">No education found</td></tr>`;
+            } else {
+                Swal.fire('Error', res.data.message || 'Something went wrong', 'error');
+                //console.log(res.data);
+            }
+        } catch (error) {
+            document.getElementById('loader').style.display = 'none';
+            if (error.response) {
+                if (error.response.status === 422) {
+                    const errors = error.response.data.errors;
+                    let messages = '';
+                    for (const key in errors) {
+                        if (errors.hasOwnProperty(key)) {
+                            messages += errors[key].join(' ') + '<br>';
+                        }
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validation Error',
+                        html: messages
+                    });
+                } else {
+                    Swal.fire('Error', error.response.data.message || 'Failed to save address', 'error');
+                    console.log(error.response.data);
+                }
+            } else {
+                Swal.fire('Error', 'Network or unknown error occurred', 'error');
+                console.log(error);
+            }
         }
-        }catch(error){
+    }
+
+    //editor address lists
+    getEdiorAddressLists();
+    async function getEdiorAddressLists() {
+        let token = localStorage.getItem('token');
+        if (!token) {
+            alert('Unauthorized user');
+            return;
+        }
+        try {
+            let res = await axios.post('/editor/address/list', {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            console.log(res.data.addressLists)
+            let addressLists = res.data.addressLists;
+            let tbody = document.querySelector('.editorAddressTableBody');
+            tbody.innerHTML = ''; // Clear old rows
+            if (addressLists.length > 0) {
+                addressLists.forEach((address) => {
+                    let tr = document.createElement('tr');
+
+                    tr.innerHTML = `
+                    <td>${address.type || ''}</td>
+                    <td>${address.village || ''}</td>
+                    <td>${address.district || 'N/A'}</td>
+                    <td>${address.upazila || ''}</td>
+                    <td>${address.post_office || ''}</td>
+                    <td>${address.postal_code || 'N/A'}</td>
+                    <td>
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                            <button type="button" class="btn btn-info editorAddressEdit" data-id="${address.id}">EDIT</button>
+                            <button type="button" class="btn btn-danger editorAddressDelete" data-id="${address.id}">DELETE</button>
+                        </div>
+                    </td>
+                `;
+
+                    tbody.appendChild(tr);
+                });
+
+
+                $('.editorAddressEdit').on('click', async function(e) {
+                    e.preventDefault();
+                    let id = $(this).data('id');
+                    await fillUpdateAddressForm(id);
+                    $('#editAddressModal').modal('show');
+
+                    console.log(id);
+                })
+            } else {
+                // No data
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center">No address found</td></tr>`;
+            }
+        } catch (error) {
             console.log(error);
         }
     }

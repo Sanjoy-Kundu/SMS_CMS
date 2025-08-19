@@ -12,6 +12,7 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\ClassModelController;
 use App\Http\Controllers\InstitutionController;
+use App\Http\Controllers\EditorAddressController;
 use App\Http\Controllers\AcademicSectionController;
 use App\Http\Controllers\EditorDashboardController;
 use App\Http\Controllers\EditorEducationController;
@@ -191,7 +192,12 @@ Route::middleware(['auth:sanctum', 'editor'])->group(function () {
     Route::post('/editor/education/by-id', [EditorEducationController::class, 'editorEducationById']);
     Route::post('/editor/education/update', [EditorEducationController::class, 'editorEducationUpdate']);
 
-
     Route::post('/editor/education', [EditorEducationController::class, 'editorEducationCreate']);
     Route::post('/editor/education/delete', [EditorEducationController::class, 'editorEducationDelete']);
+
+    //Address Route
+    Route::post('/editor/address', [EditorAddressController::class, 'editorAddressCreate']);
+    Route::post('/editor/address/list', [EditorAddressController::class, 'editorAddressLists']);
+    Route::post('/editor/address/by-id', [EditorAddressController::class,'getAddressById']);
+    Route::post('/editor/address/update', [EditorAddressController::class,'updateAddress']);
 });
