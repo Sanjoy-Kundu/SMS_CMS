@@ -192,12 +192,144 @@
                 </div>
             </div>
 
+            <!-- Education -->
+            <div class="card shadow mb-4">
+                <div class="card-header">Educational Qualifications</div>
+                <div class="card-body">
+                    <form action="" id="editorEducaionl_qualificationForm">
+                        <!-- Editor select if needed -->
+                        <input type="number" readonly name="editor_id" class="editor_id">
 
+                        <div class="mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Level</label>
+                                <select name="level" class="form-control">
+                                    <option value="">---Select Level---</option>
+                                    <option value="SSC">SSC</option>
+                                    <option value="HSC">HSC</option>
+                                    <option value="Graduation">Graduation</option>
+                                    <option value="Masters">Masters</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Roll Number</label>
+                            <input type="text" name="roll_number" class="form-control"
+                                placeholder="Enter Roll Number">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Board/University</label>
+                            <input type="text" name="board_university" class="form-control"
+                                placeholder="Enter Board/University">
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Result</label>
+                                <input type="text" name="result" class="form-control"
+                                    placeholder="GPA/Division">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Passing Year</label>
+                                <input type="number" name="passing_year" class="form-control" placeholder="YYYY">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Course Duration</label>
+                                <input type="text" name="course_duration" class="form-control"
+                                    placeholder="Only for Graduation/Masters">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success" onclick="editorEducation(event)">Save Education</button>
+                    </form>
+
+
+                    <!-- Education List (View) -->
+                    <hr>
+                    <h6 class="section-title">Educational Qualifications</h6>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Level</th>
+                                <th>Board</th>
+                                <th>Roll Number</th>
+                                <th>Result</th>
+                                <th>Year</th>
+                                <th>Duration</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="educationTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <!-- Experience -->
+            <div class="card shadow mb-4">
+                <div class="card-header">Professional Experience</div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Organization</label>
+                            <input type="text" class="form-control" placeholder="Organization Name">
+                        </div>
+                        <button class="btn btn-success">Save Experience</button>
+                    </form>
+
+                    <!-- Experience List (View) -->
+                    <hr>
+                    <h6 class="section-title">Saved Experiences</h6>
+                    <ul class="list-group">
+                        <li class="list-group-item">Software Engineer - ABC Ltd (2020-2023)</li>
+                    </ul>
+                </div>
+            </div>
+
+
+            <!-- Address -->
+            <div class="card shadow mb-4">
+                <div class="card-header">Addresses</div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Address Type</label>
+                            <select class="form-control">
+                                <option>Present</option>
+                                <option>Permanent</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Village</label>
+                            <input type="text" class="form-control" placeholder="Village">
+                        </div>
+                        <button class="btn btn-success">Save Address</button>
+                    </form>
+
+                    <!-- Address List (View) -->
+                    <hr>
+                    <h6 class="section-title">Saved Addresses</h6>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Type</th>
+                            <th>Village</th>
+                            <th>District</th>
+                        </tr>
+                        <tr>
+                            <td>Present</td>
+                            <td>Dhanmondi</td>
+                            <td>Dhaka</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
         </div>
-
     </div>
-    <div id="loader"
-        style="
+</div>
+<div id="loader"
+    style="
                 display:none;
                 position: fixed;
                 top: 0; left: 0; right: 0; bottom: 0;
@@ -206,11 +338,11 @@
                 text-align: center;
                 padding-top: 20vh;
                ">
-        <div class="spinner-border text-primary" role="status" style="width: 4rem; height: 4rem;">
-            <span class="visually-hidden">Loading...</span>
-        </div>
+    <div class="spinner-border text-primary" role="status" style="width: 4rem; height: 4rem;">
+        <span class="visually-hidden">Loading...</span>
     </div>
 </div>
+
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -233,8 +365,10 @@
             });
 
             if (res.data.status === 'success') {
-               // console.log(res.data.data.editors[0]);
+                //console.log(res.data.data.editors[0].id);
+                // console.log(res.data.data.editors[0]);
                 let editorDetails = res.data.data.editors[0]
+                document.querySelector('.editor_id').value = editorDetails.id;
                 document.querySelector('.profile_name').innerHTML = res.data.data.name || 'N/A';
                 document.querySelector('.profile_email').innerHTML = res.data.data.email || 'N/A';
                 document.querySelector('.profile_phone').innerHTML = res.data.data.editors[0].phone || 'N/A';
@@ -248,10 +382,14 @@
                 let birthDate = res.data.data.editors[0].birth_date;
 
 
-                document.querySelector('input[name="father_name"]').value = editorDetails.father_name ?editorDetails.father_name : 'N/A'
-                document.querySelector('input[name="mother_name"]').value = editorDetails.mother_name ?editorDetails.mother_name : 'N/A'
-                document.querySelector('input[name="phone"]').value = editorDetails.phone ? editorDetails.phone :'N/A'
-                document.querySelector('textarea[name="address"]').value = editorDetails.address?editorDetails.address:'N/A'
+                document.querySelector('input[name="father_name"]').value = editorDetails.father_name ?
+                    editorDetails.father_name : 'N/A'
+                document.querySelector('input[name="mother_name"]').value = editorDetails.mother_name ?
+                    editorDetails.mother_name : 'N/A'
+                document.querySelector('input[name="phone"]').value = editorDetails.phone ? editorDetails.phone :
+                    'N/A'
+                document.querySelector('textarea[name="address"]').value = editorDetails.address ? editorDetails
+                    .address : 'N/A'
                 document.querySelector('input[name="nid"]').value = editorDetails.nid ? editorDetails.nid : 'N/A'
                 //date
                 let birthDateInput = document.querySelector('input[name="birth_date"]');
@@ -282,7 +420,7 @@
             }
 
             if (res.data.status === 'error') {
-                console.log('success Error',res.data);
+                console.log('success Error', res.data);
                 // localStorage.removeItem('token');
                 // window.location.href = '/admin/login';
             }
@@ -312,7 +450,7 @@
 
 
     //password change button
-    $('.passwordChangeBtn').on('click',async function() {
+    $('.passwordChangeBtn').on('click', async function() {
         let token = localStorage.getItem('token');
         // if (!token) {
         //     window.location.href = '/admin/login';
@@ -330,94 +468,229 @@
 
 
     // Update user profile
-async function updateProfile(event) {
-    event.preventDefault();
-    let token = localStorage.getItem('token');
-    if (!token) {
-        window.location.href = '/editor/login';
-        return;
-    }
-
-    // Create formData
-    let formData = new FormData();
-
-    // Helper to safely get value
-    function getValue(selector, defaultValue = '') {
-        const el = document.querySelector(selector);
-        return el ? el.value.trim() : defaultValue;
-    }
-
-    // Append text inputs
-    formData.append('father_name', getValue('input[name="father_name"]'));
-    formData.append('mother_name', getValue('input[name="mother_name"]'));
-    formData.append('phone', getValue('input[name="phone"]'));
-    formData.append('address', getValue('textarea[name="address"]'));
-    formData.append('birth_date', getValue('input[name="birth_date"]'));
-    formData.append('nid', getValue('input[name="nid"]'));
-    formData.append('nationality', getValue('input[name="nationality"]'));
-
-    // Append selects
-    formData.append('gender', getValue('select[name="gender"]'));
-    formData.append('religion', getValue('select[name="religion"]'));
-    formData.append('marital_status', getValue('select[name="marital_status"]'));
-
-    // Append image if selected
-    const imageFile = document.querySelector('input[name="image"]')?.files[0];
-    if (imageFile) {
-        formData.append('image', imageFile);
-    }
-
-    // Show loader
-    document.getElementById('loader').style.display = 'block';
-
-    try {
-        const res = await axios.post('/editor/update-profile', formData, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data'
-            }
-        });
-
-        // Hide loader
-        document.getElementById('loader').style.display = 'none';
-
-        if (res.data.status === 'success') {
-            Swal.fire('Success', 'Profile updated successfully', 'success');
-
-            // Update profile image if uploaded
-            if (res.data.data.image) {
-                document.querySelector('#profile_img_preview').src = res.data.data.image;
-            }
-
-            getUserInfo(); // Refresh profile info
-        } else {
-            Swal.fire('Error', res.data.message || 'Something went wrong', 'error');
+    async function updateProfile(event) {
+        event.preventDefault();
+        let token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/editor/login';
+            return;
         }
-    } catch (error) {
-        // Hide loader
-        document.getElementById('loader').style.display = 'none';
 
-        if (error.response) {
-            if (error.response.status === 422) {
-                const errors = error.response.data.errors;
-                let messages = '';
-                for (const key in errors) {
-                    if (errors.hasOwnProperty(key)) {
-                        messages += errors[key].join(' ') + '<br>';
-                    }
+        // Create formData
+        let formData = new FormData();
+
+        // Helper to safely get value
+        function getValue(selector, defaultValue = '') {
+            const el = document.querySelector(selector);
+            return el ? el.value.trim() : defaultValue;
+        }
+
+        // Append text inputs
+        formData.append('father_name', getValue('input[name="father_name"]'));
+        formData.append('mother_name', getValue('input[name="mother_name"]'));
+        formData.append('phone', getValue('input[name="phone"]'));
+        formData.append('address', getValue('textarea[name="address"]'));
+        formData.append('birth_date', getValue('input[name="birth_date"]'));
+        formData.append('nid', getValue('input[name="nid"]'));
+        formData.append('nationality', getValue('input[name="nationality"]'));
+
+        // Append selects
+        formData.append('gender', getValue('select[name="gender"]'));
+        formData.append('religion', getValue('select[name="religion"]'));
+        formData.append('marital_status', getValue('select[name="marital_status"]'));
+
+        // Append image if selected
+        const imageFile = document.querySelector('input[name="image"]')?.files[0];
+        if (imageFile) {
+            formData.append('image', imageFile);
+        }
+
+        // Show loader
+        document.getElementById('loader').style.display = 'block';
+
+        try {
+            const res = await axios.post('/editor/update-profile', formData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
                 }
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Validation Error',
-                    html: messages
-                });
+            });
+
+            // Hide loader
+            document.getElementById('loader').style.display = 'none';
+
+            if (res.data.status === 'success') {
+                Swal.fire('Success', 'Profile updated successfully', 'success');
+
+                // Update profile image if uploaded
+                if (res.data.data.image) {
+                    document.querySelector('#profile_img_preview').src = res.data.data.image;
+                }
+
+                getUserInfo(); // Refresh profile info
             } else {
-                Swal.fire('Error', error.response.data.message || 'Failed to update profile', 'error');
+                Swal.fire('Error', res.data.message || 'Something went wrong', 'error');
             }
-        } else {
-            Swal.fire('Error', 'Network or unknown error occurred', 'error');
+        } catch (error) {
+            // Hide loader
+            document.getElementById('loader').style.display = 'none';
+
+            if (error.response) {
+                if (error.response.status === 422) {
+                    const errors = error.response.data.errors;
+                    let messages = '';
+                    for (const key in errors) {
+                        if (errors.hasOwnProperty(key)) {
+                            messages += errors[key].join(' ') + '<br>';
+                        }
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validation Error',
+                        html: messages
+                    });
+                } else {
+                    Swal.fire('Error', error.response.data.message || 'Failed to update profile', 'error');
+                }
+            } else {
+                Swal.fire('Error', 'Network or unknown error occurred', 'error');
+            }
         }
     }
-}
 
+    //edior eductoin
+    async function editorEducation(event){
+        event.preventDefault();
+        let token = localStorage.getItem('token');
+        if(!token){
+            alert('Unauthorized user');
+            return;
+        }
+
+        //get value
+        let editor_id = document.querySelector('input[name="editor_id"]').value;
+        let level = document.querySelector('select[name="level"]').value;
+        let roll_number = document.querySelector('input[name="roll_number"]').value;
+        let board_university = document.querySelector('input[name="board_university"]').value;
+        let result = document.querySelector('input[name="result"]').value;
+        let passing_year = parseInt(document.querySelector('input[name="passing_year"]').value);
+        let course_duration = document.querySelector('input[name="course_duration"]').value;
+
+        let data = {
+            editor_id:editor_id,
+            level:level,
+            roll_number:roll_number,
+            board_university:board_university,
+            result:result,
+            passing_year:passing_year,
+            course_duration:course_duration
+        }
+        //console.log(data);
+           try {
+            const res = await axios.post('/editor/education', data, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+
+            // Hide loader
+            document.getElementById('loader').style.display = 'none';
+
+            if (res.data.status === 'success') {
+                Swal.fire('Success', 'Data Inserted successfully', 'success');
+                await getEdiorEducationLists(); // Refresh Education Table
+                document.getElementById('editorEducaionl_qualificationForm').reset();
+
+       
+
+                //getUserInfo(); // Refresh profile info
+            } else {
+                Swal.fire('Error', res.data.message || 'Something went wrong', 'error');
+            }
+        } catch (error) {
+            // Hide loader
+            document.getElementById('loader').style.display = 'none';
+
+            if (error.response) {
+                if (error.response.status === 422) {
+                    const errors = error.response.data.errors;
+                    let messages = '';
+                    for (const key in errors) {
+                        if (errors.hasOwnProperty(key)) {
+                            messages += errors[key].join(' ') + '<br>';
+                        }
+                    }
+                    //console.log(messages);
+                    // Swal.fire({
+                    //     icon: 'error',
+                    //     title: 'Validation Error',
+                    //     html: messages
+                    // });
+                } else {
+                    //console.log(error.response.data);
+                    Swal.fire('Error', error.response.data.message || 'Failed to update profile', 'error');
+                }
+            } else {
+                Swal.fire('Error', 'Network or unknown error occurred', 'error');
+            }
+        }
+        
+    }
+
+        //editor educatoin lists
+    getEdiorEducationLists();
+    async function getEdiorEducationLists(){
+        let token = localStorage.getItem('token');
+        if(!token){
+            alert('Unauthorized user');
+            return; 
+        }
+        try{
+            let res = await axios.post('/editor/education/list',{},{
+                headers:{
+                    Authorization:`Bearer ${token}`
+                }
+            })
+            console.log(res.data.educationLists)
+            let educationLists = res.data.educationLists;
+            let tbody = document.querySelector('.educationTableBody');
+            tbody.innerHTML = ''; // Clear old rows
+        if(educationLists.length > 0){
+            educationLists.forEach((education) => {
+                let tr = document.createElement('tr');
+
+                tr.innerHTML = `
+                    <td>${education.level || ''}</td>
+                    <td>${education.board_university || ''}</td>
+                    <td>${education.roll_number || 'N/A'}</td>
+                    <td>${education.result || ''}</td>
+                    <td>${education.passing_year || ''}</td>
+                    <td>${education.course_duration || 'N/A'}</td>
+                    <td>
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                            <button type="button" class="btn btn-info editEducationEdit" data-id="${education.id}">EDIT</button>
+                        </div>
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+
+
+            $('.editEducationEdit').on('click', async function(e){
+                e.preventDefault();
+                let id = $(this).data('id');
+                await fillUpdateEducationForm(id);
+                $('#editEducationModal').modal('show');
+
+                console.log(id);
+            })
+        } else {
+            // No data
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center">No education found</td></tr>`;
+        }
+        }catch(error){
+            console.log(error);
+        }
+    }
 </script>

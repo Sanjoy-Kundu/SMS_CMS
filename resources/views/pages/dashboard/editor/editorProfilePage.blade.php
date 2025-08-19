@@ -5,4 +5,5 @@
     @include('components.dashboard.editor.profileComponent')
     @include('components.dashboard.editor.footerComponent')
     @include('components.dashboard.editor.changePasswordComponent')
+    @include('components.dashboard.editor.educationUpdateComponent')
 @endsection

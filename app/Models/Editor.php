@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\EditorEducation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Editor extends Model
 {
@@ -45,5 +46,11 @@ class Editor extends Model
     public function institution()
     {
         return $this->belongsTo(Institution::class);
+    }
+
+    // app/Models/Editor.php
+    public function educations()
+    {
+        return $this->hasMany(EditorEducation::class);
     }
 }
