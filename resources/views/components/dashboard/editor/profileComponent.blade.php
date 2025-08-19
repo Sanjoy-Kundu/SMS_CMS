@@ -65,16 +65,14 @@
                             <th>Status</th>
                             <td>
                                 <span class="profile_status" class="badge status-badge"
-                                    style="font-size: 20px;color:white; background-color:#007B7F;"></span>
+                                    style="font-size: 20px;color:green;"></span>
                             </td>
                         </tr>
                         <tr>
                             <td>Action</td>
                             <td>
-                                <button type="button" class="btn passwordChangeBtn"
-                                    style="background-color: #007B7F; color: white;">
-                                    Change Password
-                                </button>
+                                <button type="button" class="btn passwordChangeBtn" style="background-color: #007B7F; color: white;">Change Password</button>
+                                <button type="button" class="btn viewProfileCV" style="background-color: #418bff; color: white;">View Profile</button>
                             </td>
                         </tr>
                     </tbody>
@@ -268,26 +266,6 @@
             </div>
 
 
-            <!-- Experience -->
-            <div class="card shadow mb-4">
-                <div class="card-header">Professional Experience</div>
-                <div class="card-body">
-                    <form>
-                        <div class="mb-3">
-                            <label class="form-label">Organization</label>
-                            <input type="text" class="form-control" placeholder="Organization Name">
-                        </div>
-                        <button class="btn btn-success">Save Experience</button>
-                    </form>
-
-                    <!-- Experience List (View) -->
-                    <hr>
-                    <h6 class="section-title">Saved Experiences</h6>
-                    <ul class="list-group">
-                        <li class="list-group-item">Software Engineer - ABC Ltd (2020-2023)</li>
-                    </ul>
-                </div>
-            </div>
 
 
             <!-- Address -->
@@ -506,6 +484,22 @@
     });
 
 
+    //View Profile
+    $('.viewProfileCV').on('click', async function() {
+        let token = localStorage.getItem('token');
+        // if (!token) {
+        //     window.location.href = '/admin/login';
+        //     return;
+        // }
+        let email = $('.profile_email').text().trim();
+        //console.log(email);
+        if (email) {
+            await editorDetailsCVFormat(email);
+            $('#editorDetailsCVFormatModal').modal('show');
+        }
+    });
+
+
 
 
     // Update user profile
@@ -692,7 +686,7 @@
                     Authorization: `Bearer ${token}`
                 }
             })
-            console.log(res.data.educationLists)
+            //console.log(res.data.educationLists)
             let educationLists = res.data.educationLists;
             let tbody = document.querySelector('.educationTableBody');
             tbody.innerHTML = ''; // Clear old rows
@@ -829,7 +823,7 @@
                     Authorization: `Bearer ${token}`
                 }
             })
-            console.log(res.data.addressLists)
+            //console.log(res.data.addressLists)
             let addressLists = res.data.addressLists;
             let tbody = document.querySelector('.editorAddressTableBody');
             tbody.innerHTML = ''; // Clear old rows

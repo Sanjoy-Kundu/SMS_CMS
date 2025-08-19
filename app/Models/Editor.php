@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\EditorAddress;
 use App\Models\EditorEducation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -52,5 +53,10 @@ class Editor extends Model
     public function educations()
     {
         return $this->hasMany(EditorEducation::class);
+    }
+
+    public function addresses()
+    {
+        return $this->hasMany(EditorAddress::class);
     }
 }

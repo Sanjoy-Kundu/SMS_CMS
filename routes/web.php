@@ -200,4 +200,7 @@ Route::middleware(['auth:sanctum', 'editor'])->group(function () {
     Route::post('/editor/address/list', [EditorAddressController::class, 'editorAddressLists']);
     Route::post('/editor/address/by-id', [EditorAddressController::class,'getAddressById']);
     Route::post('/editor/address/update', [EditorAddressController::class,'updateAddress']);
+
+    //editor cv
+    Route::post('/editor/cv-details', [EditorController::class, 'editorCVDetails']);
 });

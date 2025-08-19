@@ -7,4 +7,5 @@
     @include('components.dashboard.editor.changePasswordComponent')
     @include('components.dashboard.editor.educationUpdateComponent')
     @include('components.dashboard.editor.addressUpdateComponent')
+    @include('components.dashboard.editor.editorDetailsCVComponent')
 @endsection

@@ -222,11 +222,29 @@ class EditorController extends Controller
 
 
     /**
-     * Display the specified resource.
+     * Editor CV
      */
-    public function show(Editor $editor)
+ public function editorCVDetails(Request $request)
     {
-        //
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $email = $request->input('email');
+
+        // Get user with role editor
+        $user = User::where('email', $email)->where('role', 'editor')->first();
+        if (!$user) {
+            return response()->json(['error' => 'Editor not found!'], 404);
+        }
+
+        $editor = Editor::with(['educations', 'addresses'])->where('user_id', $user->id)->first();
+        if (!$editor) {
+            return response()->json(['error' => 'Editor profile not found!'], 404);
+        }
+
+        return response()->json(['status'=>'success','user' => $user,'editor' => $editor,
+        ]);
     }
 
     /**
