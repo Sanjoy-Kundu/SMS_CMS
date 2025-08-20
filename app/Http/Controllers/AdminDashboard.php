@@ -122,6 +122,16 @@ class AdminDashboard extends Controller
     }
 
 
+    /**
+     * Admin Dashboard Editor Create Page 
+     */
+        public function adminTeacherCreatePage()
+    {
+        // Get institution info for header
+        return view('pages.dashboard.admin.teacher.teacherCreatePage');
+    }
+
+
 
 
 

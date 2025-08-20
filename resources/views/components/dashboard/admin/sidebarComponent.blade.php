@@ -86,6 +86,36 @@
 
 
 
+           {{-- Nav Item - Teacher Collapse Menu --}}
+           <li class="nav-item {{ Request::is('teachers') || Request::is('teacher/create') ? 'active' : '' }}">
+               <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTeacher"
+                   aria-expanded="false" aria-controls="collapseTeacher">
+                   <i class="fas fa-fw fa-chalkboard-teacher"></i>
+                   <span>Teacher Management</span>
+               </a>
+               <div id="collapseTeacher"
+                   class="collapse {{ Request::is('teachers') || Request::is('teacher/create') ? 'show' : '' }}"
+                   data-parent="#accordionSidebar">
+                   <div class="bg-white py-2 collapse-inner rounded">
+                       <h6 class="collapse-header">Manage Teachers:</h6>
+
+                       <a class="collapse-item {{ Request::is('teachers') ? 'active' : '' }}"
+                           href="{{ url('/teachers') }}">All Teachers</a>
+
+                       <a class="collapse-item {{ Request::is('teacher/create') ? 'active' : '' }}"
+                           href="{{ url('/teacher/create') }}">Create Teacher</a>
+
+                       <a class="collapse-item {{ Request::is('teachers/permissions') ? 'active' : '' }}"
+                           href="{{ url('/teachers/permissions') }}">Control Panel</a>
+                   </div>
+               </div>
+           </li>
+
+
+
+
+
+
            <!-- Nav Item - Tables -->
            <li class="nav-item">
                <a class="nav-link" href="tables.html">

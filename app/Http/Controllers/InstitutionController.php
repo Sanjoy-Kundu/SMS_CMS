@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\Admin;
+use App\Models\Editor;
 use App\Models\Institution;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+
 class InstitutionController extends Controller
 {
     /**
@@ -28,6 +30,60 @@ class InstitutionController extends Controller
             return response()->json(['status' => 'fail', 'message' => $e->getMessage()]);
         }
     }
+
+
+    
+    /**
+     * Instituion Details for Admin Editor
+     */
+    public function institutionDetailsAdminEditor()
+    {
+        try {
+            $user = auth()->user();
+
+            if ($user->role === 'admin') {
+                $admin = Admin::where('user_id', $user->id)->first();
+                if (!$admin) {
+                    return response()->json(['status'=>'error','message'=>'Admin not found']);
+                }
+                $institutions = Institution::where('admin_id', $admin->id)->get();
+                $trashInstitutions = Institution::onlyTrashed()->where('admin_id', $admin->id)->get();
+
+            } elseif ($user->role === 'editor') {
+                $editor = Editor::where('user_id', $user->id)->first();
+                if (!$editor) {
+                    return response()->json(['status'=>'error','message'=>'Editor not found']);
+                }
+                $institutions = Institution::where('id', $editor->institution_id)->get();
+                $trashInstitutions = Institution::onlyTrashed()->where('id', $editor->institution_id)->get();
+            } else {
+                return response()->json(['status'=>'error','message'=>'Unauthorized']);
+            }
+
+            return response()->json([
+                'status'=>'success',
+                'data'=>$institutions,
+                'trashData'=>$trashInstitutions
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['status'=>'fail','message'=>$e->getMessage()]);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Institution Create

@@ -9,6 +9,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PaperController;
 use App\Http\Controllers\EditorController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\ClassModelController;
 use App\Http\Controllers\InstitutionController;
@@ -64,8 +65,7 @@ Route::get('/subject/paper', [AdminDashboard::class, 'adminSubjectPaperPage']);
 
 //admin dashboard editor Creation page route
 Route::get('/editor/create', [AdminDashboard::class, 'adminEditorCreatePage']);
-
-
+Route::get('/teacher/create', [AdminDashboard::class, 'adminTeacherCreatePage']);
 
 
 // admin protected route
@@ -203,4 +203,23 @@ Route::middleware(['auth:sanctum', 'editor'])->group(function () {
 
     //editor cv
     Route::post('/editor/cv-details', [EditorController::class, 'editorCVDetails']);
+});
+
+
+
+
+//admin and editor same route
+Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
+    //Route::post('/institution/details', [InstitutionController::class, 'institutionDetails']);
+    Route::post('/institution/details/for/admin/editor', [InstitutionController::class, 'institutionDetailsAdminEditor']);
+    Route::post('/teacher/list', [TeacherController::class, 'teacherList']);
+    Route::post('/teacher/store', [TeacherController::class, 'teacherStore']);
+    Route::post('/teacher/edit-by-id', [TeacherController::class, 'teacherEditById']);
+    Route::post('/teacher/update', [TeacherController::class, 'teacherUpdate']);
+    Route::post('/teacher/trash', [TeacherController::class, 'teacherTrash']);
+    Route::post('/teacher/trashed-list', [TeacherController::class, 'teacherTrashedList']);
+    Route::post('/teacher/restore', [TeacherController::class, 'teacherRestore']);
+    Route::post('/teacher/delete', [TeacherController::class, 'teacherDelete']);
+    Route::post('/teacher/search', [TeacherController::class, 'teacherSearch']);
+    Route::post('/teacher/trashed-search', [TeacherController::class, 'teacherTrashedSearch']);
 });
