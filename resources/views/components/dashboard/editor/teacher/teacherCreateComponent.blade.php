@@ -1,17 +1,28 @@
 <style>
-    /* HTML: <div class="loader"></div> */
+    /* Loader overlay just for the form card */
+    .loader-overlay {
+        display: none; /* hidden initially */
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.7); /* semi-transparent white */
+        z-index: 10; /* above card content */
+        border-radius: 0.35rem; /* match card border radius */
+    }
+
     /* Loader bar animation */
-    .loader {
-        display: none;
-        /* hidden initially */
+    .loader-bar {
         height: 4px;
         width: 100%;
         --c: no-repeat linear-gradient(#6100ee 0 0);
         background: var(--c), var(--c), #d7b8fc;
         background-size: 60% 100%;
         animation: l16 3s infinite;
-        margin-bottom: 10px;
-        /* space above the form */
+        position: absolute;
+        top: 0;
+        left: 0;
     }
 
     @keyframes l16 {
@@ -29,52 +40,64 @@
     }
 </style>
 
-<div class="container-fluid">
+<div class="container-fluid mt-4">
+
+    <!-- Page Heading -->
+    <h1 class="h3 mb-4 text-gray-800">Editor Profile</h1>
+
     <div class="row">
 
-        <!-- Left Column: techer Form -->
         <div class="col-xl-5 col-md-6 mb-4">
-            <div class="loader" id="loader"></div>
-            <div class="card border-left-primary shadow h-100">
+            <div class="card border-left-primary shadow h-100 position-relative">
+                <!-- Loader overlay -->
+                <div class="loader-overlay" id="editorLoader">
+                    <div class="loader-bar"></div>
+                </div>
                 <div class="card-header bg-white py-3">
                     <h5 class="m-0 text-primary font-weight-bold">Create A New Teacher</h5>
                 </div>
                 <div class="card-body">
-                    <form id="teacherForm">
+                    <form id="EditorTeacherForm">
                         <div class="form-group" hidden>
                             <label for="name">Institution Id</label>
-                            <<input type="hidden" id="teacher_institution_id" name="institution_id">
-                            <span id="teacher_institution_id_error" class="text-danger small"></span>
+                             <input type="hidden" id="editor_teacher_institution_id" name="institution_id">
+                                <span id="editor_teacher_institution_id_error" class="text-danger small"></span>
                         </div>
                         <div class="form-group">
-                            <label for="name">Teacher Name</label>
-                            <input type="text" class="form-control" id="name" name="name"
+                            <label for="editor_teacher_name">Teacher Name</label>
+                            <input type="text" class="form-control" id="editor_teacher_name" name="name"
                                 placeholder="Enter teacher name">
-                            <span id="teacher_name_error" class="text-danger small"></span>
+                            <span id="editor_teacher_name_error" class="text-danger small"></span>
                         </div>
 
                         <div class="form-group">
-                            <label for="name">Teacher Email</label>
-                            <input type="email" class="form-control" id="email" name="email"
+                            <label for="editor_teacher_email">Teacher Email</label>
+                            <input type="email" class="form-control" id="editor_teacher_email" name="email"
                                 placeholder="Enter teacher Email">
-                            <span id="teacher_email_error" class="text-danger small"></span>
+                            <span id="editor_teacher_email_error" class="text-danger small"></span>
                         </div>
 
                         <button type="submit" class="btn btn-primary btn-block" id="submitBtn"
-                            onclick="teacherCreate(event)">Add
+                            onclick="teacherCreateByEditor(event)">Add
                             teacher</button>
                     </form>
                 </div>
             </div>
         </div>
 
+
+
+
+
+
+        <!-- Profile Edit Form -->
         <!-- Right Column: teacher Tables -->
         <div class="col-xl-7 col-md-6 mb-4">
 
             <!-- Active teachers -->
             <div class="card border-left-success shadow mb-4">
                 <div class="card-header bg-white py-3">
-                    <h5 class="m-0 text-success font-weight-bold">teachers List</h5>
+                    <h5 class="m-0 text-success font-weight-bold">Editor Teachers List</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -93,39 +116,9 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Trash teachers -->
-            <div class="card border-left-danger shadow">
-                <div class="card-header bg-white py-3">
-                    <h5 class="m-0 text-danger font-weight-bold">Trash teachers List</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover table-sm" id="trash-teachers-table">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Control Panel</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
         </div>
-
     </div>
 </div>
-
-
-
-
-
 
 <!-- jQuery CDN -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -164,8 +157,8 @@
                 const institutions = response.data.data;
                 if (institutions.length > 0) {
                     // যদি single input field ব্যবহার করছেন:
-                    document.getElementById('teacher_institution_id').value = institutions[0].id;
-                    //console.log(institutions[0].id);
+                    document.getElementById('editor_teacher_institution_id').value = institutions[0].id;
+                    console.log(institutions[0].id);
                 } else {
                     alert('No institution found');
                 }
@@ -180,7 +173,7 @@
 
 
 
-    async function teacherCreate(event) {
+    async function teacherCreateByEditor(event) {
         event.preventDefault();
 
         let token = localStorage.getItem('token');
@@ -190,27 +183,27 @@
         }
 
         //     // Clear previous errors
-        document.getElementById('teacher_name_error').innerText = '';
-        document.getElementById('teacher_email_error').innerText = '';
-        document.getElementById('teacher_institution_id_error').innerText = '';
+        document.getElementById('editor_teacher_name_error').innerText = '';
+        document.getElementById('editor_teacher_email_error').innerText = '';
+        document.getElementById('editor_teacher_institution_id_error').innerText = '';
 
         // Get form data
-        let name = document.getElementById('name').value.trim();
-        let email = document.getElementById('email').value.trim();
-        let institution_id = document.getElementById('teacher_institution_id').value.trim();
+        let name = document.getElementById('editor_teacher_name').value.trim();
+        let email = document.getElementById('editor_teacher_email').value.trim();
+        let institution_id = document.getElementById('editor_teacher_institution_id').value.trim();
 
         // Validation
         let isError = false;
         if (!name) {
-            document.getElementById('teacher_name_error').innerText = 'Name is required';
+            document.getElementById('editor_teacher_name_error').innerText = 'Name is required';
             isError = true;
         }
         if (!email) {
-            document.getElementById('teacher_email_error').innerText = 'Email is required';
+            document.getElementById('editor_teacher_email_error').innerText = 'Email is required';
             isError = true;
         }
         if (!institution_id) {
-            document.getElementById('teacher_institution_id_error').innerText = 'Institution is required';
+            document.getElementById('editor_teacher_institution_id_error').innerText = 'Institution is required';
             isError = true;
         }
         if (isError) return;
@@ -221,9 +214,9 @@
             institution_id:institution_id,
         };
 
-        // Show loader & disable form
-        document.getElementById('loader').style.display = 'block';
-        const formElements = document.getElementById('teacherForm').elements;
+        // Show editorLoader & disable form
+        document.getElementById('editorLoader').style.display = 'block';
+        const formElements = document.getElementById('EditorTeacherForm').elements;
         for (let el of formElements) el.disabled = true;
 
         try {
@@ -236,17 +229,17 @@
             if (res.data.status === 'success') {
                 Swal.fire('Success', res.data.message, 'success');
                 // Reset form
-                document.getElementById('name').value = '';
-                document.getElementById('email').value = '';
+                document.getElementById('editor_teacher_name').value = '';
+                document.getElementById('editor_teacher_email').value = '';
                 // Optionally reload teacher list here
             }
         } catch (error) {
             if (error.response) {
                 if (error.response.status === 422) {
                     const errors = error.response.data.errors || {};
-                    document.getElementById('teacher_name_error').innerText = errors.name ? errors.name[0] : '';
-                    document.getElementById('teacher_email_error').innerText = errors.email ? errors.email[0] : '';
-                    document.getElementById('institution_id_error').innerText = errors.institution_id ? errors
+                    document.getElementById('editor_teacher_name_error').innerText = errors.name ? errors.name[0] : '';
+                    document.getElementById('editor_teacher_email_error').innerText = errors.email ? errors.email[0] : '';
+                    document.getElementById('editor_teacher_institution_id_error').innerText = errors.institution_id ? errors
                         .institution_id[0] : '';
 
                     if (error.response.data.message && !errors.name && !errors.email && !errors.institution_id) {
@@ -259,7 +252,7 @@
                 Swal.fire('Error', 'Network or server error', 'error');
             }
         } finally {
-            document.getElementById('loader').style.display = 'none';
+            document.getElementById('editorLoader').style.display = 'none';
             for (let el of formElements) el.disabled = false;
         }
     }

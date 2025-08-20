@@ -70,7 +70,7 @@
                            href="{{ url('/teachers') }}">All Teachers</a>
 
                        <a class="collapse-item {{ Request::is('editor/teacher/create') ? 'active' : '' }}"
-                           href="{{ url('editor/teacher/create') }}">Create Teacher</a>
+                           href="{{ url('/editor/teacher/create') }}">Create Teacher</a>
 
                        <a class="collapse-item {{ Request::is('teachers/permissions') ? 'active' : '' }}"
                            href="{{ url('/teachers/permissions') }}">Control Panel</a>
