@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\User;
 use App\Models\Teacher;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Mail\TeacherCreatedMail;
-use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
@@ -18,10 +19,10 @@ class TeacherController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function teacherLists()
+    public function allTeacherLists(Request $request)
     {
         try{
-            $teachers = Teacher::all();
+            $teachers = Teacher::with('user','addedBy')->get();
             return response()->json(['status' => 'success', 'allTeachers' => $teachers]);
         }catch(Exception $ex){
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
@@ -34,6 +35,7 @@ class TeacherController extends Controller
     public function teacherCreate(Request $request)
     {
         try{
+
         }catch(Exception $ex){
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
         }
@@ -82,6 +84,7 @@ public function teacherStore(Request $request)
         // Create the teacher record
         $teacher = Teacher::create([
             'user_id' => $user->id,
+            'added_by' => Auth::id(),
             'institution_id' => $validatedData['institution_id'],
             'joined_at' => now(),
             'is_active' => true,

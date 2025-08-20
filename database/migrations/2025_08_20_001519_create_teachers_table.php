@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('teachers', function (Blueprint $table) {
         $table->id();
-        $table->foreignId('user_id')->constrained('users')->cascadeOnDelete(); // link with users
+        $table->foreignId('user_id')->constrained('users')->cascadeOnDelete(); // link with teacher id
+        $table->foreignId('added_by')->nullable()->constrained('users')->nullOnDelete(); //added by admin or edior
         $table->foreignId('institution_id')->constrained('institutions')->cascadeOnDelete();
 
         // teacher-specific info

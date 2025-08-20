@@ -1,17 +1,32 @@
+
 <style>
-    /* HTML: <div class="loader"></div> */
-    /* Loader bar animation */
-    .loader {
+    /* Loader Overlay for form card */
+    .loader-overlay {
         display: none;
         /* hidden initially */
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.7);
+        /* transparent white */
+        z-index: 10;
+        border-radius: 0.35rem;
+        /* same as card border */
+    }
+
+    /* Loader bar animation */
+    .loader-bar {
         height: 4px;
         width: 100%;
         --c: no-repeat linear-gradient(#6100ee 0 0);
         background: var(--c), var(--c), #d7b8fc;
         background-size: 60% 100%;
         animation: l16 3s infinite;
-        margin-bottom: 10px;
-        /* space above the form */
+        position: absolute;
+        top: 0;
+        left: 0;
     }
 
     @keyframes l16 {
@@ -34,8 +49,11 @@
 
         <!-- Left Column: techer Form -->
         <div class="col-xl-5 col-md-6 mb-4">
-            <div class="loader" id="loader"></div>
-            <div class="card border-left-primary shadow h-100">
+            <div class="card border-left-primary shadow h-100 position-relative">
+                <!-- Loader Overlay -->
+                <div class="loader-overlay" id="loader">
+                    <div class="loader-bar"></div>
+                </div>
                 <div class="card-header bg-white py-3">
                     <h5 class="m-0 text-primary font-weight-bold">Create A New Teacher</h5>
                 </div>
@@ -44,7 +62,7 @@
                         <div class="form-group" hidden>
                             <label for="name">Institution Id</label>
                             <<input type="hidden" id="teacher_institution_id" name="institution_id">
-                            <span id="teacher_institution_id_error" class="text-danger small"></span>
+                                <span id="teacher_institution_id_error" class="text-danger small"></span>
                         </div>
                         <div class="form-group">
                             <label for="name">Teacher Name</label>
@@ -78,17 +96,17 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover table-sm" id="active-teachers-table">
+                        <table class="table table-bordered table-hover table-sm" id="admin_teachers_table">
                             <thead class="thead-light">
                                 <tr>
                                     <th>#</th>
                                     <th>Name</th>
                                     <th>Email</th>
-                                    <th>Control Panel</th>
+                                    <th>Added By</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody></tbody>
+                            <tbody id="admin_teachers_table_body"></tbody>
                         </table>
                     </div>
                 </div>
@@ -107,7 +125,7 @@
                                     <th>#</th>
                                     <th>Name</th>
                                     <th>Email</th>
-                                    <th>Control Panel</th>
+                                    <th>Added By</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -127,8 +145,13 @@
 
 
 
-<!-- jQuery CDN -->
+{{-- <!-- jQuery CDN -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
+
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
 
 <!-- Axios CDN -->
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -137,13 +160,14 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
+
 <script>
     let token = localStorage.getItem('token');
 
     if (!token) {
         alert('Unauthorized Access');
     } else {
-        loadInstitutions();
+            loadInstitutions();
     }
     loadInstitutions();
     async function loadInstitutions() {
@@ -176,6 +200,71 @@
             console.error('Error fetching institutions:', error);
         }
     }
+
+
+    $(document).ready(function() {
+        getAllTeacherLists();
+    });
+
+    async function getAllTeacherLists() {
+        let token = localStorage.getItem('token');
+        if (!token) {
+            alert('Unauthorized Access');
+            return;
+        }
+
+        try {
+            let res = await axios.post('/all/teacher/lists', {}, {
+                headers: {
+                    Authorization: 'Bearer ' + token
+                }
+            });
+
+            if (res.data.status === 'success') {
+                const teachers = res.data.allTeachers;
+
+                // Destroy old DataTable if exists
+                if ($.fn.DataTable.isDataTable('#admin_teachers_table')) {
+                    $('#admin_teachers_table').DataTable().destroy();
+                }
+
+                // Clear table body
+                $('#admin_teachers_table_body').html('');
+
+                // Append new rows
+                teachers.forEach((teacher, index) => {
+                    const addedBy = teacher.role === 'editor' ? 'Editor' : 'Owner';
+                    const row = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${teacher.name || ''}</td>
+                        <td>${teacher.email || ''}</td>
+                        <td>${addedBy}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary editTeacher" data-id="${teacher.id}">Edit</button>
+                            <button class="btn btn-sm btn-danger deleteTeacher" data-id="${teacher.id}">Delete</button>
+                        </td>
+                    </tr>
+                `;
+                    $('#admin_teachers_table_body').append(row);
+                });
+
+                // Initialize DataTable
+                $('#admin_teachers_table').DataTable({
+                    "pageLength": 10,
+                    "lengthChange": false,
+                    "ordering": true,
+                    "info": true,
+                    "autoWidth": false
+                });
+            }
+
+        } catch (error) {
+            console.error('Error fetching teachers:', error);
+        }
+    }
+
+
 
 
 
@@ -216,9 +305,9 @@
         if (isError) return;
 
         let data = {
-            name:name,
-            email:email,
-            institution_id:institution_id,
+            name: name,
+            email: email,
+            institution_id: institution_id,
         };
 
         // Show loader & disable form
@@ -246,7 +335,8 @@
                     const errors = error.response.data.errors || {};
                     document.getElementById('teacher_name_error').innerText = errors.name ? errors.name[0] : '';
                     document.getElementById('teacher_email_error').innerText = errors.email ? errors.email[0] : '';
-                    document.getElementById('institution_id_error').innerText = errors.institution_id ? errors
+                    document.getElementById('teacher_institution_id_error').innerText = errors.institution_id ?
+                        errors
                         .institution_id[0] : '';
 
                     if (error.response.data.message && !errors.name && !errors.email && !errors.institution_id) {
@@ -263,4 +353,185 @@
             for (let el of formElements) el.disabled = false;
         }
     }
+</script> --}}
+<!-- jQuery CDN -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+<!-- Axios CDN -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+$(document).ready(function() {
+    let token = localStorage.getItem('token');
+
+    if (!token) {
+        alert('Unauthorized Access');
+        return;
+    }
+
+    // Load institution id
+    loadInstitutions();
+
+    async function loadInstitutions() {
+        try {
+            const response = await axios.post('/institution/details/for/admin/editor', {}, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+
+            if (response.data.status === 'success') {
+                const institutions = response.data.data;
+                if (institutions.length > 0) {
+                    $('#teacher_institution_id').val(institutions[0].id);
+                } else {
+                    alert('No institution found');
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching institutions:', error);
+        }
+    }
+
+    // Fetch & show teacher list
+    getAllTeacherLists();
+    async function getAllTeacherLists() {
+        try {
+            const res = await axios.post('/all/teacher/lists', {}, {
+                headers: { Authorization: 'Bearer ' + token }
+            });
+
+            if (res.data.status === 'success') {
+                const teachers = res.data.allTeachers;
+
+                // Destroy old DataTable if exists
+                if ($.fn.DataTable.isDataTable('#admin_teachers_table')) {
+                    $('#admin_teachers_table').DataTable().destroy();
+                }
+
+                // Clear table body
+                $('#admin_teachers_table_body').html('');
+
+                // Append rows
+                teachers.forEach((teacher, index) => {
+                    console.log(teacher.added_by.role);
+                    const addedBy = teacher.added_by.role === 'editor' ? 'Editor' : 'Admin';
+                    const addedName = teacher.added_by.name;
+                    const row = `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${teacher.user.name}</td>
+                            <td>${teacher.user.email || ''}</td>
+                            <td>${addedName} (${addedBy})</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary editTeacher" data-id="${teacher.id}">Edit</button>
+                                <button class="btn btn-sm btn-danger deleteTeacher" data-id="${teacher.id}">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                    $('#admin_teachers_table_body').append(row);
+                });
+
+                // Initialize DataTable
+                $('#admin_teachers_table').DataTable({
+                    "pageLength": 10,
+                    "lengthChange": false,
+                    "ordering": true,
+                    "info": true,
+                    "autoWidth": false
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching teachers:', error);
+        }
+    }
+
+    // Teacher Create
+    $('#teacherForm').on('submit', async function(e) {
+        e.preventDefault();
+
+        // Clear previous errors
+        $('#teacher_name_error').text('');
+        $('#teacher_email_error').text('');
+        $('#teacher_institution_id_error').text('');
+
+        let name = $('#name').val().trim();
+        let email = $('#email').val().trim();
+        let institution_id = $('#teacher_institution_id').val().trim();
+
+        let isError = false;
+        if (!name) { $('#teacher_name_error').text('Name is required'); isError = true; }
+        if (!email) { $('#teacher_email_error').text('Email is required'); isError = true; }
+        if (!institution_id) { $('#teacher_institution_id_error').text('Institution is required'); isError = true; }
+        if (isError) return;
+
+        let data = { name, email, institution_id };
+
+        // Show loader & disable form
+        $('#loader').show();
+        $('#teacherForm :input').prop('disabled', true);
+
+        try {
+            const res = await axios.post('/teacher/store', data, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+
+            if (res.data.status === 'success') {
+                Swal.fire('Success', res.data.message, 'success');
+                $('#name').val('');
+                $('#email').val('');
+                getAllTeacherLists(); // Reload table
+            }
+        } catch (error) {
+            if (error.response && error.response.status === 422) {
+                const errors = error.response.data.errors || {};
+                $('#teacher_name_error').text(errors.name ? errors.name[0] : '');
+                $('#teacher_email_error').text(errors.email ? errors.email[0] : '');
+                $('#teacher_institution_id_error').text(errors.institution_id ? errors.institution_id[0] : '');
+            } else {
+                Swal.fire('Error', 'Something went wrong', 'error');
+            }
+        } finally {
+            $('#loader').hide();
+            $('#teacherForm :input').prop('disabled', false);
+        }
+    });
+
+    // Edit / Delete handlers
+    $(document).on('click', '.editTeacher', function() {
+        const teacherId = $(this).data('id');
+        console.log('Edit teacher:', teacherId);
+        // TODO: Open modal & edit
+    });
+
+    $(document).on('click', '.deleteTeacher', async function() {
+        const teacherId = $(this).data('id');
+        const confirm = await Swal.fire({
+            title: 'Are you sure?',
+            text: "This teacher will be deleted!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete'
+        });
+
+        if (confirm.isConfirmed) {
+            try {
+                const res = await axios.post('/teacher/delete', { id: teacherId }, {
+                    headers: { Authorization: 'Bearer ' + token }
+                });
+
+                if (res.data.status === 'success') {
+                    Swal.fire('Deleted!', res.data.message, 'success');
+                    getAllTeacherLists(); // Reload table
+                }
+            } catch (err) {
+                Swal.fire('Error', 'Delete failed', 'error');
+            }
+        }
+    });
+});
 </script>
+

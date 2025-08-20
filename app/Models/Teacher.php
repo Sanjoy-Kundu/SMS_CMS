@@ -18,6 +18,7 @@ class Teacher extends Model
     // mass assignable fields
     protected $fillable = [
         'user_id',
+        'added_by',
         'institution_id',
         'joined_at',
         'is_active',
@@ -49,6 +50,12 @@ class Teacher extends Model
     public function institution()
     {
         return $this->belongsTo(Institution::class);
+    }
+
+    // User who added the teacher
+    public function addedBy()
+    {
+        return $this->belongsTo(User::class, 'added_by');
     }
 
     // // Classes relation (Many-to-Many) with pivot table for designation

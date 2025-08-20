@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Editor;
+use App\Models\Teacher;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -55,5 +56,12 @@ class User extends Authenticatable
     public function editors()
     {
         return $this->hasMany(Editor::class);
+    }
+
+
+        // Teachers added by this user (1:N)
+    public function addedTeachers()
+    {
+        return $this->hasMany(Teacher::class, 'added_by', 'id');
     }
 }

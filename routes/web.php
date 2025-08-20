@@ -215,7 +215,7 @@ Route::middleware(['auth:sanctum', 'editor'])->group(function () {
 Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
     //Route::post('/auth/admin/details', [AdminDashboard::class, 'adminDetails']);
     Route::post('/institution/details/for/admin/editor', [InstitutionController::class, 'institutionDetailsAdminEditor']);
-    Route::post('/teacher/list', [TeacherController::class, 'teacherLists']);
+    Route::post('/all/teacher/lists', [TeacherController::class, 'allTeacherLists']);
     Route::post('/teacher/store', [TeacherController::class, 'teacherStore']);
     Route::post('/teacher/edit-by-id', [TeacherController::class, 'teacherEditById']);
     Route::post('/teacher/update', [TeacherController::class, 'teacherUpdate']);
