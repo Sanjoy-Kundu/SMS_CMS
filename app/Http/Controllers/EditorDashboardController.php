@@ -38,6 +38,27 @@ class EditorDashboardController extends Controller
         }
     }
 
+
+
+    /**
+     * Editor Teacher Page
+     */
+    public function editorTeacherCreatePage()
+    {
+        try {
+            return view('pages.dashboard.editor.teacher.teacherCreatePage');
+        } catch (Exception $ex) {
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
+    }
+
+
+
+
+
+
+
+
     //editor details
     public function editorDetails()
     {

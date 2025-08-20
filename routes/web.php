@@ -68,6 +68,8 @@ Route::get('/editor/create', [AdminDashboard::class, 'adminEditorCreatePage']);
 Route::get('/teacher/create', [AdminDashboard::class, 'adminTeacherCreatePage']);
 
 
+
+
 // admin protected route
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/auth/admin/details', [AdminDashboard::class, 'adminDetails']);
@@ -179,6 +181,7 @@ Route::post('/editor/login/store', [EditorController::class, 'editor_login_store
 //editor dashboard page
 Route::get('/editor/dashboard', [EditorDashboardController::class, 'editorDashboardPage']);
 Route::get('/editor/profile', [EditorDashboardController::class, 'editorProfilePage']);
+Route::get('/editor/teacher/create', [EditorDashboardController::class, 'editorTeacherCreatePage']);
 
 
 Route::middleware(['auth:sanctum', 'editor'])->group(function () {
@@ -210,9 +213,9 @@ Route::middleware(['auth:sanctum', 'editor'])->group(function () {
 
 //admin and editor same route
 Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
-    //Route::post('/institution/details', [InstitutionController::class, 'institutionDetails']);
+    //Route::post('/auth/admin/details', [AdminDashboard::class, 'adminDetails']);
     Route::post('/institution/details/for/admin/editor', [InstitutionController::class, 'institutionDetailsAdminEditor']);
-    Route::post('/teacher/list', [TeacherController::class, 'teacherList']);
+    Route::post('/teacher/list', [TeacherController::class, 'teacherLists']);
     Route::post('/teacher/store', [TeacherController::class, 'teacherStore']);
     Route::post('/teacher/edit-by-id', [TeacherController::class, 'teacherEditById']);
     Route::post('/teacher/update', [TeacherController::class, 'teacherUpdate']);

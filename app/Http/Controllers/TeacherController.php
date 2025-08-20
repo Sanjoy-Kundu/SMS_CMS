@@ -7,18 +7,36 @@ use App\Models\Teacher;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Mail\TeacherCreatedMail;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
 class TeacherController extends Controller
 {
+    
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function teacherLists()
     {
-        //
+        try{
+            $teachers = Teacher::all();
+            return response()->json(['status' => 'success', 'allTeachers' => $teachers]);
+        }catch(Exception $ex){
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
+    }
+
+    /**
+     * Teacher Create by admin or editor
+     */
+    public function teacherCreate(Request $request)
+    {
+        try{
+        }catch(Exception $ex){
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
     }
 
     /**
