@@ -134,10 +134,11 @@
             <div class="card border-left-danger shadow">
                 <div class="card-header bg-white py-3">
                     <h5 class="m-0 text-danger font-weight-bold">Trash teachers List</h5>
-                    <p class="m-0 text-info font-weight-bold">Total Teachers: <span class="totalTrashTeachersCount">0</span>
+                    <p class="m-0 text-info font-weight-bold">Total Teachers: <span
+                            class="totalTrashTeachersCount">0</span>
                 </div>
                 <div class="card-body">
-                         <div class="table-loader-overlay" id="trashTableLoader"
+                    <div class="table-loader-overlay" id="trashTableLoader"
                         style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); z-index:5;">
                         <div class="loader-bar"></div>
                     </div>
@@ -470,7 +471,7 @@
                     $('#admin_teachers_table_body').append(row);
                 });
 
-                // Edit / Delete handlers
+                // Edit  handlers
                 $(document).on('click', '.editTeacher', async function() {
                     const teacherId = $(this).data('id');
                     console.log('Edit teacher:', teacherId);
@@ -478,6 +479,7 @@
                     $('#adminTeacherEditModal').modal('show');
                 });
 
+                //delete handelers
                 $(document).on('click', '.trashTeacher', async function() {
                     const id = $(this).data('id');
 
@@ -587,14 +589,57 @@
                     $('#admin_trash_teachers_table_body').append(row);
                 });
 
-                // Edit / Delete handlers
-                // $(document).on('click', '.editTeacher', async function() {
-                //     const teacherId = $(this).data('id');
-                //     console.log('Edit teacher:', teacherId);
-                //     await fillAdminTeacherForm(teacherId);
-                //     $('#adminTeacherEditModal').modal('show');
-                // });
+                // Restore Teacher Handler
+                $(document).on('click', '.restoreTeacher', async function() {
+                    const id = $(this).data('id');
+                    console.log('Restore teacher:', id);
 
+                    const confirm = await Swal.fire({
+                        title: '♻️ Restore Teacher?',
+                        text: "This teacher will be restored to active list.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, Restore',
+                        cancelButtonText: 'Cancel',
+                        reverseButtons: true,
+                        focusCancel: true,
+                        buttonsStyling: true,
+                        customClass: {
+                            confirmButton: 'btn btn-success', // green button
+                            cancelButton: 'btn btn-secondary' // gray button
+                        }
+                    });
+
+                    if (!confirm.isConfirmed) return;
+
+                    // Show loader on table
+                    $('#trashTableLoader').show();
+
+                    try {
+                        const res = await axios.post('/admin/teacher/restore-by-id', {
+                            id: id
+                        }, {
+                            headers: {
+                                Authorization: 'Bearer ' + token
+                            }
+                        });
+
+                        if (res.data.status === 'success') {
+                            Swal.fire('Restored!', res.data.message, 'success');
+                            await getAllTeacherTrashLists(); // reload trash table
+                            await getAllTeacherLists();
+                        } else {
+                            Swal.fire('Error', res.data.message || 'Restore failed', 'error');
+                        }
+                    } catch (err) {
+                        Swal.fire('Error', 'Server or network error', 'error');
+                    } finally {
+                        $('#trashTableLoader').hide();
+                    }
+                });
+
+
+                //permanent delete teacher
                 $(document).on('click', '.permanentDeleteTeacher', async function() {
                     const id = $(this).data('id');
                     console.log('Permanent delete teacher:', id);
@@ -610,8 +655,8 @@
                         focusCancel: true,
                         buttonsStyling: true,
                         customClass: {
-                            confirmButton: 'btn btn-danger',   // red button
-                            cancelButton: 'btn btn-secondary'  // gray button
+                            confirmButton: 'btn btn-danger', // red button
+                            cancelButton: 'btn btn-secondary' // gray button
                         }
                     });
 

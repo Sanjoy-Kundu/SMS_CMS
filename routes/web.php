@@ -222,6 +222,7 @@ Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
     Route::post('/admin/teacher/trash-by-id', [TeacherController::class, 'teacherTrashByAdmin']);
     Route::post('/all/teacher/trash/lists', [TeacherController::class, 'allteacherTrashListsByAdmin']);
     Route::post('/admin/teacher/delete-by-id', [TeacherController::class, 'teacherDeleteByAdmin']);
+    Route::post('/admin/teacher/restore-by-id', [TeacherController::class, 'teacherRestoreByAdmin']);
 //     Route::post('/teacher/trashed-list', [TeacherController::class, 'teacherTrashedList']);
 //     Route::post('/teacher/restore', [TeacherController::class, 'teacherRestore']);
 //     Route::post('/teacher/delete', [TeacherController::class, 'teacherDelete']);

@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Profile Update Notification</title>
+    <title>Account Restored</title>
 </head>
-<body style="font-family: Arial, sans-serif; background-color:#f9f9f9; margin:0; padding:0;">
+<body style="font-family: Arial, sans-serif; background-color:#f4f6f8; margin:0; padding:0;">
     <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
             <td align="center" style="padding: 30px 0; background-color: #004080; color:#fff;">
@@ -20,19 +20,27 @@
                         <td style="padding: 20px;">
                             <h2 style="color:#333; font-size:18px;">Dear {{ $name }},</h2>
                             <p style="color:#555; font-size:14px; line-height:1.6;">
-                                We would like to inform you that your profile information 
-                                has been successfully updated in our system.
+                                We are pleased to inform you that your profile has been successfully 
+                                <strong>restored</strong> in our system at 
+                                <strong>AB School & College</strong>.
                             </p>
 
                             <p style="color:#333; font-size:14px;">
-                                <strong>Updated Name:</strong> {{ $name }}<br>
-                                <strong>Updated Email:</strong> {{ $email }}
-                                <strong>Role:</strong> Teacher
+                                <strong>Account Email:</strong> {{ $email }}
                             </p>
 
                             <p style="color:#555; font-size:14px; line-height:1.6;">
-                                If you notice any incorrect information or did not request 
-                                this change, please contact the administration office immediately.
+                                You can now access your account again and continue your journey with us.  
+                                If you did not request this action, please contact our administration immediately.
+                            </p>
+
+                            <!-- ✅ Call to Action Button -->
+                            <p style="text-align: center; margin: 25px 0;">
+                                <a href="{{ url('/login') }}" 
+                                   style="background-color:#004080; color:#fff; padding:12px 20px; 
+                                          text-decoration:none; border-radius:5px; font-size:14px;">
+                                    🔑 Login Now
+                                </a>
                             </p>
 
                             <p style="margin-top:20px; font-size:14px; color:#333;">

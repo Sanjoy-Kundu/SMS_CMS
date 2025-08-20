@@ -11,6 +11,7 @@ use App\Mail\TeacherCreatedMail;
 use App\Mail\TeacherDeletedMail;
 use App\Mail\TeacherTrashedMail;
 use App\Mail\TeacherUpdatedMail;
+use App\Mail\TeacherRestoredMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -32,6 +33,19 @@ class TeacherController extends Controller
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
         }
     }
+    // /**
+    //  * Display a listing of the resource.
+    //  */
+    // public function editorTeacherLists(Request $request)
+    // {
+    //     try{
+
+    //         $editorTeachers = Teacher::with('user','addedBy')->where('added_by',Auth::user()->id)->get();
+    //         return response()->json(['status' => 'success', 'allTeachers' => $editorTeachers, 'editorTeachers' => $editorTeachers]);
+    //     }catch(Exception $ex){
+    //         return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+    //     }
+    // }
 
 
     /**
@@ -131,10 +145,16 @@ class TeacherController extends Controller
      */
     public function allteacherTrashListsByAdmin(Request $request){
         try{
+            $editorId = Auth::id();
            $trashedTeachersDetailsData = Teacher::onlyTrashed()->with(['user' => function($q) { $q->withTrashed();}, 'addedBy'])->get();
+            $trashEditorData = Teacher::with('user')->onlyTrashed()
+            ->where('added_by', $editorId)
+            ->get();
+       
             return response()->json([
                 'status' => 'success',
-                'trashTeachers' => $trashedTeachersDetailsData
+                'trashTeachers' => $trashedTeachersDetailsData,
+                'trashEditorData' =>$trashEditorData
             ]);
         }catch(Exception $ex){
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
@@ -174,6 +194,39 @@ class TeacherController extends Controller
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
         }
     }
+
+
+    /**
+     * Teacher Resore By admin or  Editor
+     */
+    public function teacherRestoreByAdmin(Request $request){
+    try{
+        $id = $request->id;
+
+        $teacher = Teacher::withTrashed()->where('id', $id)->first();
+        if(!$teacher){
+            return response()->json(['status' => 'fail', 'message' => 'Teacher not found']);
+        }
+
+        $user = User::withTrashed()->where('id', $teacher->user_id)->first();
+
+        // Restore
+        $teacher->restore();
+        if($user){
+            $user->restore();
+
+            // Send Restore Email
+            Mail::to($user->email)->send(new TeacherRestoredMail(
+                $user->name,
+                $user->email
+            ));
+        }
+
+        return response()->json(['status' => 'success', 'message' => 'Teacher restored successfully']);
+    }catch(Exception $ex){
+        return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+    }
+}
 
 
 
