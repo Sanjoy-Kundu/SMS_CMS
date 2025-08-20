@@ -8,6 +8,8 @@ use App\Models\Teacher;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Mail\TeacherCreatedMail;
+use App\Mail\TeacherDeletedMail;
+use App\Mail\TeacherTrashedMail;
 use App\Mail\TeacherUpdatedMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -75,6 +77,106 @@ class TeacherController extends Controller
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
         }
       }
+
+
+
+
+
+
+
+      /**
+       * Both teacher trash admin or Edior
+       */
+    
+    
+    
+    
+      public function teacherTrashByAdmin(Request $request){
+        try {
+            $id = $request->id;
+            $searchingTeacherDetails = Teacher::with('user','addedBy')->where('id', $id)->first();
+
+            if (!$searchingTeacherDetails) {
+                return response()->json(['status' => 'fail', 'message' => 'Teacher Details not found']);
+            }
+
+            $userTableTeacher = User::where('id', $searchingTeacherDetails->user_id)
+                                    ->where('role', 'teacher')
+                                    ->first();
+
+            if (!$userTableTeacher) {
+                return response()->json(['status' => 'fail', 'message' => 'User Teacher not found']);
+            }
+
+            // Send email to teacher before soft delete
+            Mail::to($userTableTeacher->email)->send(new TeacherTrashedMail(
+                $userTableTeacher->name,
+                $userTableTeacher->email
+            ));
+
+            // Soft delete both tables
+            $searchingTeacherDetails->delete();
+            $userTableTeacher->delete();
+
+            return response()->json(['status' => 'success', 'message' => 'Teacher trashed successfully']);
+
+        } catch (Exception $ex) {
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
+    }
+
+
+    /**
+     * Teacher Restore By admin or  Editor
+     */
+    public function allteacherTrashListsByAdmin(Request $request){
+        try{
+           $trashedTeachersDetailsData = Teacher::onlyTrashed()->with(['user' => function($q) { $q->withTrashed();}, 'addedBy'])->get();
+            return response()->json([
+                'status' => 'success',
+                'trashTeachers' => $trashedTeachersDetailsData
+            ]);
+        }catch(Exception $ex){
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
+    }
+
+
+
+
+    /**
+     * Teacher Permanent Delete By admin or  Editor
+     */
+    public function teacherDeleteByAdmin(Request $request){
+        try{
+            $id = $request->id;
+
+            // Teacher খুঁজে বের করা
+             $teacher = Teacher::withTrashed()->where('id', $id)->first();
+            if(!$teacher){
+                return response()->json(['status' => 'fail', 'message' => 'Teacher not found']);
+            }
+
+            // Teacher এর related user
+             $user = User::withTrashed()->where('id', $teacher->user_id)->first();
+            if(!$user){
+                return response()->json(['status' => 'fail', 'message' => 'User not found']);
+            }
+
+            Mail::to($user->email)->send(new TeacherDeletedMail($user->name, $user->email));
+            // Permanently delete
+            $teacher->forceDelete(); // teacher table
+            $user->forceDelete();    // user table
+
+            return response()->json(['status' => 'success', 'message' => 'Teacher permanently deleted Successfully!']);
+
+        }catch(Exception $ex){
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
+    }
+
+
+
 
 
 

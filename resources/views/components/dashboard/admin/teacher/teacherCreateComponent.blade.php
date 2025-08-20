@@ -28,6 +28,20 @@
         left: 0;
     }
 
+
+    .table-loader-overlay .loader-bar {
+        height: 4px;
+        width: 100%;
+        --c: no-repeat linear-gradient(#6100ee 0 0);
+        background: var(--c), var(--c), #d7b8fc;
+        background-size: 60% 100%;
+        animation: l16 3s infinite;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+
     @keyframes l16 {
         0% {
             background-position: -150% 0, -150% 0
@@ -94,7 +108,12 @@
                     </p>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
+                    <!-- Loader overlay for teacher table -->
+                    <div class="table-loader-overlay" id="tableLoader"
+                        style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); z-index:5;">
+                        <div class="loader-bar"></div>
+                    </div>
+                    <div class="table-responsive position-relative">
                         <table class="table table-bordered table-hover table-sm" id="admin_teachers_table">
                             <thead class="thead-light">
                                 <tr>
@@ -115,10 +134,15 @@
             <div class="card border-left-danger shadow">
                 <div class="card-header bg-white py-3">
                     <h5 class="m-0 text-danger font-weight-bold">Trash teachers List</h5>
+                    <p class="m-0 text-info font-weight-bold">Total Teachers: <span class="totalTrashTeachersCount">0</span>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover table-sm" id="trash-teachers-table">
+                         <div class="table-loader-overlay" id="trashTableLoader"
+                        style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); z-index:5;">
+                        <div class="loader-bar"></div>
+                    </div>
+                    <div class="table-responsive position-relative">
+                        <table class="table table-bordered table-hover table-sm" id="admin_trash_teachers_table">
                             <thead class="thead-light">
                                 <tr>
                                     <th>#</th>
@@ -128,7 +152,7 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody></tbody>
+                            <tbody id="admin_trash_teachers_table_body"></tbody>
                         </table>
                     </div>
                 </div>
@@ -396,7 +420,10 @@
     // Fetch & show teacher list
     $(document).ready(function() {
         getAllTeacherLists();
+        getAllTeacherTrashLists();
     });
+
+    //all teacher lists admin and editor
     async function getAllTeacherLists() {
         let token = localStorage.getItem('token');
 
@@ -436,7 +463,7 @@
                             <td>${addedName} (${addedBy})</td>
                             <td>
                                 <button class="btn btn-sm btn-primary editTeacher" data-id="${teacher.id}">Edit</button>
-                                <button class="btn btn-sm btn-danger deleteTeacher" data-id="${teacher.id}">Delete</button>
+                                <button class="btn btn-sm btn-danger trashTeacher" data-id="${teacher.id}">TRASH</button>
                             </td>
                         </tr>
                     `;
@@ -451,33 +478,43 @@
                     $('#adminTeacherEditModal').modal('show');
                 });
 
-                $(document).on('click', '.deleteTeacher', async function() {
-                    const teacherId = $(this).data('id');
+                $(document).on('click', '.trashTeacher', async function() {
+                    const id = $(this).data('id');
+
                     const confirm = await Swal.fire({
                         title: 'Are you sure?',
-                        text: "This teacher will be deleted!",
+                        text: "This teacher will be trashed!",
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Yes, delete'
+                        confirmButtonText: 'Yes, trash'
                     });
 
-                    if (confirm.isConfirmed) {
-                        try {
-                            const res = await axios.post('/teacher/delete', {
-                                id: teacherId
-                            }, {
-                                headers: {
-                                    Authorization: 'Bearer ' + token
-                                }
-                            });
+                    if (!confirm.isConfirmed) return;
 
-                            if (res.data.status === 'success') {
-                                Swal.fire('Deleted!', res.data.message, 'success');
-                                getAllTeacherLists(); // Reload table
+                    // Show loader on table
+                    $('#tableLoader').show();
+
+                    try {
+                        const res = await axios.post('/admin/teacher/trash-by-id', {
+                            id: id
+                        }, {
+                            headers: {
+                                Authorization: 'Bearer ' + token
                             }
-                        } catch (err) {
-                            Swal.fire('Error', 'Delete failed', 'error');
+                        });
+
+                        if (res.data.status === 'success') {
+                            Swal.fire('Trashed!', res.data.message, 'success');
+
+                            await getAllTeacherLists(); // reload table
+                            await getAllTeacherTrashLists(); // reload trash table
+                        } else {
+                            Swal.fire('Error', res.data.message || 'Trash failed', 'error');
                         }
+                    } catch (err) {
+                        Swal.fire('Error', 'Server or network error', 'error');
+                    } finally {
+                        $('#tableLoader').hide();
                     }
                 });
 
@@ -500,6 +537,135 @@
             console.error('Error fetching teachers:', error);
         }
     }
+
+    //get all trash teacher lists admin or editor
+    async function getAllTeacherTrashLists() {
+        let token = localStorage.getItem('token');
+
+        if (!token) {
+            alert('Unauthorized Access');
+            return;
+        }
+        try {
+            const res = await axios.post('/all/teacher/trash/lists', {}, {
+                headers: {
+                    Authorization: 'Bearer ' + token
+                }
+            });
+
+            if (res.data.status === 'success') {
+                const teachers = res.data.trashTeachers;
+                document.querySelector('.totalTrashTeachersCount').innerText = teachers.length;
+
+                // Destroy old DataTable if exists
+                if ($.fn.DataTable.isDataTable('#admin_trash_teachers_table')) {
+                    $('#admin_trash_teachers_table').DataTable().destroy();
+                }
+
+                // Clear table body
+                $('#admin_trash_teachers_table_body').html('');
+
+                // Append rows
+                teachers.forEach((teacher, index) => {
+                    //console.log(teacher.added_by.role);
+                    const addedBy = teacher.added_by.role === 'editor' ? 'Editor' : 'Admin';
+                    const addedName = teacher.added_by.name;
+                    const row = `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${teacher.user.name}</td>
+                            <td>${teacher.user.email || ''}</td>
+                            <td>${addedName} (${addedBy})</td>
+                            <td>
+                                <div class="btn-group" role="group" aria-label="Basic example">
+                                <button class="btn btn-sm btn-info restoreTeacher" data-id="${teacher.id}">RESTORE</button>
+                                <button class="btn btn-sm btn-danger permanentDeleteTeacher" data-id="${teacher.id}">DELTE</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    $('#admin_trash_teachers_table_body').append(row);
+                });
+
+                // Edit / Delete handlers
+                // $(document).on('click', '.editTeacher', async function() {
+                //     const teacherId = $(this).data('id');
+                //     console.log('Edit teacher:', teacherId);
+                //     await fillAdminTeacherForm(teacherId);
+                //     $('#adminTeacherEditModal').modal('show');
+                // });
+
+                $(document).on('click', '.permanentDeleteTeacher', async function() {
+                    const id = $(this).data('id');
+                    console.log('Permanent delete teacher:', id);
+
+                    const confirm = await Swal.fire({
+                        title: '⚠️ Are you sure?',
+                        text: "This teacher will be permanently deleted!",
+                        icon: 'warning', // icon can be 'warning', 'error', 'success', 'info', 'question'
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, Delete Permanently',
+                        cancelButtonText: 'Cancel',
+                        reverseButtons: true,
+                        focusCancel: true,
+                        buttonsStyling: true,
+                        customClass: {
+                            confirmButton: 'btn btn-danger',   // red button
+                            cancelButton: 'btn btn-secondary'  // gray button
+                        }
+                    });
+
+
+                    if (!confirm.isConfirmed) return;
+
+                    // Show loader on table
+                    $('#trashTableLoader').show();
+
+                    try {
+                        const res = await axios.post('/admin/teacher/delete-by-id', {
+                            id: id
+                        }, {
+                            headers: {
+                                Authorization: 'Bearer ' + token
+                            }
+                        });
+
+                        if (res.data.status === 'success') {
+                            Swal.fire('Trashed!', res.data.message, 'success');
+                            getAllTeacherTrashLists(); // reload table
+                        } else {
+                            Swal.fire('Error', res.data.message || 'Trash failed', 'error');
+                        }
+                    } catch (err) {
+                        Swal.fire('Error', 'Server or network error', 'error');
+                    } finally {
+                        $('#trashTableLoader').hide();
+                    }
+                });
+
+
+
+
+
+
+
+                // Initialize DataTable
+                $('#admin_trash_teachers_table').DataTable({
+                    "pageLength": 10,
+                    "lengthChange": false,
+                    "ordering": true,
+                    "info": true,
+                    "autoWidth": false
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching teachers:', error);
+        }
+    }
+
+
+
+
 
 
     // Teacher Create

@@ -219,7 +219,9 @@ Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
     Route::post('/teacher/store', [TeacherController::class, 'teacherStore']);
     Route::post('/admin-teacher/details-by-id', [TeacherController::class, 'teacherDetailsById']);
     Route::post('/update-teacher-by-admin', [TeacherController::class, 'teacherUpdateByAdmin']);
-//     Route::post('/teacher/trash', [TeacherController::class, 'teacherTrash']);
+    Route::post('/admin/teacher/trash-by-id', [TeacherController::class, 'teacherTrashByAdmin']);
+    Route::post('/all/teacher/trash/lists', [TeacherController::class, 'allteacherTrashListsByAdmin']);
+    Route::post('/admin/teacher/delete-by-id', [TeacherController::class, 'teacherDeleteByAdmin']);
 //     Route::post('/teacher/trashed-list', [TeacherController::class, 'teacherTrashedList']);
 //     Route::post('/teacher/restore', [TeacherController::class, 'teacherRestore']);
 //     Route::post('/teacher/delete', [TeacherController::class, 'teacherDelete']);
