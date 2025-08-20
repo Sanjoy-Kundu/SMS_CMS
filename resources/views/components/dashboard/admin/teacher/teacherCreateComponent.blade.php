@@ -1,4 +1,3 @@
-
 <style>
     /* Loader Overlay for form card */
     .loader-overlay {
@@ -78,9 +77,7 @@
                             <span id="teacher_email_error" class="text-danger small"></span>
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-block" id="submitBtn"
-                            onclick="teacherCreate(event)">Add
-                            teacher</button>
+                        <button type="submit" class="btn btn-primary btn-block" id="submitBtn">Add teacher</button>
                     </form>
                 </div>
             </div>
@@ -92,7 +89,9 @@
             <!-- Active teachers -->
             <div class="card border-left-success shadow mb-4">
                 <div class="card-header bg-white py-3">
-                    <h5 class="m-0 text-success font-weight-bold">teachers List</h5>
+                    <h5 class="m-0 text-success font-weight-bold">Teachers Lists</h5>
+                    <p class="m-0 text-info font-weight-bold">Total Teachers: <span class="totalTeachersCount">0</span>
+                    </p>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -366,21 +365,19 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-$(document).ready(function() {
-    let token = localStorage.getItem('token');
-
-    if (!token) {
-        alert('Unauthorized Access');
-        return;
-    }
-
     // Load institution id
     loadInstitutions();
-
     async function loadInstitutions() {
+        let token = localStorage.getItem('token');
+        if (!token) {
+            alert('Unauthorized Access');
+            return;
+        }
         try {
             const response = await axios.post('/institution/details/for/admin/editor', {}, {
-                headers: { 'Authorization': 'Bearer ' + token }
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
             });
 
             if (response.data.status === 'success') {
@@ -397,15 +394,26 @@ $(document).ready(function() {
     }
 
     // Fetch & show teacher list
-    getAllTeacherLists();
+    $(document).ready(function() {
+        getAllTeacherLists();
+    });
     async function getAllTeacherLists() {
+        let token = localStorage.getItem('token');
+
+        if (!token) {
+            alert('Unauthorized Access');
+            return;
+        }
         try {
             const res = await axios.post('/all/teacher/lists', {}, {
-                headers: { Authorization: 'Bearer ' + token }
+                headers: {
+                    Authorization: 'Bearer ' + token
+                }
             });
 
             if (res.data.status === 'success') {
                 const teachers = res.data.allTeachers;
+                document.querySelector('.totalTeachersCount').innerText = teachers.length;
 
                 // Destroy old DataTable if exists
                 if ($.fn.DataTable.isDataTable('#admin_teachers_table')) {
@@ -417,7 +425,7 @@ $(document).ready(function() {
 
                 // Append rows
                 teachers.forEach((teacher, index) => {
-                    console.log(teacher.added_by.role);
+                    //console.log(teacher.added_by.role);
                     const addedBy = teacher.added_by.role === 'editor' ? 'Editor' : 'Admin';
                     const addedName = teacher.added_by.name;
                     const row = `
@@ -435,6 +443,50 @@ $(document).ready(function() {
                     $('#admin_teachers_table_body').append(row);
                 });
 
+                // Edit / Delete handlers
+                $(document).on('click', '.editTeacher', async function() {
+                    const teacherId = $(this).data('id');
+                    console.log('Edit teacher:', teacherId);
+                    await fillAdminTeacherForm(teacherId);
+                    $('#adminTeacherEditModal').modal('show');
+                });
+
+                $(document).on('click', '.deleteTeacher', async function() {
+                    const teacherId = $(this).data('id');
+                    const confirm = await Swal.fire({
+                        title: 'Are you sure?',
+                        text: "This teacher will be deleted!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, delete'
+                    });
+
+                    if (confirm.isConfirmed) {
+                        try {
+                            const res = await axios.post('/teacher/delete', {
+                                id: teacherId
+                            }, {
+                                headers: {
+                                    Authorization: 'Bearer ' + token
+                                }
+                            });
+
+                            if (res.data.status === 'success') {
+                                Swal.fire('Deleted!', res.data.message, 'success');
+                                getAllTeacherLists(); // Reload table
+                            }
+                        } catch (err) {
+                            Swal.fire('Error', 'Delete failed', 'error');
+                        }
+                    }
+                });
+
+
+
+
+
+
+
                 // Initialize DataTable
                 $('#admin_teachers_table').DataTable({
                     "pageLength": 10,
@@ -449,9 +501,18 @@ $(document).ready(function() {
         }
     }
 
+
     // Teacher Create
     $('#teacherForm').on('submit', async function(e) {
         e.preventDefault();
+        let token = localStorage.getItem('token');
+
+        if (!token) {
+            alert('Unauthorized Access');
+            return;
+        }
+
+
 
         // Clear previous errors
         $('#teacher_name_error').text('');
@@ -463,12 +524,25 @@ $(document).ready(function() {
         let institution_id = $('#teacher_institution_id').val().trim();
 
         let isError = false;
-        if (!name) { $('#teacher_name_error').text('Name is required'); isError = true; }
-        if (!email) { $('#teacher_email_error').text('Email is required'); isError = true; }
-        if (!institution_id) { $('#teacher_institution_id_error').text('Institution is required'); isError = true; }
+        if (!name) {
+            $('#teacher_name_error').text('Name is required');
+            isError = true;
+        }
+        if (!email) {
+            $('#teacher_email_error').text('Email is required');
+            isError = true;
+        }
+        if (!institution_id) {
+            $('#teacher_institution_id_error').text('Institution is required');
+            isError = true;
+        }
         if (isError) return;
 
-        let data = { name, email, institution_id };
+        let data = {
+            name,
+            email,
+            institution_id
+        };
 
         // Show loader & disable form
         $('#loader').show();
@@ -476,7 +550,9 @@ $(document).ready(function() {
 
         try {
             const res = await axios.post('/teacher/store', data, {
-                headers: { 'Authorization': 'Bearer ' + token }
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
             });
 
             if (res.data.status === 'success') {
@@ -490,7 +566,8 @@ $(document).ready(function() {
                 const errors = error.response.data.errors || {};
                 $('#teacher_name_error').text(errors.name ? errors.name[0] : '');
                 $('#teacher_email_error').text(errors.email ? errors.email[0] : '');
-                $('#teacher_institution_id_error').text(errors.institution_id ? errors.institution_id[0] : '');
+                $('#teacher_institution_id_error').text(errors.institution_id ? errors
+                    .institution_id[0] : '');
             } else {
                 Swal.fire('Error', 'Something went wrong', 'error');
             }
@@ -499,39 +576,4 @@ $(document).ready(function() {
             $('#teacherForm :input').prop('disabled', false);
         }
     });
-
-    // Edit / Delete handlers
-    $(document).on('click', '.editTeacher', function() {
-        const teacherId = $(this).data('id');
-        console.log('Edit teacher:', teacherId);
-        // TODO: Open modal & edit
-    });
-
-    $(document).on('click', '.deleteTeacher', async function() {
-        const teacherId = $(this).data('id');
-        const confirm = await Swal.fire({
-            title: 'Are you sure?',
-            text: "This teacher will be deleted!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, delete'
-        });
-
-        if (confirm.isConfirmed) {
-            try {
-                const res = await axios.post('/teacher/delete', { id: teacherId }, {
-                    headers: { Authorization: 'Bearer ' + token }
-                });
-
-                if (res.data.status === 'success') {
-                    Swal.fire('Deleted!', res.data.message, 'success');
-                    getAllTeacherLists(); // Reload table
-                }
-            } catch (err) {
-                Swal.fire('Error', 'Delete failed', 'error');
-            }
-        }
-    });
-});
 </script>
-

@@ -97,21 +97,20 @@
             <!-- Active teachers -->
             <div class="card border-left-success shadow mb-4">
                 <div class="card-header bg-white py-3">
-                    <h5 class="m-0 text-success font-weight-bold">Editor Teachers List</h5>
+                    <h5 class="m-0 text-success font-weight-bold">Teachers List</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover table-sm" id="active-teachers-table">
+                        <table class="table table-bordered table-hover table-sm" id="editor_teachers_table">
                             <thead class="thead-light">
                                 <tr>
                                     <th>#</th>
                                     <th>Name</th>
                                     <th>Email</th>
-                                    <th>Control Panel</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody></tbody>
+                            <tbody id="editor_teachers_table_body"></tbody>
                         </table>
                     </div>
                 </div>
@@ -122,6 +121,10 @@
 
 <!-- jQuery CDN -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
 
 <!-- Axios CDN -->
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -156,9 +159,8 @@
             if (response.data.status === 'success') {
                 const institutions = response.data.data;
                 if (institutions.length > 0) {
-                    // যদি single input field ব্যবহার করছেন:
                     document.getElementById('editor_teacher_institution_id').value = institutions[0].id;
-                    console.log(institutions[0].id);
+                    //console.log(institutions[0].id);
                 } else {
                     alert('No institution found');
                 }
@@ -227,6 +229,7 @@
             });
 
             if (res.data.status === 'success') {
+                await getEditorSelfTeacherLists();
                 Swal.fire('Success', res.data.message, 'success');
                 // Reset form
                 document.getElementById('editor_teacher_name').value = '';
@@ -254,6 +257,57 @@
         } finally {
             document.getElementById('editorLoader').style.display = 'none';
             for (let el of formElements) el.disabled = false;
+        }
+    }
+
+
+    //teacher list by editor id 
+    getEditorSelfTeacherLists()
+    async function getEditorSelfTeacherLists() {
+        try {
+            const res = await axios.post('/all/teacher/lists', {}, {
+                headers: { Authorization: 'Bearer ' + token }
+            });
+
+            if (res.data.status === 'success') {
+                const teachers = res.data.editorTeachers;
+
+                // Destroy old DataTable if exists
+                if ($.fn.DataTable.isDataTable('#editor_teachers_table')) {
+                    $('#editor_teachers_table').DataTable().destroy();
+                }
+
+                // Clear table body
+                $('#editor_teachers_table_body').html('');
+
+                // Append rows
+                teachers.forEach((teacher, index) => {
+                    //console.log(teacher.added_by.role);
+                    const row = `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${teacher.user.name}</td>
+                            <td>${teacher.user.email || ''}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary editTeacher" data-id="${teacher.id}">Edit</button>
+                                <button class="btn btn-sm btn-danger deleteTeacher" data-id="${teacher.id}">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                    $('#editor_teachers_table_body').append(row);
+                });
+
+                // Initialize DataTable
+                $('#editor_teachers_table').DataTable({
+                    "pageLength": 10,
+                    "lengthChange": false,
+                    "ordering": true,
+                    "info": true,
+                    "autoWidth": false
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching teachers:', error);
         }
     }
 </script>

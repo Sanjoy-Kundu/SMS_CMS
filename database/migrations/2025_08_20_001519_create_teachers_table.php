@@ -26,6 +26,7 @@ return new class extends Migration
         $table->string('mother_name')->nullable();
         $table->string('phone')->unique()->nullable();
         $table->string('address')->nullable();
+        $table->text('about_me')->nullable(); // for biodata
         $table->string('image')->nullable();
         $table->string('nationality')->nullable();
         $table->date('birth_date')->nullable();

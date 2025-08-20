@@ -4,4 +4,5 @@
     @include('components.dashboard.admin.navComponent')
     @include('components.dashboard.admin.teacher.teacherCreateComponent')
     @include('components.dashboard.admin.footerComponent')
+    @include('components.dashboard.admin.teacher.teacherEditComponent')
 @endsection

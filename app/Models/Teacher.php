@@ -26,6 +26,7 @@ class Teacher extends Model
         'mother_name',
         'phone',
         'address',
+        'about_me',
         'image',
         'nationality',
         'birth_date',

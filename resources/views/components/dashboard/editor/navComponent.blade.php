@@ -1,3 +1,4 @@
+<script src="{{asset('/assets/vendor/jquery/jquery.min.js')}}"></script>
 <!-- Content Wrapper -->
 <div id="content-wrapper" class="d-flex flex-column">
 

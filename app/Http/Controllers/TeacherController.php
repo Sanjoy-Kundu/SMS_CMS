@@ -8,6 +8,7 @@ use App\Models\Teacher;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Mail\TeacherCreatedMail;
+use App\Mail\TeacherUpdatedMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -23,26 +24,63 @@ class TeacherController extends Controller
     {
         try{
             $teachers = Teacher::with('user','addedBy')->get();
-            return response()->json(['status' => 'success', 'allTeachers' => $teachers]);
+            $editorTeachers = Teacher::with('user','addedBy')->where('added_by',Auth::user()->id)->get();
+            return response()->json(['status' => 'success', 'allTeachers' => $teachers, 'editorTeachers' => $editorTeachers]);
         }catch(Exception $ex){
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
         }
     }
 
+
     /**
-     * Teacher Create by admin or editor
+     * Admin Edit By all Teachers both admin or editor
      */
-    public function teacherCreate(Request $request)
-    {
+    public function teacherDetailsById(Request $request){
         try{
-
+            $id = $request->id;
+            $searchingTeacherDetails = Teacher::with('user','addedBy')->where('id',$id)->first();
+            if(!$searchingTeacherDetails){
+                return response()->json(['status' => 'error', 'message' => 'Teacher not found']);
+            }
+            return response()->json(['status' => 'success', 'teacherDetails' => $searchingTeacherDetails]);
         }catch(Exception $ex){
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
         }
     }
 
+
+    /***
+     * Teacher Update By admin Only
+     */
+    public function teacherUpdateByAdmin(Request $request){
+        try{
+            $id = $request->id;
+            $searchingTeacherDetails = Teacher::with('user','addedBy')->where('id',$id)->first(); //teacher table id = 2  User table id = 16
+            if(!$searchingTeacherDetails){
+                return response()->json(['status' => 'error', 'message' => 'Teacher not found']);
+            }
+                 $user = $searchingTeacherDetails->user;
+                $user->name = $request->name;
+                $user->email = $request->email;
+                
+                //if update then just send a email to teacher mail 
+            Mail::to($user->email)->send(new TeacherUpdatedMail(
+                  $user->name,
+                  $user->email
+            ));
+            $user->save();
+
+            return response()->json(['status' => 'success', 'message' => 'Teacher updated successfully']);
+        }catch(Exception $ex){
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
+      }
+
+
+
+
     /**
-     * Teacher Store
+     * Teacher Created By admin or  Store
      */
 public function teacherStore(Request $request)
 {
@@ -98,7 +136,7 @@ public function teacherStore(Request $request)
         // Return success response
         return response()->json([
             'status' => 'success',
-            'message' => 'Teacher created successfully. A random password has been generated.',
+            'message' => 'Teacher created successfully.',
             'teacher' => $teacher,
             'user' => $user,
         ], 201);
