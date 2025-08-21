@@ -25,7 +25,7 @@ class TeacherController extends Controller
      */
     public function allTeacherLists(Request $request)
     {
-        try{
+   try{
             $teachers = Teacher::with('user','addedBy')->get();
             $editorTeachers = Teacher::with('user','addedBy')->where('added_by',Auth::user()->id)->get();
             return response()->json(['status' => 'success', 'allTeachers' => $teachers, 'editorTeachers' => $editorTeachers]);
@@ -145,16 +145,19 @@ class TeacherController extends Controller
      */
     public function allteacherTrashListsByAdmin(Request $request){
         try{
-            $editorId = Auth::id();
+            $authUser = Auth::user();
            $trashedTeachersDetailsData = Teacher::onlyTrashed()->with(['user' => function($q) { $q->withTrashed();}, 'addedBy'])->get();
-            $trashEditorData = Teacher::with('user')->onlyTrashed()
-            ->where('added_by', $editorId)
+           
+        $EditortrashedTeachers = Teacher::onlyTrashed()->with([
+                'user' => function ($q) {$q->withTrashed(); },'addedBy'
+            ])
+            ->where('added_by', $authUser->id)
             ->get();
        
             return response()->json([
                 'status' => 'success',
                 'trashTeachers' => $trashedTeachersDetailsData,
-                'trashEditorData' =>$trashEditorData
+                'EditortrashedTeachers' =>$EditortrashedTeachers
             ]);
         }catch(Exception $ex){
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);

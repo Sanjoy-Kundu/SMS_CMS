@@ -149,6 +149,7 @@
                                     <th>#</th>
                                     <th>Name</th>
                                     <th>Email</th>
+                                    <th>Added By</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -330,7 +331,7 @@
 
                     // Append rows
                     teachers.forEach((teacher, index) => {
-                        console.log(teacher);
+                        //console.log(teacher);
                         const row = `
                         <tr>
                             <td>${index + 1}</td>
@@ -344,11 +345,11 @@
                     `;
                         $('#editor_teachers_table_body').append(row);
                     });
-
-                    //editor edit Teacher 
+                }
+                              //editor edit Teacher 
                     $(document).on('click', '.EditorEditTeacher', async function() {
                         const teacherId = $(this).data('id');
-                        console.log('Edit teacher:', teacherId);
+                        //console.log('Edit teacher:', teacherId);
                         await fillEditorTeacherForm(teacherId);
                         $('#editorTeacherEditModal').modal('show');
                     });
@@ -383,6 +384,7 @@
                                 Swal.fire('Trashed!', res.data.message, 'success');
 
                                 await getEditorSelfTeacherLists(); // reload table
+                                await getEditorTrashTeacherLists();
                                 //await getEditorSelfTeacherTrashLists(); // reload trash table
                             } else {
                                 Swal.fire('Error', res.data.message || 'Trash failed', 'error');
@@ -402,43 +404,42 @@
                         "info": true,
                         "autoWidth": false
                     });
-                }
             } catch (error) {
                 console.error('Error fetching teachers:', error);
             }
         }
 
-        //teacher trash lists
-        //get all trash teacher lists admin or editor
-        async function getAllTeacherTrashLists() {
-            let token = localStorage.getItem('token');
 
-            if (!token) {
-                alert('Unauthorized Access');
+        getEditorTrashTeacherLists();
+        async  function getEditorTrashTeacherLists() {
+            let token = localStorage.getItem('token');
+            if(!token){
+                alert('Unauthorized access');
                 return;
             }
-            try {
-                const res = await axios.post('/all/teacher/trash/lists', {}, {
+
+            try{
+                 const res = await axios.post('/all/teacher/trash/lists', {}, {
                     headers: {
                         Authorization: 'Bearer ' + token
                     }
                 });
+                if(res.data.status === 'success'){
+                    let trashTeacherLists = res.data.EditortrashedTeachers;
+                    document.querySelector('.editorTotalTrashTeachersCount').innerText = trashTeacherLists.length;
+                    //console.log('trash lists',trashTeacherLists);
 
-                if (res.data.status === 'success') {
-                    const teachers = res.data.trashEditonData;
-                    document.querySelector('.totalTrashTeachersCount').innerText = teachers.length;
-
-                    // Destroy old DataTable if exists
-                    if ($.fn.DataTable.isDataTable('#admin_trash_teachers_table')) {
-                        $('#admin_trash_teachers_table').DataTable().destroy();
+                     // Destroy old DataTable if exists
+                    if ($.fn.DataTable.isDataTable('#editor_trash_teachers_table')) {
+                        $('#editor_trash_teachers_table_body').DataTable().destroy();
                     }
 
                     // Clear table body
-                    $('#admin_trash_teachers_table_body').html('');
+                    $('#editor_trash_teachers_table_body').html('');
 
                     // Append rows
-                    teachers.forEach((teacher, index) => {
-                        console.log(teacher);
+                    trashTeacherLists.forEach((teacher, index) => {
+                        //console.log(teacher);
                         const addedBy = teacher.added_by.role === 'editor' ? 'Editor' : 'Admin';
                         const addedName = teacher.added_by.name;
                         const row = `
@@ -449,17 +450,19 @@
                             <td>${addedName} (${addedBy})</td>
                             <td>
                                 <div class="btn-group" role="group" aria-label="Basic example">
-                                <button class="btn btn-sm btn-info restoreTeacher" data-id="${teacher.id}">RESTORE</button>
-                                <button class="btn btn-sm btn-danger permanentDeleteTeacher" data-id="${teacher.id}">DELTE</button>
+                                <button class="btn btn-sm btn-info EditorRestoreTeacher" data-id="${teacher.id}">RESTORE</button>
+                                <button class="btn btn-sm btn-danger EditorPermanentDeleteTeacher" data-id="${teacher.id}">DELTE</button>
                                 </div>
                             </td>
                         </tr>
                     `;
-                        $('#admin_trash_teachers_table_body').append(row);
-                    });
+                        $('#editor_trash_teachers_table_body').append(row);
+                    });  
+                }
+
 
                     // Restore Teacher Handler
-                    $(document).on('click', '.restoreTeacher', async function() {
+                    $(document).on('click', '.EditorRestoreTeacher', async function() {
                         const id = $(this).data('id');
                         console.log('Restore teacher:', id);
 
@@ -482,7 +485,7 @@
                         if (!confirm.isConfirmed) return;
 
                         // Show loader on table
-                        $('#trashTableLoader').show();
+                        $('#editorTrashTableLoader').show();
 
                         try {
                             const res = await axios.post('/admin/teacher/restore-by-id', {
@@ -495,21 +498,22 @@
 
                             if (res.data.status === 'success') {
                                 Swal.fire('Restored!', res.data.message, 'success');
-                                await getAllTeacherTrashLists(); // reload trash table
-                                await getAllTeacherLists();
+                                await getEditorTrashTeacherLists(); // reload trash table
+                                await getEditorSelfTeacherLists();
                             } else {
                                 Swal.fire('Error', res.data.message || 'Restore failed', 'error');
                             }
                         } catch (err) {
                             Swal.fire('Error', 'Server or network error', 'error');
                         } finally {
-                            $('#trashTableLoader').hide();
+                            $('#editorTrashTableLoader').hide();
                         }
                     });
 
 
+                    //Permanent Delete Teacher Handeler
                     //permanent delete teacher
-                    $(document).on('click', '.permanentDeleteTeacher', async function() {
+                    $(document).on('click', '.EditorPermanentDeleteTeacher', async function() {
                         const id = $(this).data('id');
                         console.log('Permanent delete teacher:', id);
 
@@ -533,7 +537,7 @@
                         if (!confirm.isConfirmed) return;
 
                         // Show loader on table
-                        $('#trashTableLoader').show();
+                        $('#editorTrashTableLoader').show();
 
                         try {
                             const res = await axios.post('/admin/teacher/delete-by-id', {
@@ -546,204 +550,33 @@
 
                             if (res.data.status === 'success') {
                                 Swal.fire('Trashed!', res.data.message, 'success');
-                                getAllTeacherTrashLists(); // reload table
+                                getEditorTrashTeacherLists(); // reload table
                             } else {
                                 Swal.fire('Error', res.data.message || 'Trash failed', 'error');
                             }
                         } catch (err) {
                             Swal.fire('Error', 'Server or network error', 'error');
                         } finally {
-                            $('#trashTableLoader').hide();
+                            $('#editorTrashTableLoader').hide();
                         }
                     });
 
 
 
 
-
-
-
                     // Initialize DataTable
-                    $('#admin_trash_teachers_table').DataTable({
+                    $('#editor_trash_teachers_table').DataTable({
                         "pageLength": 10,
                         "lengthChange": false,
                         "ordering": true,
                         "info": true,
                         "autoWidth": false
                     });
-                }
-            } catch (error) {
+                //console.log('trash lists',res.data);
+            }catch(error){
                 console.error('Error fetching teachers:', error);
             }
         }
 
 
-
-        //get all trash teacher lists admin or editor
-        // async function getEditorSelfTeacherTrashLists() {
-        //     let token = localStorage.getItem('token');
-
-        //     if (!token) {
-        //         alert('Unauthorized Access');
-        //         return;
-        //     }
-        //     try {
-        //         const res = await axios.post('/all/teacher/trash/lists', {}, {
-        //             headers: {
-        //                 Authorization: 'Bearer ' + token
-        //             }
-        //         });
-
-        //         if (res.data.status === 'success') {
-        //             const teachers = res.data.trashTeachers;
-        //             document.querySelector('.totalTrashTeachersCount').innerText = teachers.length;
-
-        //             // Destroy old DataTable if exists
-        //             if ($.fn.DataTable.isDataTable('#admin_trash_teachers_table')) {
-        //                 $('#admin_trash_teachers_table').DataTable().destroy();
-        //             }
-
-        //             // Clear table body
-        //             $('#admin_trash_teachers_table_body').html('');
-
-        //             // Append rows
-        //             teachers.forEach((teacher, index) => {
-        //                 //console.log(teacher.added_by.role);
-        //                 const addedBy = teacher.added_by.role === 'editor' ? 'Editor' : 'Admin';
-        //                 const addedName = teacher.added_by.name;
-        //                 const row = `
-    //                     <tr>
-    //                         <td>${index + 1}</td>
-    //                         <td>${teacher.user.name}</td>
-    //                         <td>${teacher.user.email || ''}</td>
-    //                         <td>${addedName} (${addedBy})</td>
-    //                         <td>
-    //                             <div class="btn-group" role="group" aria-label="Basic example">
-    //                             <button class="btn btn-sm btn-info restoreTeacher" data-id="${teacher.id}">RESTORE</button>
-    //                             <button class="btn btn-sm btn-danger permanentDeleteTeacher" data-id="${teacher.id}">DELTE</button>
-    //                             </div>
-    //                         </td>
-    //                     </tr>
-    //                 `;
-        //                 $('#admin_trash_teachers_table_body').append(row);
-        //             });
-
-        //             // Restore Teacher Handler
-        //             $(document).on('click', '.restoreTeacher', async function() {
-        //                 const id = $(this).data('id');
-        //                 console.log('Restore teacher:', id);
-
-        //                 const confirm = await Swal.fire({
-        //                     title: '♻️ Restore Teacher?',
-        //                     text: "This teacher will be restored to active list.",
-        //                     icon: 'question',
-        //                     showCancelButton: true,
-        //                     confirmButtonText: 'Yes, Restore',
-        //                     cancelButtonText: 'Cancel',
-        //                     reverseButtons: true,
-        //                     focusCancel: true,
-        //                     buttonsStyling: true,
-        //                     customClass: {
-        //                         confirmButton: 'btn btn-success', // green button
-        //                         cancelButton: 'btn btn-secondary' // gray button
-        //                     }
-        //                 });
-
-        //                 if (!confirm.isConfirmed) return;
-
-        //                 // Show loader on table
-        //                 $('#trashTableLoader').show();
-
-        //                 try {
-        //                     const res = await axios.post('/admin/teacher/restore-by-id', {
-        //                         id: id
-        //                     }, {
-        //                         headers: {
-        //                             Authorization: 'Bearer ' + token
-        //                         }
-        //                     });
-
-        //                     if (res.data.status === 'success') {
-        //                         Swal.fire('Restored!', res.data.message, 'success');
-        //                         await getAllTeacherTrashLists(); // reload trash table
-        //                         await getAllTeacherLists();
-        //                     } else {
-        //                         Swal.fire('Error', res.data.message || 'Restore failed', 'error');
-        //                     }
-        //                 } catch (err) {
-        //                     Swal.fire('Error', 'Server or network error', 'error');
-        //                 } finally {
-        //                     $('#trashTableLoader').hide();
-        //                 }
-        //             });
-
-
-        //             //permanent delete teacher
-        //             $(document).on('click', '.permanentDeleteTeacher', async function() {
-        //                 const id = $(this).data('id');
-        //                 console.log('Permanent delete teacher:', id);
-
-        //                 const confirm = await Swal.fire({
-        //                     title: '⚠️ Are you sure?',
-        //                     text: "This teacher will be permanently deleted!",
-        //                     icon: 'warning', // icon can be 'warning', 'error', 'success', 'info', 'question'
-        //                     showCancelButton: true,
-        //                     confirmButtonText: 'Yes, Delete Permanently',
-        //                     cancelButtonText: 'Cancel',
-        //                     reverseButtons: true,
-        //                     focusCancel: true,
-        //                     buttonsStyling: true,
-        //                     customClass: {
-        //                         confirmButton: 'btn btn-danger', // red button
-        //                         cancelButton: 'btn btn-secondary' // gray button
-        //                     }
-        //                 });
-
-
-        //                 if (!confirm.isConfirmed) return;
-
-        //                 // Show loader on table
-        //                 $('#trashTableLoader').show();
-
-        //                 try {
-        //                     const res = await axios.post('/admin/teacher/delete-by-id', {
-        //                         id: id
-        //                     }, {
-        //                         headers: {
-        //                             Authorization: 'Bearer ' + token
-        //                         }
-        //                     });
-
-        //                     if (res.data.status === 'success') {
-        //                         Swal.fire('Trashed!', res.data.message, 'success');
-        //                         getAllTeacherTrashLists(); // reload table
-        //                     } else {
-        //                         Swal.fire('Error', res.data.message || 'Trash failed', 'error');
-        //                     }
-        //                 } catch (err) {
-        //                     Swal.fire('Error', 'Server or network error', 'error');
-        //                 } finally {
-        //                     $('#trashTableLoader').hide();
-        //                 }
-        //             });
-
-
-
-
-
-
-
-        //             // Initialize DataTable
-        //             $('#admin_trash_teachers_table').DataTable({
-        //                 "pageLength": 10,
-        //                 "lengthChange": false,
-        //                 "ordering": true,
-        //                 "info": true,
-        //                 "autoWidth": false
-        //             });
-        //         }
-        //     } catch (error) {
-        //         console.error('Error fetching teachers:', error);
-        //     }
-        // }
     </script>

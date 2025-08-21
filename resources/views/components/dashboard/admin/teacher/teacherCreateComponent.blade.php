@@ -441,6 +441,7 @@
 
             if (res.data.status === 'success') {
                 const teachers = res.data.allTeachers;
+                //console.log(res.data.allTeachers);
                 document.querySelector('.totalTeachersCount').innerText = teachers.length;
 
                 // Destroy old DataTable if exists
@@ -453,7 +454,7 @@
 
                 // Append rows
                 teachers.forEach((teacher, index) => {
-                    //console.log(teacher.added_by.role);
+                    //console.log(teacher);
                     const addedBy = teacher.added_by.role === 'editor' ? 'Editor' : 'Admin';
                     const addedName = teacher.added_by.name;
                     const row = `
@@ -473,7 +474,7 @@
 
                 // Edit  handlers
                 $(document).on('click', '.editTeacher', async function() {
-                    const teacherId = $(this).data('id');
+                    //const teacherId = $(this).data('id');
                     console.log('Edit teacher:', teacherId);
                     await fillAdminTeacherForm(teacherId);
                     $('#adminTeacherEditModal').modal('show');
