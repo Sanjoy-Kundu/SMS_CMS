@@ -65,15 +65,8 @@
                    data-parent="#accordionSidebar">
                    <div class="bg-white py-2 collapse-inner rounded">
                        <h6 class="collapse-header">Manage Teachers:</h6>
-
-                       <a class="collapse-item {{ Request::is('teachers') ? 'active' : '' }}"
-                           href="{{ url('/teachers') }}">All Teachers</a>
-
                        <a class="collapse-item {{ Request::is('editor/teacher/create') ? 'active' : '' }}"
                            href="{{ url('/editor/teacher/create') }}">Create Teacher</a>
-
-                       <a class="collapse-item {{ Request::is('teachers/permissions') ? 'active' : '' }}"
-                           href="{{ url('/teachers/permissions') }}">Control Panel</a>
                    </div>
                </div>
            </li>

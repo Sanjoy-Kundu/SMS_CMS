@@ -3,13 +3,14 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Admin;
 use App\Models\Editor;
 use App\Models\Teacher;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
@@ -56,7 +57,15 @@ class User extends Authenticatable
      */
     public function editors()
     {
-        return $this->hasMany(Editor::class);
+        return $this->hasMany(Editor::class, 'user_id', 'id');
+    }
+
+    /***
+     * Relation: User has one or one Editors
+     */
+        public function editor()
+    {
+        return $this->hasOne(Editor::class, 'user_id', 'id');
     }
 
 

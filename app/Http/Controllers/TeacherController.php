@@ -33,19 +33,7 @@ class TeacherController extends Controller
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
         }
     }
-    // /**
-    //  * Display a listing of the resource.
-    //  */
-    // public function editorTeacherLists(Request $request)
-    // {
-    //     try{
 
-    //         $editorTeachers = Teacher::with('user','addedBy')->where('added_by',Auth::user()->id)->get();
-    //         return response()->json(['status' => 'success', 'allTeachers' => $editorTeachers, 'editorTeachers' => $editorTeachers]);
-    //     }catch(Exception $ex){
-    //         return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
-    //     }
-    // }
 
 
     /**

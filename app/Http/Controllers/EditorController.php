@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use Exception;
 use App\Models\User;
 use App\Models\Editor;
+use App\Mail\EditorTrashed;
 use Illuminate\Support\Str;
+use App\Mail\EditorRestored;
 use Illuminate\Http\Request;
 use App\Mail\EditorCreatedMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\EditorPermanentlyDeleted;
 use Illuminate\Validation\ValidationException;
 
 class EditorController extends Controller
@@ -18,7 +21,7 @@ class EditorController extends Controller
     /**
      * Display a Editor LoginFrom
      */
-        public function editorLoginPage()
+    public function editorLoginPage()
     {
         try {
             return view('form.editor.editor_login_form');
@@ -27,8 +30,7 @@ class EditorController extends Controller
         }
     }
 
-
-        /**
+    /**
      * Editor Login Store
      */
     public function editor_login_store(Request $request)
@@ -104,23 +106,6 @@ class EditorController extends Controller
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * Editor Create By Admin Dashboard Form
      */
@@ -148,42 +133,41 @@ class EditorController extends Controller
 
             $exists = Editor::withTrashed()->where('user_id', $user->id)->where('institution_id', $validatedData['institution_id'])->first();
             if ($exists) {
-            DB::rollBack();
-            return response()->json([
-                'status' => 'error',
-                'message' => 'This user is already an editor for this institution.'
-            ], 422);
-        }
-
-
-
-
+                DB::rollBack();
+                return response()->json(
+                    [
+                        'status' => 'error',
+                        'message' => 'This user is already an editor for this institution.',
+                    ],
+                    422,
+                );
+            }
 
             // Create the editor record
             $editor = Editor::create([
                 'user_id' => $user->id,
                 'institution_id' => $request->institution_id,
-                'designation' => null, 
+                'designation' => null,
                 'joined_at' => now(),
                 'is_active' => true,
-                'father_name' => null, 
-                'mother_name' => null, 
-                'nationality'=>null,
-                'religion'=>null,
-                'marital_status'=>null,
+                'father_name' => null,
+                'mother_name' => null,
+                'nationality' => null,
+                'religion' => null,
+                'marital_status' => null,
                 'phone' => null,
-                'address' => null, 
-                'image'=>null,
+                'address' => null,
+                'image' => null,
                 'date_of_birth' => null,
-                'nid' => null, 
-                'gender' => null, 
+                'nid' => null,
+                'gender' => null,
             ]);
 
             // Commit the transaction
             DB::commit();
 
-            //edior mail 
-             Mail::to($user->email)->send(new EditorCreatedMail($user, $password));
+            //edior mail
+            Mail::to($user->email)->send(new EditorCreatedMail($user, $password));
             // Return success response
             return response()->json(
                 [
@@ -219,12 +203,192 @@ class EditorController extends Controller
         }
     }
 
+    /**
+     * Editor Lists Admin Dashobard
+     */
+    public function editorListAdminDashobard(Request $request)
+    {
+        try {
+            $editors = Editor::with(['user:id,name,email', 'educations', 'addresses'])->get();
+            $editorTrash = Editor::with([
+                'user' => function ($q) {
+                    $q->withTrashed(); // Soft deleted users ke include korbe
+                },
+                'educations',
+                'addresses',
+            ])
+                ->onlyTrashed()
+                ->get();
+            return response()->json(['status' => 'success', 'editorLists' => $editors, 'editorTrashLists' => $editorTrash]);
+        } catch (Exception $ex) {
+            return response()->json(['status' => 'error', 'message' => $ex->getMessage()]);
+        }
+    }
 
+    /**
+     * Editor Lists and trsh lists  Admin Dashobard
+     */
+    public function editorList(Request $request)
+    {
+        try {
+            $editor = Editor::with(['user:id,name,email', 'institution:id,name', 'educations', 'addresses'])->get();
+
+            return response()->json(['status' => 'success', 'message' => 'Editor List', 'data' => $editor]);
+        } catch (Exception $ex) {
+            return response()->json(['status' => 'error', 'message' => $ex->getMessage()]);
+        }
+    }
+
+    /**
+     * Editor Trash Admin Dashboard
+     */
+    // public function editorTrashListAdminDashobard(Request $request){
+    //     try{
+
+    //     }catch(Exception $ex){
+    //         return response()->json(['status' => 'error', 'message' => $ex->getMessage()]);
+    //     }
+    // }
+
+    /**
+     * Editor Trash Admin Dashboard
+     */
+    public function editorTrashAdminDashobard(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer|exists:editors,id',
+        ]);
+
+        try {
+            $editorId = $request->id;
+
+            // Editor record fetch
+            $editor = Editor::with('user:id,name,email')->findOrFail($editorId);
+
+            // Soft delete editor
+            $editor->delete(); // Ei line ta deleted_at fill korbe
+            $editor->user()->delete();
+            Mail::to($editor->user->email)->send(new EditorTrashed($editor));
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Editor has been trashed successfully.',
+            ]);
+        } catch (Exception $ex) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $ex->getMessage(),
+            ]);
+        }
+    }
+    /**
+     * Editor Restore Admin Dashboard
+     */
+    public function editorRestoreAdminDashboard(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer|exists:editors,id',
+        ]);
+
+        try {
+            $editorId = $request->id;
+
+            // Soft deleted editor fetch
+            //$editor = Editor::withTrashed()->with('user:id,name,email')->findOrFail($editorId);
+            $editor = Editor::with([
+                'user' => function ($q) {
+                    $q->withTrashed();
+                },
+            ])
+                ->withTrashed()
+                ->findOrFail($editorId);
+
+            // Restore the editor
+            $editor->restore(); // Ei line deleted_at null kore active kore
+            $editor->user()->restore();
+
+            // Optional: mail notify kora
+            Mail::to($editor->user->email)->send(new EditorRestored($editor));
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Editor has been restored successfully.',
+            ]);
+        } catch (Exception $ex) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $ex->getMessage(),
+            ]);
+        }
+    }
+    /**
+     * Editor Permanent Delete Admin Dashboard
+     */
+    public function editorPermanentDeleteAdminDashboard(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer|exists:editors,id',
+        ]);
+
+        try {
+            $editorId = $request->id;
+
+            // Fetch soft deleted editor with user (for email)
+            $editor = Editor::with([
+                'user' => function ($query) {
+                    $query->withTrashed();
+                },
+            ])
+                ->withTrashed()
+                ->findOrFail($editorId);
+
+            if (!$editor) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Editor not found.',
+                ]);
+            }
+
+            if (!$editor) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Editor not found.',
+                ]);
+            }
+
+            // Store user email and name for notification before deletion
+            $editorEmail = $editor->user ? $editor->user->email : null;
+            $editorName = $editor->user ? $editor->user->name : 'Editor';
+
+            // Permanently delete editor
+            $editor->forceDelete(); // Completely remove from DB
+            $editor->user()->forceDelete(); // Completely remove from DB
+
+            // Send mail notification if email exists
+            if ($editorEmail) {
+                Mail::to($editorEmail)->send(new EditorPermanentlyDeleted([
+                        'name' => $editorName,
+                        'email' => $editorEmail,
+                        'institution' => 'AB School & College',
+                    ]),
+                );
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Editor has been permanently deleted successfully.',
+            ]);
+        } catch (Exception $ex) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $ex->getMessage(),
+            ]);
+        }
+    }
 
     /**
      * Editor CV
      */
- public function editorCVDetails(Request $request)
+    public function editorCVDetails(Request $request)
     {
         $request->validate([
             'email' => 'required|email',
@@ -238,13 +402,14 @@ class EditorController extends Controller
             return response()->json(['error' => 'Editor not found!'], 404);
         }
 
-        $editor = Editor::with(['educations', 'addresses'])->where('user_id', $user->id)->first();
+        $editor = Editor::with(['educations', 'addresses'])
+            ->where('user_id', $user->id)
+            ->first();
         if (!$editor) {
             return response()->json(['error' => 'Editor profile not found!'], 404);
         }
 
-        return response()->json(['status'=>'success','user' => $user,'editor' => $editor,
-        ]);
+        return response()->json(['status' => 'success', 'user' => $user, 'editor' => $editor]);
     }
 
     /**

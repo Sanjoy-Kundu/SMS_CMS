@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\User;
+use App\Models\Institution;
 use App\Models\EditorAddress;
 use App\Models\EditorEducation;
 use Illuminate\Database\Eloquent\Model;
@@ -38,7 +40,7 @@ class Editor extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->select('id', 'name', 'email');
     }
 
     /**

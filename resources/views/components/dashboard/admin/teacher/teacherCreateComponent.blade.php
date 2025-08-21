@@ -643,7 +643,7 @@
                 //permanent delete teacher
                 $(document).on('click', '.permanentDeleteTeacher', async function() {
                     const id = $(this).data('id');
-                    console.log('Permanent delete teacher:', id);
+                    //console.log('Permanent delete teacher:', id);
 
                     const confirm = await Swal.fire({
                         title: '⚠️ Are you sure?',

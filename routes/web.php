@@ -169,6 +169,11 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
     //::::::::::::::: Editor Create By Admin :::::::::::::::::::::::
     Route::post('/editor/store', [EditorController::class, 'editorStore']);
+    Route::post('/admin_db/editor/list', [EditorController::class, 'editorListAdminDashobard']);
+    Route::post('/admin_db/editor/trash/list', [EditorController::class, 'editorTrashListAdminDashobard']);
+    Route::post('/admin/editor/trash-by-id', [EditorController::class, 'editorTrashAdminDashobard']);
+    Route::post('/admin/editor/restore-by-id', [EditorController::class, 'editorRestoreAdminDashboard']);
+    Route::post('/admin/editor/delete-by-id', [EditorController::class, 'editorPermanentDeleteAdminDashboard']);
 });
 
 
