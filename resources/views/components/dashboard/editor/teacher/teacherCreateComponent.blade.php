@@ -366,6 +366,14 @@
                      }
                  });
 
+                // Edit  handlers
+                $(document).on('click', '.EditorEditTeacher', async function() {
+                    const teacherId = $(this).data('id');
+                    //console.log('Edit teacher:', teacherId);
+                    await fillEditorTeacherForm(teacherId);
+                    $('#editorTeacherEditModal').modal('show');
+                });
+
              } catch (error) {
                  console.error('Error fetching teachers:', error);
              }finally{

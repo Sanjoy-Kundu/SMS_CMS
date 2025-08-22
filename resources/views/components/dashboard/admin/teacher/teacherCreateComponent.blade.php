@@ -474,8 +474,8 @@
 
                 // Edit  handlers
                 $(document).on('click', '.editTeacher', async function() {
-                    //const teacherId = $(this).data('id');
-                    console.log('Edit teacher:', teacherId);
+                    const teacherId = $(this).data('id');
+                    //console.log('Edit teacher:', teacherId);
                     await fillAdminTeacherForm(teacherId);
                     $('#adminTeacherEditModal').modal('show');
                 });

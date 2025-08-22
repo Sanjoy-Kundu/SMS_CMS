@@ -1,6 +1,6 @@
 <!-- Modal -->
-<div class="modal fade" id="editorDetailsCVFormatModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
-    aria-labelledby="editorDetailsCVFormatModalLabel" aria-hidden="true">
+<div class="modal fade" id="adminDBEditorDetailsModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+    aria-labelledby="adminDBEditorDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -10,7 +10,7 @@
                 </button>
             </div>
 
-            <div class="modal-body" id="editorCVContent">
+            <div class="modal-body" id="adminEditorCVContent">
                 <p>Loading...</p>
             </div>
 
@@ -23,15 +23,15 @@
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-async function editorDetailsCVFormat(email){
+async function adminEditorDetailsFormat(email){
     let token = localStorage.getItem('token');
     if(!token){
         alert('Unauthorized access');
         return;
     }
 
-    $('#editorDetailsCVFormatModal').modal('show');
-    document.getElementById('editorCVContent').innerHTML = '<p>Loading...</p>';
+    $('#adminDBEditorDetailsModal').modal('show');
+    document.getElementById('adminEditorCVContent').innerHTML = '<p>Loading...</p>';
 
     try {
         let res = await axios.post('/editor/cv-details', 
@@ -70,10 +70,10 @@ async function editorDetailsCVFormat(email){
         //         </ul>
         //     `;
 
-        //     document.getElementById('editorCVContent').innerHTML = html;
+        //     document.getElementById('adminEditorCVContent').innerHTML = html;
 
         // } else {
-        //     document.getElementById('editorCVContent').innerHTML = `<p class="text-danger">${res.data.error ?? 'Something went wrong!'}</p>`;
+        //     document.getElementById('adminEditorCVContent').innerHTML = `<p class="text-danger">${res.data.error ?? 'Something went wrong!'}</p>`;
         // }
         if(res.data.status === 'success'){
     const editorData = res.data.editor;
@@ -146,16 +146,16 @@ async function editorDetailsCVFormat(email){
         </table>
     `;
 
-    document.getElementById('editorCVContent').innerHTML = html;
+    document.getElementById('adminEditorCVContent').innerHTML = html;
 
 } else {
-    document.getElementById('editorCVContent').innerHTML = `<p class="text-danger">${res.data.error ?? 'Something went wrong!'}</p>`;
+    document.getElementById('adminEditorCVContent').innerHTML = `<p class="text-danger">${res.data.error ?? 'Something went wrong!'}</p>`;
 }
 
 
     } catch (error) {
         console.error(error);
-        document.getElementById('editorCVContent').innerHTML = '<p class="text-danger">Editor not found or unauthorized!</p>';
+        document.getElementById('adminEditorCVContent').innerHTML = '<p class="text-danger">Editor not found or unauthorized!</p>';
     }
 }
 

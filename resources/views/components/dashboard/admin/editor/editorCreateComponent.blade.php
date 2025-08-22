@@ -148,7 +148,6 @@
                                     <th>#</th>
                                     <th>Name</th>
                                     <th>Email</th>
-                                    <th>View</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -322,7 +321,7 @@
                             <td>${index + 1}</td>
                             <td>${editor.user.name}</td>
                             <td>${editor.user.email || ''}</td>
-                            <td><button class="btn btn-sm btn-info EditorViewInfo" data-id="${editor.id}">View</button></td>
+                           <td><button class="btn btn-sm btn-info EditorViewInfo" data-email="${editor.user.email}">View</button></td>
                             <td>
                                 <button class="btn btn-sm btn-primary EditorEditInfo" data-id="${editor.id}">Edit</button>
                                 <button class="btn btn-sm btn-danger editorTrashInfo" data-id="${editor.id}">Trash</button>
@@ -379,6 +378,14 @@
                     $('#adminEditorTableLoader').hide();
                 }
             });
+            
+            // Editor View Info
+            $(document).off('click', '.EditorViewInfo').on('click', '.EditorViewInfo', async function() {
+                const email = $(this).data('email');
+                // console.log('editor trash id is',id);
+                adminEditorDetailsFormat(email);
+                $('#adminDBEditorDetailsModal').show();
+            });
 
 
         } catch (error) {
@@ -421,7 +428,6 @@
                             <td>${index + 1}</td>
                             <td>${editor.user.name}</td>
                             <td>${editor.user.email || ''}</td>
-                            <td><button class="btn btn-sm btn-info EditorViewInfo" data-id="${editor.id}">View</button></td>
                             <td>
                                 <button class="btn btn-sm btn-primary TrashEditorEditRestore" data-id="${editor.id}">RESTORE</button>
                                 <button class="btn btn-sm btn-danger TrashEditorEditDelete" data-id="${editor.id}">DELETE</button>

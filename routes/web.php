@@ -209,8 +209,7 @@ Route::middleware(['auth:sanctum', 'editor'])->group(function () {
     Route::post('/editor/address/by-id', [EditorAddressController::class,'getAddressById']);
     Route::post('/editor/address/update', [EditorAddressController::class,'updateAddress']);
 
-    //editor cv
-    Route::post('/editor/cv-details', [EditorController::class, 'editorCVDetails']);
+
 });
 
 
@@ -218,6 +217,13 @@ Route::middleware(['auth:sanctum', 'editor'])->group(function () {
 
 //admin and editor same route
 Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
+
+    //editor cv
+    Route::post('/editor/cv-details', [EditorController::class, 'editorCVDetails']);
+
+
+
+
     //Route::post('/auth/admin/details', [AdminDashboard::class, 'adminDetails']);
     Route::post('/institution/details/for/admin/editor', [InstitutionController::class, 'institutionDetailsAdminEditor']);
     Route::post('/all/teacher/lists', [TeacherController::class, 'allTeacherLists']);
@@ -228,6 +234,8 @@ Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
     Route::post('/all/teacher/trash/lists', [TeacherController::class, 'allteacherTrashListsByAdmin']);
     Route::post('/admin/teacher/delete-by-id', [TeacherController::class, 'teacherDeleteByAdmin']);
     Route::post('/admin/teacher/restore-by-id', [TeacherController::class, 'teacherRestoreByAdmin']);
+    
+
 //     Route::post('/teacher/trashed-list', [TeacherController::class, 'teacherTrashedList']);
 //     Route::post('/teacher/restore', [TeacherController::class, 'teacherRestore']);
 //     Route::post('/teacher/delete', [TeacherController::class, 'teacherDelete']);
