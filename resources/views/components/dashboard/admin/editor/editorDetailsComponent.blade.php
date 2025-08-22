@@ -38,47 +38,10 @@ async function adminEditorDetailsFormat(email){
             { email: email }, 
             { headers: { 'Authorization': 'Bearer ' + token } }
         );
-
-        // if(res.data.status === 'success'){
-        //     const editorData = res.data.editor;
-        //     //console.log(editorData.image);
-        //     const userData = res.data.user;
-        //     const image = editorData.image ? editorData.image : 'https://via.placeholder.com/150';
-
-        //     let html = `
-        //         <h4>${userData.name} (${userData.email})</h4>
-        //         <p><strong>Role:</strong> ${userData.role}</p>
-        //         <p><strong>Designation:</strong> ${editorData.designation ?? 'N/A'}</p>
-        //         <p><strong>Phone:</strong> ${editorData.phone ?? 'N/A'}</p>
-        //         <p><strong>Address:</strong> ${editorData.address ?? 'N/A'}</p>
-        //         <p><strong>Birth Date:</strong> ${editorData.birth_date ?? 'N/A'}</p>
-        //         <p><strong>Gender:</strong> ${editorData.gender ?? 'N/A'}</p>
-        //         <p><strong>Religion:</strong> ${editorData.religion ?? 'N/A'}</p>
-        //         <hr>
-        //         <h5>Educations:</h5>
-        //         <ul>
-        //             ${editorData.educations.map(e => `
-        //                 <li>${e.level ?? 'N/A'} - ${e.board_university ?? 'N/A'} (${e.passing_year ?? 'N/A'}) - Result: ${e.result ?? 'N/A'}</li>
-        //             `).join('')}
-        //         </ul>
-        //         <hr>
-        //         <h5>Addresses:</h5>
-        //         <ul>
-        //             ${editorData.addresses.map(a => `
-        //                 <li>${a.type ?? ''} Address: ${a.village ?? ''}, ${a.upazila ?? ''}, ${a.district ?? ''} - ${a.postal_code ?? ''}</li>
-        //             `).join('')}
-        //         </ul>
-        //     `;
-
-        //     document.getElementById('adminEditorCVContent').innerHTML = html;
-
-        // } else {
-        //     document.getElementById('adminEditorCVContent').innerHTML = `<p class="text-danger">${res.data.error ?? 'Something went wrong!'}</p>`;
-        // }
         if(res.data.status === 'success'){
     const editorData = res.data.editor;
     const userData = res.data.user;
-    const image = editorData.image ? editorData.image : 'https://via.placeholder.com/150';
+    const image = editorData.image ? editorData.image : 'default.png';
 
     let html = `
         <div style="display:flex;align-items:center;gap:20px;margin-bottom:20px;">

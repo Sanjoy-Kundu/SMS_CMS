@@ -114,7 +114,6 @@ class EditorAddressController extends Controller
         try {
             // Validate incoming request
             $validated = $request->validate([
-            'editor_id' => 'required|exists:editors,id',
             'type' => 'required|in:present,permanent',
             'village' => 'nullable|string|max:255',
             'district' => 'nullable|string|max:255',
@@ -141,7 +140,7 @@ class EditorAddressController extends Controller
 
             // Create new address record
             EditorAddress::create([
-                'editor_id' => $validated['editor_id'],
+                'editor_id' => $editor->id,
                 'type' => $validated['type'],
                 'village' => $validated['village'] ?? null,
                 'district' => $validated['district'] ?? null,

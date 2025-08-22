@@ -78,7 +78,7 @@ async function editorDetailsCVFormat(email){
         if(res.data.status === 'success'){
     const editorData = res.data.editor;
     const userData = res.data.user;
-    const image = editorData.image ? editorData.image : 'https://via.placeholder.com/150';
+    const image = editorData.image ? editorData.image : 'default.png';
 
     let html = `
         <div style="display:flex;align-items:center;gap:20px;margin-bottom:20px;">
