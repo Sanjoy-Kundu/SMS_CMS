@@ -312,7 +312,7 @@
                         <tr>
                             <td>${index + 1}</td>
                             <td>${teacher.user.name}</td>
-                            <td>${teacher.user.email || ''}</td>
+                            <td>${teacher.user.email}</td>
                             <td>
                                 <button class="btn btn-sm btn-primary EditorEditTeacher" data-id="${teacher.id}">Edit</button>
                                 <button class="btn btn-sm btn-danger editorTrashTeacher" data-id="${teacher.id}">Trash</button>
@@ -373,6 +373,8 @@
                     await fillEditorTeacherForm(teacherId);
                     $('#editorTeacherEditModal').modal('show');
                 });
+
+                
 
              } catch (error) {
                  console.error('Error fetching teachers:', error);

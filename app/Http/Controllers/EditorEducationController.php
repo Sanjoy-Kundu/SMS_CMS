@@ -120,7 +120,6 @@ public function editorEducationCreate(Request $request)
     try{
             // Validate the incoming request data
     $validated = $request->validate([
-        'editor_id' => 'required|exists:editors,id',// editor_id from form
         'level' => 'required|in:SSC,HSC,Graduation,Masters',
         'roll_number' => 'nullable|string|max:255',
         'board_university' => 'required|string|max:255',
@@ -128,14 +127,24 @@ public function editorEducationCreate(Request $request)
         'passing_year' => 'required',
         'course_duration' => 'nullable|string|max:50'
     ]);
-       
-    $exists = EditorEducation::where('level','SSC')->orWhere('level','HSC')->orWhere('level','Graduation')->orWhere('level','Masters')->exists();
-    if ($exists) {
-        return response()->json(['status' => 'error', 'message' => 'Level  already exists.'], 400);
+    $user = Auth::user();
+    $editor = Editor::where('user_id', $user->id)->first();
+    if (!$editor) {
+        return response()->json(['status' => 'error', 'message' => 'Editor not found'], 404);
     }
+       
+        // Check if level already exists for this user (via editor_id)
+        $exists = EditorEducation::where('editor_id', $editor->id)
+                    ->where('level', $validated['level'])
+                    ->exists();
+
+        if ($exists) {
+            return response()->json(['status' => 'error', 'message' => 'This education level already exists.'], 400);
+        }
+
     // Create new education record
     EditorEducation::create([
-        'editor_id' => $validated['editor_id'],
+        'editor_id' => $editor->id,
         'level' => $validated['level'],
         'roll_number' => $validated['roll_number'],
         'board_university' => $validated['board_university'],
