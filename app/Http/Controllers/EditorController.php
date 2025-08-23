@@ -6,6 +6,7 @@ use Exception;
 use App\Models\User;
 use App\Models\Editor;
 use App\Mail\EditorTrashed;
+use App\Mail\EditorUpdated;
 use Illuminate\Support\Str;
 use App\Mail\EditorRestored;
 use Illuminate\Http\Request;
@@ -413,26 +414,112 @@ class EditorController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Editor Details By ID
      */
-    public function edit(Editor $editor)
+    public function editorDetailsById(Request $request)
     {
-        //
+         $request->validate([
+            'id' => 'required|integer',
+        ]);
+        try{
+            $id = $request->id;
+            $editorDetails = User::where('id', $id)->where('role', 'editor')->first();
+            if(!$editorDetails){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Editor not found!'
+                ]);
+            }
+            return response()->json(['status' => 'success', 'editorDetails' => $editorDetails]);
+        }catch(Exception $ex){
+            return response()->json([
+                'status' => 'error',
+                'message' => $ex->getMessage(),
+            ]);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Editor $editor)
-    {
-        //
-    }
 
     /**
-     * Remove the specified resource from storage.
+     * Editor Updae by id
      */
-    public function destroy(Editor $editor)
-    {
-        //
+public function editorUpdateById(Request $request)
+{
+    $request->validate([
+        'id' => 'required|integer',
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+    ]);
+
+    try {
+        $id = $request->id;
+        $editorDetails = User::where('id', $id)->where('role', 'editor')->first();
+
+        if (!$editorDetails) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Editor not found!'
+            ]);
+        }
+
+        if (
+            $editorDetails->name === $request->name &&
+            $editorDetails->email === $request->email
+        ) {
+            return response()->json([
+                'status' => 'warning',
+                'message' => 'No changes were applied since the provided details are identical to the existing information.'
+            ]);
+        }
+
+
+        $editorDetails->name = $request->name;
+        $editorDetails->email = $request->email;
+        $editorDetails->save();
+
+        // Mail 
+        Mail::to($editorDetails->email)->send(new EditorUpdated($editorDetails));
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Editor updated successfully!'
+        ]);
+
+    } catch (Exception $ex) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $ex->getMessage(),
+        ]);
     }
+}
+
+
+
+
+
+
+    // /**
+    //  * Store a newly created resource in storage.
+    //  */
+    // public function store(Request $request)
+    // {
+    //     //
+    //     }
+    // }
+
+    // /**
+    //  * Update the specified resource in storage.
+    //  */
+    // public function update(Request $request, Editor $editor)
+    // {
+    //     //
+    // }
+
+    // /**
+    //  * Remove the specified resource from storage.
+    //  */
+    // public function destroy(Editor $editor)
+    // {
+    //     //
+    // }
 }

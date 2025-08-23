@@ -1,8 +1,10 @@
 @extends('layouts.dashboard')
+@section('title', 'Editor Create')
 @section('content')
     @include('components.dashboard.admin.sidebarComponent')
     @include('components.dashboard.admin.navComponent')
     @include('components.dashboard.admin.editor.editorCreateComponent')
     @include('components.dashboard.admin.footerComponent')
     @include('components.dashboard.admin.editor.editorDetailsComponent')
+    @include('components.dashboard.admin.editor.editorEditComponent')
 @endsection

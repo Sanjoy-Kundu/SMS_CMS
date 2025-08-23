@@ -71,8 +71,10 @@
                         <tr>
                             <td>Action</td>
                             <td>
-                                <button type="button" class="btn passwordChangeBtn" style="background-color: #007B7F; color: white;">Change Password</button>
-                                <button type="button" class="btn viewProfileCV" style="background-color: #418bff; color: white;">View Profile</button>
+                                <button type="button" class="btn passwordChangeBtn"
+                                    style="background-color: #007B7F; color: white;">Change Password</button>
+                                <button type="button" class="btn viewProfileCV"
+                                    style="background-color: #418bff; color: white;">View Profile</button>
                             </td>
                         </tr>
                     </tbody>
@@ -274,7 +276,8 @@
                 <div class="card-body">
                     <form id="editor_address_Form">
                         <!-- Editor ID (hidden or readonly) -->
-                        <input type="number" name="editor_id" class="form-control address_editor_id" readonly hidden>
+                        <input type="number" name="editor_id" class="form-control address_editor_id" readonly
+                            hidden>
 
                         <!-- Address Type -->
                         <div class="mb-3">
@@ -849,15 +852,70 @@
                     tbody.appendChild(tr);
                 });
 
-
+                //editor address edit 
                 $('.editorAddressEdit').on('click', async function(e) {
                     e.preventDefault();
                     let id = $(this).data('id');
                     await fillUpdateAddressForm(id);
                     $('#editAddressModal').modal('show');
-
                     console.log(id);
                 })
+
+                // editor address delete
+                $('.editorAddressDelete').on('click', async function() {
+                    let token = localStorage.getItem('token');
+                    let id = $(this).data('id');
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "This address will be permanently deleted!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            try {
+                                let res = await axios.post('/editor/address/delete', {
+                                    id: id
+                                }, {
+                                    headers: {
+                                        Authorization: `Bearer ${token}`
+                                    }
+                                });
+
+                                if (res.data.status === 'success') {
+                                    await getEdiorAddressLists();
+                                    Swal.fire(
+                                        'Deleted!',
+                                        res.data.message,
+                                        'success'
+                                    );
+
+                                    // DOM থেকে ওই row remove করো (optional)
+                                    $(`.address-row-${id}`).remove();
+                                } else {
+                                    Swal.fire(
+                                        'Error!',
+                                        res.data.message || 'Something went wrong!',
+                                        'error'
+                                    );
+                                }
+                            } catch (error) {
+                                Swal.fire(
+                                    'Error!',
+                                    error.response?.data?.message ||
+                                    'Server error occurred',
+                                    'error'
+                                );
+                            }
+                        }
+                    });
+                });
+
+
+
             } else {
                 // No data
                 tbody.innerHTML = `<tr><td colspan="7" class="text-center">No address found</td></tr>`;

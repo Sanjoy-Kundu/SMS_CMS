@@ -9,7 +9,13 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Admin Dashboard</title>
+ <title>
+    @hasSection('title')
+        @yield('title') || Dashboard
+    @else
+        Dashboard
+    @endif
+</title>
 
     <!-- Custom fonts for this template-->
     <link href="{{asset('assets/vendor/fontawesome-free/css/all.min.css')}}" rel="stylesheet" type="text/css">

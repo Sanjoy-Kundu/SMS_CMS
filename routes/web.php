@@ -206,8 +206,9 @@ Route::middleware(['auth:sanctum', 'editor'])->group(function () {
     //Address Route
     Route::post('/editor/address', [EditorAddressController::class, 'editorAddressCreate']);
     Route::post('/editor/address/list', [EditorAddressController::class, 'editorAddressLists']);
-    Route::post('/editor/address/by-id', [EditorAddressController::class,'getAddressById']);
+    Route::post('/editor/address/by-id', [EditorAddressController::class,'getAddressById']); //adress details by id
     Route::post('/editor/address/update', [EditorAddressController::class,'updateAddress']);
+    Route::post('/editor/address/delete', [EditorAddressController::class,'deleteAddress']);
 
 
 });
@@ -219,6 +220,8 @@ Route::middleware(['auth:sanctum', 'editor'])->group(function () {
 Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
 
     //editor cv
+    Route::post('/editor/details-by-id', [EditorController::class, 'editorDetailsById']);
+    Route::post('/editor/update-by-id', [EditorController::class, 'editorUpdateById']);
     Route::post('/editor/cv-details', [EditorController::class, 'editorCVDetails']);
 
 

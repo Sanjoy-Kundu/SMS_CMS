@@ -316,6 +316,7 @@
                 $('#admin_added_editor_lists_body').html('');
 
                 editors.forEach((editor, index) => {
+                    //console.log(editor);
                     const row = `
                         <tr>
                             <td>${index + 1}</td>
@@ -323,7 +324,7 @@
                             <td>${editor.user.email || ''}</td>
                            <td><button class="btn btn-sm btn-info EditorViewInfo" data-email="${editor.user.email}">View</button></td>
                             <td>
-                                <button class="btn btn-sm btn-primary EditorEditInfo" data-id="${editor.id}">Edit</button>
+                                <button class="btn btn-sm btn-primary EditorEditInfo" data-id="${editor.user.id}">Edit</button>
                                 <button class="btn btn-sm btn-danger editorTrashInfo" data-id="${editor.id}">Trash</button>
                             </td>
                         </tr>`;
@@ -338,6 +339,18 @@
                     "autoWidth": false
                 });
             }
+
+            //Edit Editor 
+            $(document).on('click', '.EditorEditInfo', function() {
+                let id = $(this).data('id');
+               // console.log('editor edit id is', id);
+                // Call function and show modal
+                adminEditorEditFillupForm(id);
+                $('#adminEditorEditModal').modal('show');
+            });
+
+
+
 
             // Trash Editor
             $(document).off('click', '.editorTrashInfo').on('click', '.editorTrashInfo', async function() {
