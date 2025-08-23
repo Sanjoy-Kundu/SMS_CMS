@@ -17,6 +17,7 @@ use App\Http\Controllers\EditorAddressController;
 use App\Http\Controllers\AcademicSectionController;
 use App\Http\Controllers\EditorDashboardController;
 use App\Http\Controllers\EditorEducationController;
+use App\Http\Controllers\TeacherDashboardController;
 
 //admin registration and login  page route
 Route::get('/admin/login', [AdminController::class, 'admin_login_page']);
@@ -254,8 +255,10 @@ Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
 Route::get('/teacher/login', [TeacherController::class, 'teacherLoginPage']);
 Route::post('/teacher/login/store', [TeacherController::class, 'teacher_login_store']);
 Route::get('/teacher/dashboard', [TeacherController::class, 'teacherDashboardPage']);
+Route::get('/teacher/profile', [TeacherDashboardController::class, 'teacherProfilePage']);
 
 Route::middleware(['auth:sanctum', 'teacher'])->group(function () {
     Route::post('/auth/teacher/details', [TeacherController::class, 'authTeacherDetails']);
     Route::post('/auth/teacher/logout', [TeacherController::class, 'teacherLogout']);
+
 });                      
