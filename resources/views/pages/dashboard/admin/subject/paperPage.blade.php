@@ -1,5 +1,5 @@
 @extends('layouts.dashboard')
-@section('title', 'Create Paper')
+@section('title', 'Paper')
 @section('content')
     @include('components.dashboard.admin.sidebarComponent')
     @include('components.dashboard.admin.navComponent')

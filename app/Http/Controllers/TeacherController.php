@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 
 class TeacherController extends Controller
 {
@@ -302,43 +303,152 @@ public function teacherStore(Request $request)
     }
 }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+  
+
+
+
+
+/**
+ * ==================================================
+ * Teacher Dahboard Start 
+ * ===================================================
+ */
+
+    public function teacherLoginPage()
     {
-        //
+        try {
+            return view('form.teacher.teacher_login_form');
+        } catch (Exception $ex) {
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Teacher $teacher)
+
+
+ //Teacher Dashboard Page
+     public function teacherDashboardPage()
     {
-        //
+        try {
+            return view('pages.dashboard.teacher.indexPage');
+        } catch (Exception $ex) {
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Teacher $teacher)
+
+
+     //teacher login store
+    public function teacher_login_store(Request $request)
     {
-        //
+        try {
+            $validated = $request->validate([
+                'email' => 'required|email',
+                'password' => 'required|string|min:8',
+                'role' => 'required|in:teacher',
+            ]);
+
+            $user = User::where('email', $validated['email'])->first();
+
+            if (!$user) {
+                return response()->json(
+                    [
+                        'status' => 'error',
+                        'message' => 'Email not found',
+                    ],
+                    404,
+                );
+            }
+
+            if (!Hash::check($validated['password'], $user->password)) {
+                return response()->json(
+                    [
+                        'status' => 'error',
+                        'message' => 'Invalid password',
+                    ],
+                    401,
+                );
+            }
+
+            if ($user->role !== 'teacher') {
+                return response()->json(
+                    [
+                        'status' => 'fail',
+                        'message' => 'Access denied! Only teacher can login.',
+                    ],
+                    403,
+                );
+            }
+
+            // Clear old tokens and create new token
+            //$user->tokens()->delete();
+            $token = $user->createToken('token')->plainTextToken;
+
+            return response()->json(
+                [
+                    'status' => 'success',
+                    'message' => 'Login successful',
+                    'token' => $token,
+                    'email' => $user->email,
+                ],
+                200,
+            );
+        } catch (ValidationException $ex) {
+            return response()->json(
+                [
+                    'status' => 'fail',
+                    'errors' => $ex->errors(),
+                ],
+                422,
+            );
+        } catch (\Exception $ex) {
+            return response()->json(
+                [
+                    'status' => 'fail',
+                    'message' => $ex->getMessage(),
+                ],
+                500,
+            );
+        }
+    }   
+    
+    
+    //auth techer details
+    public function authTeacherDetails()
+    {
+        try {
+            $user = Auth::user();
+
+            if (!$user) {
+                return response()->json(['status' => 'error', 'message' => 'User not authenticated']);
+            }
+
+            $teacherDetails = User::where('role', 'teacher')->find($user->id);
+
+            if (!$teacherDetails) {
+                return response()->json(['status' => 'error', 'message' => 'Teacher Details Not Found']);
+            }
+
+            return response()->json(['status' => 'success', 'data' => $teacherDetails]);
+        } catch (Exception $ex) {
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Teacher $teacher)
+    //auth teacher logout
+        public function teacherLogout(Request $request)
     {
-        //
+        try {
+            $request->user()->currentAccessToken()->delete();
+            return response()->json(['status' => 'success', 'message' => 'Logged out successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'fail', 'message' => $e->getMessage()], 500);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Teacher $teacher)
-    {
-        //
-    }
+
+/**
+ * ==================================================
+ * Teacher Dahboard End 
+ * ===================================================
+ */
 }

@@ -9,7 +9,7 @@
                {{-- <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div> --}}
-               <div class="sidebar-brand-text mx-3">ADMIN PANEL</div>
+               <div class="sidebar-brand-text mx-3">Teacher PANEL</div>
            </a>
 
            <!-- Divider -->
@@ -17,7 +17,7 @@
 
            <!-- Nav Item - Dashboard -->
            <li class="nav-item active">
-               <a class="nav-link" href="{{ url('/admin/dashboard') }}">
+               <a class="nav-link" href="{{ url('/teacher/dashboard') }}">
                    <i class="fas fa-fw fa-tachometer-alt"></i>
                    <span>Dashboard</span></a>
            </li>
@@ -25,7 +25,7 @@
            <!-- Divider -->
            <hr class="sidebar-divider">
            <!-- Nav Item - Institutioin Collapse Menu -->
-           <li class="nav-item {{ Request::is('institution') ? 'active' : '' }}">
+           {{-- <li class="nav-item {{ Request::is('institution') ? 'active' : '' }}">
                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAcademic"
                    aria-expanded="false" aria-controls="collapseAcademic">
                    <i class="fas fa-fw fa-school"></i>
@@ -52,10 +52,10 @@
                            href="{{ url('/class/overview') }}" target="_blank">Over View</a>
                    </div>
                </div>
-           </li>
+           </li> --}}
 
            {{-- Nav Item  - Editor Collapse Menu --}}
-           <li class="nav-item {{ Request::is('editor/create') ? 'active' : '' }}">
+           {{-- <li class="nav-item {{ Request::is('editor/create') ? 'active' : '' }}">
                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseEditor"
                    aria-expanded="false" aria-controls="collapseEditor">
                    <i class="fas fa-fw fa-user-edit"></i>
@@ -71,14 +71,14 @@
                            href="{{ url('/editors/permissions') }}">Control Panel</a>
                    </div>
                </div>
-           </li>
+           </li> --}}
 
 
 
 
 
            {{-- Nav Item - Teacher Collapse Menu --}}
-           <li class="nav-item {{ Request::is('teachers') || Request::is('teacher/create') ? 'active' : '' }}">
+           {{-- <li class="nav-item {{ Request::is('teachers') || Request::is('teacher/create') ? 'active' : '' }}">
                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTeacher"
                    aria-expanded="false" aria-controls="collapseTeacher">
                    <i class="fas fa-fw fa-chalkboard-teacher"></i>
@@ -97,7 +97,7 @@
                            href="{{ url('/teachers/permissions') }}">Control Panel</a>
                    </div>
                </div>
-           </li>
+           </li> --}}
 
 
 

@@ -245,3 +245,17 @@ Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
 //     Route::post('/teacher/search', [TeacherController::class, 'teacherSearch']);
 //     Route::post('/teacher/trashed-search', [TeacherController::class, 'teacherTrashedSearch']);
 });
+
+
+
+
+//only teacher routes 
+//editor Dashboard page Route
+Route::get('/teacher/login', [TeacherController::class, 'teacherLoginPage']);
+Route::post('/teacher/login/store', [TeacherController::class, 'teacher_login_store']);
+Route::get('/teacher/dashboard', [TeacherController::class, 'teacherDashboardPage']);
+
+Route::middleware(['auth:sanctum', 'teacher'])->group(function () {
+    Route::post('/auth/teacher/details', [TeacherController::class, 'authTeacherDetails']);
+    Route::post('/auth/teacher/logout', [TeacherController::class, 'teacherLogout']);
+});                      
