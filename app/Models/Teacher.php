@@ -5,9 +5,11 @@ namespace App\Models;
 use App\Models\User;
 use App\Models\ClassModel;
 use App\Models\Institution;
+use App\Models\TeacherAddress;
+use App\Models\TeacherEducation;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Teacher extends Model
 {
@@ -59,24 +61,17 @@ class Teacher extends Model
         return $this->belongsTo(User::class, 'added_by');
     }
 
-    // // Classes relation (Many-to-Many) with pivot table for designation
-    // public function classes()
-    // {
-    //     return $this->belongsToMany(ClassModel::class, 'class_teacher')
-    //                 ->withPivot('designation')
-    //                 ->withTimestamps();
-    // }
 
-    // // Teacher's addresses
-    // public function addresses()
-    // {
-    //     return $this->hasMany(TeacherAddress::class);
-    // }
 
-    // // Teacher's educations
-    // public function educations()
-    // {
-    //     return $this->hasMany(TeacherEducation::class);
-    // }
+        public function educations()
+    {
+        return $this->hasMany(TeacherEducation::class);
+    }
+
+    public function addresses()
+    {
+        return $this->hasMany(TeacherAddress::class);
+    }
+
     
 }

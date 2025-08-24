@@ -95,7 +95,7 @@
                     <h6 class="m-0 font-weight-bold text-primary">Update Profile</h6>
                 </div>
                 <div class="card-body">
-                    <input type="text" name="'institution_id" class="institution_id">
+                    <input type="text" name="'institution_id" class="institution_id" hidden>
                     <form action="" method="POST" enctype="multipart/form-data">
                         <!-- Father Name -->
                         <div class="mb-3">
@@ -204,7 +204,7 @@
                 <div class="card-header">Educational Qualifications</div>
                 <div class="card-body">
                      <!-- Editor select if needed -->
-                        <input type="number" readonly name="teacher_id" class="teacher_id form-control">
+                        <input type="number" readonly name="teacher_id" class="teacher_id form-control" hidden>
                     <form action="" id="teacherEducaionl_qualificationForm">
                        
 
@@ -283,11 +283,8 @@
             <div class="card shadow mb-4">
                 <div class="card-header">Addresses</div>
                 <div class="card-body">
-                    <form id="editor_address_Form">
-                        
-                        <input type="number" name="teacher_id" class="form-control address_teacher_id" readonly
-                            hidden>
-
+                    <input type="number" name="teacher_id" class="form-control address_teacher_id" readonly hidden>
+                    <form id="teacher_address_Form">
                         <!-- Address Type -->
                         <div class="mb-3">
                             <label class="form-label">Address Type</label>
@@ -330,7 +327,7 @@
                         </div>
 
                         <!-- Submit -->
-                        <button type="submit" class="btn btn-success" onclick="EditorAddress(event)">Save
+                        <button type="submit" class="btn btn-success" onclick="TeacherAddress(event)">Save
                             Address</button>
                     </form>
 
@@ -349,7 +346,7 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="editorAddressTableBody">
+                        <tbody class="TeacherAddressTableBody">
                            
                         </tbody>
                     </table>
@@ -397,14 +394,10 @@
             });
 
             if (res.data.status === 'success') {
-                //console.log(res.data.data.editors[0].id);
-               //console.log(res.data.data.teachers[0]);
-               // let teachersDetails = res.data.data.teachers[0];
                 let teachersDetails = res.data.data.teachers[0];
                // console.log(teachersDetails);
-
                 document.querySelector('.teacher_id').value = teachersDetails.id;
-                // document.querySelector('.address_teacher_id').value = editorDetails.id;
+                document.querySelector('.address_teacher_id').value = teachersDetails.id;
                 document.querySelector('.profile_name').innerHTML = res.data.data.name || 'N/A';
                 document.querySelector('.profile_email').innerHTML = res.data.data.email || 'N/A';
                 document.querySelector('.profile_phone').innerHTML = teachersDetails.phone || 'N/A';
@@ -696,7 +689,7 @@
 
     }
 
-        //editor educatoin lists
+    //editor educatoin lists
     getTeacherEducationLists();
     async function getTeacherEducationLists() {
         let token = localStorage.getItem('token');
@@ -752,6 +745,219 @@
             console.log(error);
         }
     }
+
+
+    //teacher Address
+    async function TeacherAddress(event) {
+        event.preventDefault();
+        let token = localStorage.getItem('token');
+        if (!token) {
+            alert('Unauthorized user');
+            return;
+        }
+
+        // Get values
+        let teacher_id = document.querySelector('input[name="teacher_id"]').value;
+        let type = document.querySelector('select[name="type"]').value;
+        let village = document.querySelector('input[name="village"]').value;
+        let district = document.querySelector('input[name="district"]').value;
+        let upazila = document.querySelector('input[name="upazila"]').value;
+        let post_office = document.querySelector('input[name="post_office"]').value;
+        let postal_code = document.querySelector('input[name="postal_code"]').value;
+
+        let data = {
+            teacher_id: teacher_id,
+            type: type,
+            village: village,
+            district: district,
+            upazila: upazila,
+            post_office: post_office,
+            postal_code: postal_code
+        };
+
+        try {
+            const res = await axios.post('/teacher/address', data, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+
+            document.getElementById('loader').style.display = 'none';
+
+            if (res.data.status === 'success') {
+                await getTeacherAddressLists();
+                Swal.fire('Success', res.data.message || 'Address added successfully', 'success');
+                let type = document.querySelector('select[name="type"]').value = "";
+                document.querySelector('input[name="village"]').value = "";
+                document.querySelector('input[name="district"]').value = "";
+                document.querySelector('input[name="upazila"]').value = "";
+                document.querySelector('input[name="post_office"]').value = "";
+                document.querySelector('input[name="postal_code"]').value = "";
+
+            } else {
+                Swal.fire('Error', res.data.message || 'Something went wrong', 'error');
+                //console.log(res.data);
+            }
+        } catch (error) {
+            document.getElementById('loader').style.display = 'none';
+            if (error.response) {
+                if (error.response.status === 422) {
+                    const errors = error.response.data.errors;
+                    let messages = '';
+                    for (const key in errors) {
+                        if (errors.hasOwnProperty(key)) {
+                            messages += errors[key].join(' ') + '<br>';
+                        }
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validation Error',
+                        html: messages
+                    });
+                } else {
+                    Swal.fire('Error', error.response.data.message || 'Failed to save address', 'error');
+                    console.log(error.response.data);
+                }
+            } else {
+                Swal.fire('Error', 'Network or unknown error occurred', 'error');
+                console.log(error);
+            }
+        }
+    }
+
+
+    //Teacher address lists
+    getTeacherAddressLists();
+    async function getTeacherAddressLists() {
+        let token = localStorage.getItem('token');
+        if (!token) {
+            alert('Unauthorized user');
+            return;
+        }
+        try {
+            let res = await axios.post('/teacher/address/lists', {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            //console.log(res.data.addressLists)
+            let addressLists = res.data.addressLists;
+            let tbody = document.querySelector('.TeacherAddressTableBody');
+            tbody.innerHTML = ''; // Clear old rows
+            if (addressLists.length > 0) {
+                addressLists.forEach((address) => {
+                    let tr = document.createElement('tr');
+
+                    tr.innerHTML = `
+                    <td>${address.type || ''}</td>
+                    <td>${address.village || ''}</td>
+                    <td>${address.district || 'N/A'}</td>
+                    <td>${address.upazila || ''}</td>
+                    <td>${address.post_office || ''}</td>
+                    <td>${address.postal_code || 'N/A'}</td>
+                    <td>
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                            <button type="button" class="btn btn-info TeacherAddressEdit" data-id="${address.id}">EDIT</button>
+                            <button type="button" class="btn btn-danger TeacherAddressDelete" data-id="${address.id}">DELETE</button>
+                        </div>
+                    </td>
+                `;
+
+                    tbody.appendChild(tr);
+                });
+
+                //teacher address edit 
+                $('.TeacherAddressEdit').on('click', async function(e) {
+                    e.preventDefault();
+                    let id = $(this).data('id');
+                    await fillUpdateAddressForm(id);
+                    $('#editAddressModal').modal('show');
+                    //console.log(id);
+                })
+
+                // teacher address delete
+                $('.TeacherAddressDelete').on('click', async function() {
+                    let token = localStorage.getItem('token');
+                    let id = $(this).data('id');
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "This address will be permanently deleted!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            try {
+                                let res = await axios.post('/teacher/address/delete', {
+                                    id: id
+                                }, {
+                                    headers: {
+                                        Authorization: `Bearer ${token}`
+                                    }
+                                });
+
+                                if (res.data.status === 'success') {
+                                    await getTeacherAddressLists();
+                                    Swal.fire(
+                                        'Deleted!',
+                                        res.data.message,
+                                        'success'
+                                    );
+
+                                    
+                                    $(`.address-row-${id}`).remove();
+                                } else {
+                                    Swal.fire(
+                                        'Error!',
+                                        res.data.message || 'Something went wrong!',
+                                        'error'
+                                    );
+                                }
+                            } catch (error) {
+                                console.log(error);
+                                Swal.fire(
+                                    'Error!',
+                                    error.response?.data?.message ||
+                                    'Server error occurred',
+                                    'error'
+                                );
+                            }
+                        }
+                    });
+                });
+
+
+
+            } else {
+                // No data
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center">No address found</td></tr>`;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+
+
+
+        //View Profile
+    $('.viewProfileCV').on('click', async function() {
+        let token = localStorage.getItem('token');
+        // if (!token) {
+        //     window.location.href = '/admin/login';
+        //     return;
+        // }
+        let email = $('.profile_email').text().trim();
+        //console.log(email);
+        if (email) {
+            console.log(email);
+            await teacherDetailsCVFormat(email);
+            $('#teacherDetailsCVFormatModal').modal('show');
+        }
+    });
 
 
 
@@ -1129,7 +1335,7 @@
 
 
     //editor Address
-    async function EditorAddress(event) {
+    async function TeacherAddress(event) {
         event.preventDefault();
         let token = localStorage.getItem('token');
         if (!token) {
@@ -1166,7 +1372,7 @@
             document.getElementById('loader').style.display = 'none';
 
             if (res.data.status === 'success') {
-                await getEdiorAddressLists();
+                await getTeacherAddressLists();
                 Swal.fire('Success', res.data.message || 'Address added successfully', 'success');
                 let type = document.querySelector('select[name="type"]').value = "";
                 document.querySelector('input[name="village"]').value = "";
@@ -1207,8 +1413,8 @@
     }
 
     //editor address lists
-    getEdiorAddressLists();
-    async function getEdiorAddressLists() {
+    getTeacherAddressLists();
+    async function getTeacherAddressLists() {
         let token = localStorage.getItem('token');
         if (!token) {
             alert('Unauthorized user');
@@ -1222,7 +1428,7 @@
             })
             //console.log(res.data.addressLists)
             let addressLists = res.data.addressLists;
-            let tbody = document.querySelector('.editorAddressTableBody');
+            let tbody = document.querySelector('.TeacherAddressTableBody');
             tbody.innerHTML = ''; // Clear old rows
             if (addressLists.length > 0) {
                 addressLists.forEach((address) => {
@@ -1237,8 +1443,8 @@
                     <td>${address.postal_code || 'N/A'}</td>
                     <td>
                         <div class="btn-group" role="group" aria-label="Basic example">
-                            <button type="button" class="btn btn-info editorAddressEdit" data-id="${address.id}">EDIT</button>
-                            <button type="button" class="btn btn-danger editorAddressDelete" data-id="${address.id}">DELETE</button>
+                            <button type="button" class="btn btn-info TeacherAddressEdit" data-id="${address.id}">EDIT</button>
+                            <button type="button" class="btn btn-danger TeacherAddressDelete" data-id="${address.id}">DELETE</button>
                         </div>
                     </td>
                 `;
@@ -1247,7 +1453,7 @@
                 });
 
                 //editor address edit 
-                $('.editorAddressEdit').on('click', async function(e) {
+                $('.TeacherAddressEdit').on('click', async function(e) {
                     e.preventDefault();
                     let id = $(this).data('id');
                     await fillUpdateAddressForm(id);
@@ -1256,7 +1462,7 @@
                 })
 
                 // editor address delete
-                $('.editorAddressDelete').on('click', async function() {
+                $('.TeacherAddressDelete').on('click', async function() {
                     let token = localStorage.getItem('token');
                     let id = $(this).data('id');
 
@@ -1280,7 +1486,7 @@
                                 });
 
                                 if (res.data.status === 'success') {
-                                    await getEdiorAddressLists();
+                                    await getTeacherAddressLists();
                                     Swal.fire(
                                         'Deleted!',
                                         res.data.message,

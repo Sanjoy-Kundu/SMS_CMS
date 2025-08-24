@@ -5,8 +5,7 @@
     @include('components.dashboard.teacher.navComponent')
     @include('components.dashboard.teacher.profileComponent')
     @include('components.dashboard.teacher.footerComponent')
-    {{-- @include('components.dashboard.teacher.changePasswordComponent')
     @include('components.dashboard.teacher.educationUpdateComponent')
     @include('components.dashboard.teacher.addressUpdateComponent')
-    @include('components.dashboard.teacher.teacherDetailsCVComponent') --}}
+    @include('components.dashboard.teacher.teacherDetailsCVComponent')
 @endsection

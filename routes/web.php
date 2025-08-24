@@ -14,6 +14,7 @@ use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\ClassModelController;
 use App\Http\Controllers\InstitutionController;
 use App\Http\Controllers\EditorAddressController;
+use App\Http\Controllers\TeacherAddressController;
 use App\Http\Controllers\AcademicSectionController;
 use App\Http\Controllers\EditorDashboardController;
 use App\Http\Controllers\EditorEducationController;
@@ -267,5 +268,17 @@ Route::middleware(['auth:sanctum', 'teacher'])->group(function () {
     //education
     Route::post('/teacher/education', [TeacherEducationController::class, 'teacherEducationCreate']);
     Route::post('/teacher/education/lists', [TeacherEducationController::class, 'teacherEducationList']);
+    Route::post('/teacher/education/by-id', [TeacherEducationController::class, 'teacherEducationById']);
+    Route::post('/teacher/education/update', [TeacherEducationController::class, 'teacherEducationUpdate']);
 
+
+    //address
+    Route::post('/teacher/address', [TeacherAddressController::class, 'teacherAddressCreate']);
+    Route::post('/teacher/address/lists', [TeacherAddressController::class, 'teacherAddressLists']);
+    Route::post('/teacher/address/by-id', [TeacherAddressController::class,'getAddressById']); //adress details by id
+    Route::post('/teacher/address/update', [TeacherAddressController::class,'updateAddress']);
+    Route::post('/teacher/address/delete', [TeacherAddressController::class,'deleteAddress']);
+
+
+    Route::post('/teacher/cv-details', [TeacherController::class, 'teacherCVDetails']);
 });                      

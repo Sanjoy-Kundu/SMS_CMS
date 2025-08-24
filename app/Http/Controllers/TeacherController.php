@@ -28,8 +28,8 @@ class TeacherController extends Controller
     {
    try{
             $teachers = Teacher::with('user','addedBy')->get();
-            $editorTeachers = Teacher::with('user','addedBy')->where('added_by',Auth::user()->id)->get();
-            return response()->json(['status' => 'success', 'allTeachers' => $teachers, 'editorTeachers' => $editorTeachers]);
+            $teacherTeachers = Teacher::with('user','addedBy')->where('added_by',Auth::user()->id)->get();
+            return response()->json(['status' => 'success', 'allTeachers' => $teachers, 'teacherTeachers' => $teacherTeachers]);
         }catch(Exception $ex){
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
         }
@@ -38,7 +38,7 @@ class TeacherController extends Controller
 
 
     /**
-     * Admin Edit By all Teachers both admin or editor
+     * Admin Edit By all Teachers both admin or teacher
      */
     public function teacherDetailsById(Request $request){
         try{
@@ -130,14 +130,14 @@ class TeacherController extends Controller
 
 
     /**
-     * Teacher Restore By admin or  Editor
+     * Teacher Restore By admin or  teacher
      */
     public function allteacherTrashListsByAdmin(Request $request){
         try{
             $authUser = Auth::user();
            $trashedTeachersDetailsData = Teacher::onlyTrashed()->with(['user' => function($q) { $q->withTrashed();}, 'addedBy'])->get();
            
-        $EditortrashedTeachers = Teacher::onlyTrashed()->with([
+        $teachertrashedTeachers = Teacher::onlyTrashed()->with([
                 'user' => function ($q) {$q->withTrashed(); },'addedBy'
             ])
             ->where('added_by', $authUser->id)
@@ -146,7 +146,7 @@ class TeacherController extends Controller
             return response()->json([
                 'status' => 'success',
                 'trashTeachers' => $trashedTeachersDetailsData,
-                'EditortrashedTeachers' =>$EditortrashedTeachers
+                'teachertrashedTeachers' =>$teachertrashedTeachers
             ]);
         }catch(Exception $ex){
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
@@ -157,7 +157,7 @@ class TeacherController extends Controller
 
 
     /**
-     * Teacher Permanent Delete By admin or  Editor
+     * Teacher Permanent Delete By admin or  teacher
      */
     public function teacherDeleteByAdmin(Request $request){
         try{
@@ -189,7 +189,7 @@ class TeacherController extends Controller
 
 
     /**
-     * Teacher Resore By admin or  Editor
+     * Teacher Resore By admin or  teacher
      */
     public function teacherRestoreByAdmin(Request $request){
     try{
@@ -446,6 +446,37 @@ public function teacherStore(Request $request)
     }
 
 
+
+
+
+
+
+        /**
+     * teacher CV
+     */
+    public function teacherCVDetails(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $email = $request->input('email');
+
+        // Get user with role teacher
+        $user = User::where('email', $email)->where('role', 'teacher')->first();
+        if (!$user) {
+            return response()->json(['error' => 'Teacher not found!'], 404);
+        }
+
+        $teacher = Teacher::with(['educations', 'addresses'])
+            ->where('user_id', $user->id)
+            ->first();
+        if (!$teacher) {
+            return response()->json(['error' => 'Teacher profile not found!'], 404);
+        }
+
+        return response()->json(['status' => 'success', 'user' => $user, 'teacher' => $teacher]);
+    }
 /**
  * ==================================================
  * Teacher Dahboard End 

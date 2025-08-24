@@ -46,48 +46,48 @@ class EditorAddressController extends Controller
         }
     }
 
-
+    //delete address by id
     public function deleteAddress(Request $request)
-{
-    try {
-        // Validate request
-        $request->validate([
-            'id' => 'required|integer',
-        ]);
+    {
+        try {
+            // Validate request
+            $request->validate([
+                'id' => 'required|integer',
+            ]);
 
-        $user = Auth::user();
-        if (!$user) {
-            return response()->json(['status' => 'error', 'message' => 'User not authenticated'], 401);
+            $user = Auth::user();
+            if (!$user) {
+                return response()->json(['status' => 'error', 'message' => 'User not authenticated'], 401);
+            }
+
+            $editorDetails = Editor::where('user_id', $user->id)->first();
+            if (!$editorDetails) {
+                return response()->json(['status' => 'error', 'message' => 'Editor profile not found'], 404);
+            }
+
+            $editorAddressDetails = EditorAddress::where('id', $request->id)
+                ->where('editor_id', $editorDetails->id)
+                ->first();
+
+            if (!$editorAddressDetails) {
+                return response()->json(['status' => 'error', 'message' => 'Address not found'], 404);
+            }
+
+            // ⚡ Permanent delete
+            $editorAddressDetails->forceDelete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Address permanently deleted'
+            ], 200);
+
+        } catch (Exception $ex) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $ex->getMessage()
+            ], 500);
         }
-
-        $editorDetails = Editor::where('user_id', $user->id)->first();
-        if (!$editorDetails) {
-            return response()->json(['status' => 'error', 'message' => 'Editor profile not found'], 404);
-        }
-
-         $editorAddressDetails = EditorAddress::where('id', $request->id)
-            ->where('editor_id', $editorDetails->id)
-            ->first();
-
-        if (!$editorAddressDetails) {
-            return response()->json(['status' => 'error', 'message' => 'Address not found'], 404);
-        }
-
-        // ⚡ Permanent delete
-        $editorAddressDetails->forceDelete();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Address permanently deleted'
-        ], 200);
-
-    } catch (Exception $ex) {
-        return response()->json([
-            'status' => 'fail',
-            'message' => $ex->getMessage()
-        ], 500);
     }
-}
 
 
 
@@ -95,54 +95,54 @@ class EditorAddressController extends Controller
 
 
     // Update address
- public function updateAddress(Request $request)
+    public function updateAddress(Request $request)
     {
-        try {
-            $validator = Validator::make($request->all(), [
-                'id' => 'required|exists:editor_addresses,id',
-                'type' => 'required|in:present,permanent',
-                'village' => 'nullable|string|max:255',
-                'district' => 'nullable|string|max:255',
-                'upazila' => 'nullable|string|max:255',
-                'post_office' => 'nullable|string|max:255',
-                'postal_code' => 'nullable|string|max:20',
-            ]);
+            try {
+                $validator = Validator::make($request->all(), [
+                    'id' => 'required|exists:editor_addresses,id',
+                    'type' => 'required|in:present,permanent',
+                    'village' => 'nullable|string|max:255',
+                    'district' => 'nullable|string|max:255',
+                    'upazila' => 'nullable|string|max:255',
+                    'post_office' => 'nullable|string|max:255',
+                    'postal_code' => 'nullable|string|max:20',
+                ]);
 
-            if ($validator->fails()) {
+                if ($validator->fails()) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Validation failed',
+                        'errors' => $validator->errors()
+                    ], 422);
+                }
+                $user = Auth::user();
+            $editor = Editor::where('user_id', $user->id)->first();
+
+                // Update or create
+                $address = EditorAddress::updateOrCreate(
+                    ['id' => $request->id],
+                    [
+                        'editor_id' => $editor->id,
+                        'type' => $request->type,
+                        'village' => $request->village ?? null,
+                        'district' => $request->district ?? null,
+                        'upazila' => $request->upazila ?? null,
+                        'post_office' => $request->post_office ?? null,
+                        'postal_code' => $request->postal_code ?? null,
+                    ]
+                );
+
                 return response()->json([
-                    'status' => 'error',
-                    'message' => 'Validation failed',
-                    'errors' => $validator->errors()
-                ], 422);
+                    'status' => 'success',
+                    'message' => 'Address updated successfully',
+                    'data' => $address
+                ]);
+            } catch (\Exception $ex) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => $ex->getMessage()
+                ], 500);
             }
-            $user = Auth::user();
-           $editor = Editor::where('user_id', $user->id)->first();
-
-            // Update or create
-            $address = EditorAddress::updateOrCreate(
-                ['id' => $request->id],
-                [
-                    'editor_id' => $editor->id,
-                    'type' => $request->type,
-                    'village' => $request->village ?? null,
-                    'district' => $request->district ?? null,
-                    'upazila' => $request->upazila ?? null,
-                    'post_office' => $request->post_office ?? null,
-                    'postal_code' => $request->postal_code ?? null,
-                ]
-            );
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Address updated successfully',
-                'data' => $address
-            ]);
-        } catch (\Exception $ex) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $ex->getMessage()
-            ], 500);
-        }
     }
 
 
