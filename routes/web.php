@@ -258,7 +258,10 @@ Route::get('/teacher/dashboard', [TeacherController::class, 'teacherDashboardPag
 Route::get('/teacher/profile', [TeacherDashboardController::class, 'teacherProfilePage']);
 
 Route::middleware(['auth:sanctum', 'teacher'])->group(function () {
+    Route::post('/teacher/institution/details', [TeacherDashboardController::class, 'institutionDetailsByTeacher']);
     Route::post('/auth/teacher/details', [TeacherController::class, 'authTeacherDetails']);
     Route::post('/auth/teacher/logout', [TeacherController::class, 'teacherLogout']);
+
+    Route::post('/teacher/update-profile', [TeacherDashboardController::class, 'teacherUpdateProfile']);
 
 });                      

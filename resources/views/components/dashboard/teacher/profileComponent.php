@@ -188,8 +188,8 @@
 
                               <!-- myself -->
                         <div class="mb-3">
-                            <label for="myself" class="form-label">My Selft Bio</label>
-                            <textarea name="myself" class="form-control myself"></textarea>
+                            <label for="about_me" class="form-label">About MySelf</label>
+                            <textarea name="about_me" class="form-control about_me"></textarea>
                         </div>
 
 
@@ -285,11 +285,12 @@
 
 
             <!-- Address -->
+             
             <div class="card shadow mb-4">
                 <div class="card-header">Addresses</div>
                 <div class="card-body">
                     <form id="editor_address_Form">
-                        <!-- Editor ID (hidden or readonly) -->
+                        
                         <input type="number" name="editor_id" class="form-control address_editor_id" readonly
                             hidden>
 
@@ -355,11 +356,12 @@
                             </tr>
                         </thead>
                         <tbody class="editorAddressTableBody">
-                            <!-- Data will be injected here via JS -->
+                           
                         </tbody>
                     </table>
                 </div>
             </div>
+          
         </div>
     </div>
 </div>
@@ -382,6 +384,251 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    getUserInfo();
+    async function getUserInfo() {
+        document.getElementById('loader').style.display = 'block';
+        let token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/editor/login';
+            return;
+        }
+
+        try {
+            let res = await axios.post('/auth/teacher/details', {}, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (res.data.status === 'success') {
+                //console.log(res.data.data.editors[0].id);
+                // console.log(res.data.data.editors[0]);
+                //let editorDetails = res.data.data.editors[0]
+                // document.querySelector('.editor_id').value = editorDetails.id;
+                // document.querySelector('.address_editor_id').value = editorDetails.id;
+                document.querySelector('.profile_name').innerHTML = res.data.data.name || 'N/A';
+                document.querySelector('.profile_name').innerHTML = res.data.data.name || 'N/A';
+                document.querySelector('.profile_email').innerHTML = res.data.data.email || 'N/A';
+                //document.querySelector('.profile_phone').innerHTML = res.data.data.editors[0].phone || 'N/A';
+                document.querySelector('.profile_role').innerHTML = res.data.data.role || 'N/A';
+                // document.querySelector('.profile_status').innerHTML = res.data.data.editors[0].is_active === 1 ?
+                //     'Active' : 'Inactive';
+                document.querySelector('.profile_joined_at').innerHTML = res.data.data.created_at ? new Date(res
+                    .data.data.created_at).toLocaleDateString() : 'N/A';
+                document.querySelector('.profile_updated_at').innerHTML = res.data.data.updated_at ? new Date(res
+                    .data.data.updated_at).toLocaleDateString() : 'N/A';
+                // let birthDate = res.data.data.editors[0].birth_date;
+
+
+                // document.querySelector('input[name="father_name"]').value = editorDetails.father_name ?
+                //     editorDetails.father_name : 'N/A'
+                // document.querySelector('input[name="mother_name"]').value = editorDetails.mother_name ?
+                //     editorDetails.mother_name : 'N/A'
+                // document.querySelector('input[name="phone"]').value = editorDetails.phone ? editorDetails.phone :
+                //     'N/A'
+                // document.querySelector('textarea[name="address"]').value = editorDetails.address ? editorDetails
+                //     .address : 'N/A'
+                // document.querySelector('input[name="nid"]').value = editorDetails.nid ? editorDetails.nid : 'N/A'
+                // //date
+                // let birthDateInput = document.querySelector('input[name="birth_date"]');
+                // if (birthDateInput) birthDateInput.value = editorDetails.birth_date || '';
+                // // Gender
+                // let genderSelect = document.querySelector('select[name="gender"]');
+                // if (genderSelect) genderSelect.value = editorDetails.gender || '';
+
+                // // Religion
+                // let religionSelect = document.querySelector('select[name="religion"]');
+                // if (religionSelect) religionSelect.value = editorDetails.religion || '';
+
+                // // Marital Status
+                // let maritalSelect = document.querySelector('select[name="marital_status"]');
+                // if (maritalSelect) maritalSelect.value = editorDetails.marital_status || '';
+
+                // document.querySelector('input[name="nationality"]').value = editorDetails.nationality ?
+                //     editorDetails.nationality : 'N/A'
+                // // Profile image set if exists
+                // if (editorDetails.image) {
+                //     document.querySelector('#profile_img_preview').src =
+                //         `/uploads/editor/profile/${editorDetails.image}`;
+                // } else {
+                //     document.querySelector('#profile_img_preview').src = `/uploads/editor/profile/default.png`;
+                // }
+
+
+            }
+
+            if (res.data.status === 'error') {
+                console.log('success Error', res.data);
+                // localStorage.removeItem('token');
+                // window.location.href = '/admin/login';
+            }
+        } catch (error) {
+            Swal.fire('Error', 'Authentication failed. Please login again.', 'error').then(() => {
+                // localStorage.removeItem('token');
+                // window.location.href = '/admin/login';
+                console.log(error)
+            });
+        } finally {
+            document.getElementById('loader').style.display = 'none';
+        }
+    }
+
+    //Institutions Details
+    getInstitutionDetailsInfo();
+    async function getInstitutionDetailsInfo() {
+        document.getElementById('loader').style.display = 'block';
+        let token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/teacher/login';
+            return;
+        }
+
+        try {
+            let res = await axios.post('/teacher/institution/details', {}, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (res.data.status === 'success') {
+                //console.log(res.data.data[0].id);
+                document.querySelector('.institution_id').value =res.data.data[0].id;
+            }
+
+            if (res.data.status === 'error') {
+                alert('Unauthorized Access');
+                console.log('success Error', res.data);
+                // localStorage.removeItem('token');
+                // window.location.href = '/admin/login';
+            }
+        } catch (error) {
+            Swal.fire('Error', 'Authentication failed. Please login again.', 'error').then(() => {
+                // localStorage.removeItem('token');
+                // window.location.href = '/admin/login';
+                console.log(error)
+            });
+        } finally {
+            document.getElementById('loader').style.display = 'none';
+        }
+    }
+
+    // Image preview handler
+    document.querySelector('.image').addEventListener('change', function(event) {
+        let file = event.target.files[0];
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                document.querySelector('#profile_img_preview').src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+
+        // Update user profile
+    async function updateProfile(event) {
+        event.preventDefault();
+        let token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/editor/login';
+            return;
+        }
+
+        // Create formData
+        let formData = new FormData();
+
+        // Helper to safely get value
+        function getValue(selector, defaultValue = '') {
+            const el = document.querySelector(selector);
+            return el ? el.value.trim() : defaultValue;
+        }
+
+        // Append text inputs
+        formData.append('father_name', getValue('input[name="father_name"]'));
+        formData.append('mother_name', getValue('input[name="mother_name"]'));
+        formData.append('phone', getValue('input[name="phone"]'));
+        formData.append('address', getValue('textarea[name="address"]'));
+        formData.append('about_me', getValue('textarea[name="about_me"]'));
+        formData.append('birth_date', getValue('input[name="birth_date"]'));
+        formData.append('nid', getValue('input[name="nid"]'));
+        formData.append('nationality', getValue('input[name="nationality"]'));
+
+        // Append selects
+        formData.append('gender', getValue('select[name="gender"]'));
+        formData.append('religion', getValue('select[name="religion"]'));
+        formData.append('marital_status', getValue('select[name="marital_status"]'));
+
+        // Append image if selected
+        const imageFile = document.querySelector('input[name="image"]')?.files[0];
+        if (imageFile) {
+            formData.append('image', imageFile);
+        }
+
+        // Show loader
+        document.getElementById('loader').style.display = 'block';
+
+        try {
+            const res = await axios.post('/teacher/update-profile', formData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            // Hide loader
+            document.getElementById('loader').style.display = 'none';
+
+            if (res.data.status === 'success') {
+                Swal.fire('Success', 'Profile updated successfully', 'success');
+
+                // Update profile image if uploaded
+                if (res.data.data.image) {
+                    document.querySelector('#profile_img_preview').src = res.data.data.image;
+                }
+
+                getUserInfo(); // Refresh profile info
+            } else {
+                Swal.fire('Error', res.data.message || 'Something went wrong', 'error');
+            }
+        } catch (error) {
+            // Hide loader
+            document.getElementById('loader').style.display = 'none';
+
+            if (error.response) {
+                if (error.response.status === 422) {
+                    const errors = error.response.data.errors;
+                    let messages = '';
+                    for (const key in errors) {
+                        if (errors.hasOwnProperty(key)) {
+                            messages += errors[key].join(' ') + '<br>';
+                        }
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validation Error',
+                        html: messages
+                    });
+                } else {
+                    Swal.fire('Error', error.response.data.message || 'Failed to update profile', 'error');
+                }
+            } else {
+                Swal.fire('Error', 'Network or unknown error occurred', 'error');
+            }
+        }
+    }
+
+
+
+
+
+
+    
+</script>
+
+
+
 <!-- <script>
     getUserInfo();
     async function getUserInfo() {

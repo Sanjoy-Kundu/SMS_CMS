@@ -56,7 +56,9 @@ class InstitutionController extends Controller
                 }
                 $institutions = Institution::where('id', $editor->institution_id)->get();
                 $trashInstitutions = Institution::onlyTrashed()->where('id', $editor->institution_id)->get();
-            } else {
+            } elseif($user->role === 'teacher' || $user->role === 'student' || $user->role === 'parent') {
+                    $institutions = Institution::all();
+            }else{
                 return response()->json(['status'=>'error','message'=>'Unauthorized']);
             }
 
