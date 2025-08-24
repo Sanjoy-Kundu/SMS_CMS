@@ -95,15 +95,8 @@
                     <h6 class="m-0 font-weight-bold text-primary">Update Profile</h6>
                 </div>
                 <div class="card-body">
-                   <input type="text" name="'user_id" class="user_id">
                     <input type="text" name="'institution_id" class="institution_id">
                     <form action="" method="POST" enctype="multipart/form-data">
-                        <!-- Father Name -->
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input type="text" name="name" value="" class="form-control"
-                                placeholder="Enter Your Fater's Name">
-                        </div>
                         <!-- Father Name -->
                         <div class="mb-3">
                             <label for="father_name" class="form-label">Father's Name</label>
@@ -210,9 +203,10 @@
             <div class="card shadow mb-4">
                 <div class="card-header">Educational Qualifications</div>
                 <div class="card-body">
-                    <form action="" id="editorEducaionl_qualificationForm">
-                        <!-- Editor select if needed -->
-                        <input type="number" readonly name="editor_id" class="editor_id form-control" hidden>
+                     <!-- Editor select if needed -->
+                        <input type="number" readonly name="teacher_id" class="teacher_id form-control">
+                    <form action="" id="teacherEducaionl_qualificationForm">
+                       
 
                         <div class="mb-3">
                             <div class="col-md-12">
@@ -256,7 +250,7 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-success" onclick="editorEducation(event)">Save
+                        <button type="submit" class="btn btn-success" onclick="teacherEducation(event)">Save
                             Education</button>
                     </form>
 
@@ -291,7 +285,7 @@
                 <div class="card-body">
                     <form id="editor_address_Form">
                         
-                        <input type="number" name="editor_id" class="form-control address_editor_id" readonly
+                        <input type="number" name="teacher_id" class="form-control address_teacher_id" readonly
                             hidden>
 
                         <!-- Address Type -->
@@ -404,70 +398,74 @@
 
             if (res.data.status === 'success') {
                 //console.log(res.data.data.editors[0].id);
-                // console.log(res.data.data.editors[0]);
-                //let editorDetails = res.data.data.editors[0]
-                // document.querySelector('.editor_id').value = editorDetails.id;
-                // document.querySelector('.address_editor_id').value = editorDetails.id;
-                document.querySelector('.profile_name').innerHTML = res.data.data.name || 'N/A';
+               //console.log(res.data.data.teachers[0]);
+               // let teachersDetails = res.data.data.teachers[0];
+                let teachersDetails = res.data.data.teachers[0];
+               // console.log(teachersDetails);
+
+                document.querySelector('.teacher_id').value = teachersDetails.id;
+                // document.querySelector('.address_teacher_id').value = editorDetails.id;
                 document.querySelector('.profile_name').innerHTML = res.data.data.name || 'N/A';
                 document.querySelector('.profile_email').innerHTML = res.data.data.email || 'N/A';
-                //document.querySelector('.profile_phone').innerHTML = res.data.data.editors[0].phone || 'N/A';
+                document.querySelector('.profile_phone').innerHTML = teachersDetails.phone || 'N/A';
                 document.querySelector('.profile_role').innerHTML = res.data.data.role || 'N/A';
-                // document.querySelector('.profile_status').innerHTML = res.data.data.editors[0].is_active === 1 ?
-                //     'Active' : 'Inactive';
+              
+                document.querySelector('.profile_status').innerHTML = teachersDetails.is_active === 1 ?
+                      'Active' : 'Inactive';
                 document.querySelector('.profile_joined_at').innerHTML = res.data.data.created_at ? new Date(res
                     .data.data.created_at).toLocaleDateString() : 'N/A';
                 document.querySelector('.profile_updated_at').innerHTML = res.data.data.updated_at ? new Date(res
                     .data.data.updated_at).toLocaleDateString() : 'N/A';
-                // let birthDate = res.data.data.editors[0].birth_date;
+                 let birthDate = teachersDetails.birth_date;
 
 
-                // document.querySelector('input[name="father_name"]').value = editorDetails.father_name ?
-                //     editorDetails.father_name : 'N/A'
-                // document.querySelector('input[name="mother_name"]').value = editorDetails.mother_name ?
-                //     editorDetails.mother_name : 'N/A'
-                // document.querySelector('input[name="phone"]').value = editorDetails.phone ? editorDetails.phone :
-                //     'N/A'
-                // document.querySelector('textarea[name="address"]').value = editorDetails.address ? editorDetails
-                //     .address : 'N/A'
-                // document.querySelector('input[name="nid"]').value = editorDetails.nid ? editorDetails.nid : 'N/A'
-                // //date
-                // let birthDateInput = document.querySelector('input[name="birth_date"]');
-                // if (birthDateInput) birthDateInput.value = editorDetails.birth_date || '';
-                // // Gender
-                // let genderSelect = document.querySelector('select[name="gender"]');
-                // if (genderSelect) genderSelect.value = editorDetails.gender || '';
+                
+                document.querySelector('input[name="father_name"]').value = teachersDetails.father_name ?
+                    teachersDetails.father_name : 'N/A'
+                document.querySelector('input[name="mother_name"]').value = teachersDetails.mother_name ?
+                    teachersDetails.mother_name : 'N/A'
+                document.querySelector('input[name="phone"]').value = teachersDetails.phone ? teachersDetails.phone :
+                    'N/A'
+                document.querySelector('textarea[name="address"]').value = teachersDetails.address ? teachersDetails
+                    .address : 'N/A'
+                document.querySelector('input[name="nid"]').value = teachersDetails.nid ? teachersDetails.nid : 'N/A'
+                //date
+                let birthDateInput = document.querySelector('input[name="birth_date"]');
+                if (birthDateInput) birthDateInput.value = teachersDetails.birth_date || '';
+                // Gender
+                let genderSelect = document.querySelector('select[name="gender"]');
+                if (genderSelect) genderSelect.value = teachersDetails.gender || '';
 
-                // // Religion
-                // let religionSelect = document.querySelector('select[name="religion"]');
-                // if (religionSelect) religionSelect.value = editorDetails.religion || '';
+                // Religion
+                let religionSelect = document.querySelector('select[name="religion"]');
+                if (religionSelect) religionSelect.value = teachersDetails.religion || '';
 
-                // // Marital Status
-                // let maritalSelect = document.querySelector('select[name="marital_status"]');
-                // if (maritalSelect) maritalSelect.value = editorDetails.marital_status || '';
+                // Marital Status
+                let maritalSelect = document.querySelector('select[name="marital_status"]');
+                if (maritalSelect) maritalSelect.value = teachersDetails.marital_status || '';
 
-                // document.querySelector('input[name="nationality"]').value = editorDetails.nationality ?
-                //     editorDetails.nationality : 'N/A'
-                // // Profile image set if exists
-                // if (editorDetails.image) {
-                //     document.querySelector('#profile_img_preview').src =
-                //         `/uploads/editor/profile/${editorDetails.image}`;
-                // } else {
-                //     document.querySelector('#profile_img_preview').src = `/uploads/editor/profile/default.png`;
-                // }
+                document.querySelector('input[name="nationality"]').value = teachersDetails.nationality ?
+                    teachersDetails.nationality : 'N/A'
+                // Profile image set if exists
+                if (teachersDetails.image) {
+                    document.querySelector('#profile_img_preview').src =
+                        `/uploads/teacher/profile/${teachersDetails.image}`;
+                } else {
+                    document.querySelector('#profile_img_preview').src = `/uploads/teacher/profile/default.png`;
+                }
 
-
+                
             }
 
             if (res.data.status === 'error') {
                 console.log('success Error', res.data);
-                // localStorage.removeItem('token');
-                // window.location.href = '/admin/login';
+                alert('Unauthorized Access');
+                window.location.href = '/teacher/login';
             }
         } catch (error) {
             Swal.fire('Error', 'Authentication failed. Please login again.', 'error').then(() => {
-                // localStorage.removeItem('token');
-                // window.location.href = '/admin/login';
+                localStorage.removeItem('token');
+                window.location.href = '/teacher/login';
                 console.log(error)
             });
         } finally {
@@ -619,6 +617,141 @@
         }
     }
 
+    //teacher eductoin
+    async function teacherEducation(event) {
+        event.preventDefault();
+        let token = localStorage.getItem('token');
+        if (!token) {
+            alert('Unauthorized user');
+            return;
+        }
+
+        //get value
+        let teacher_id = document.querySelector('input[name="teacher_id"]').value;
+        let level = document.querySelector('select[name="level"]').value;
+        let roll_number = document.querySelector('input[name="roll_number"]').value;
+        let board_university = document.querySelector('input[name="board_university"]').value;
+        let result = document.querySelector('input[name="result"]').value;
+        let passing_year = parseInt(document.querySelector('input[name="passing_year"]').value);
+        let course_duration = document.querySelector('input[name="course_duration"]').value;
+
+        let data = {
+            teacher_id: teacher_id,
+            level: level,
+            roll_number: roll_number,
+            board_university: board_university,
+            result: result,
+            passing_year: passing_year,
+            course_duration: course_duration
+        }
+        //console.log(data);
+        try {
+            const res = await axios.post('/teacher/education', data, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+
+            // Hide loader
+            document.getElementById('loader').style.display = 'none';
+
+            if (res.data.status === 'success') {
+                Swal.fire('Success', 'Data Inserted successfully', 'success');
+                await getTeacherEducationLists(); // Refresh Education Table
+                document.getElementById('teacherEducaionl_qualificationForm').reset();
+
+
+
+                //getUserInfo(); // Refresh profile info
+            } else {
+                Swal.fire('Error', res.data.message || 'Something went wrong', 'error');
+            }
+        } catch (error) {
+            // Hide loader
+            document.getElementById('loader').style.display = 'none';
+
+            if (error.response) {
+                if (error.response.status === 422) {
+                    const errors = error.response.data.errors;
+                    let messages = '';
+                    for (const key in errors) {
+                        if (errors.hasOwnProperty(key)) {
+                            messages += errors[key].join(' ') + '<br>';
+                        }
+                    }
+                    //console.log(messages);
+                    // Swal.fire({
+                    //     icon: 'error',
+                    //     title: 'Validation Error',
+                    //     html: messages
+                    // });
+                } else {
+                    //console.log(error.response.data);
+                    Swal.fire('Error', error.response.data.message || 'Failed to update profile', 'error');
+                }
+            } else {
+                Swal.fire('Error', 'Network or unknown error occurred', 'error');
+            }
+        }
+
+    }
+
+        //editor educatoin lists
+    getTeacherEducationLists();
+    async function getTeacherEducationLists() {
+        let token = localStorage.getItem('token');
+        if (!token) {
+            alert('Unauthorized user');
+            return;
+        }
+        try {
+            let res = await axios.post('/teacher/education/lists', {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            //console.log(res.data.educationLists)
+            let educationLists = res.data.educationLists;
+            let tbody = document.querySelector('.educationTableBody');
+            tbody.innerHTML = ''; // Clear old rows
+            if (educationLists.length > 0) {
+                educationLists.forEach((education) => {
+                    let tr = document.createElement('tr');
+
+                    tr.innerHTML = `
+                    <td>${education.level || ''}</td>
+                    <td>${education.board_university || ''}</td>
+                    <td>${education.roll_number || 'N/A'}</td>
+                    <td>${education.result || ''}</td>
+                    <td>${education.passing_year || ''}</td>
+                    <td>${education.course_duration || 'N/A'}</td>
+                    <td>
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                            <button type="button" class="btn btn-info teacherEducationEdit" data-id="${education.id}">EDIT</button>
+                        </div>
+                    </td>
+                `;
+
+                    tbody.appendChild(tr);
+                });
+
+
+                $('.teacherEducationEdit').on('click', async function(e) {
+                    e.preventDefault();
+                    let id = $(this).data('id');
+                    await fillUpdateEducationForm(id);
+                    $('#editEducationModal').modal('show');
+
+                    console.log(id);
+                })
+            } else {
+                // No data
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center">No education found</td></tr>`;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
 
 
@@ -650,8 +783,8 @@
                 //console.log(res.data.data.editors[0].id);
                 // console.log(res.data.data.editors[0]);
                 let editorDetails = res.data.data.editors[0]
-                document.querySelector('.editor_id').value = editorDetails.id;
-                document.querySelector('.address_editor_id').value = editorDetails.id;
+                document.querySelector('.teacher_id').value = editorDetails.id;
+                document.querySelector('.address_teacher_id').value = editorDetails.id;
                 document.querySelector('.profile_name').innerHTML = res.data.data.name || 'N/A';
                 document.querySelector('.profile_email').innerHTML = res.data.data.email || 'N/A';
                 document.querySelector('.profile_phone').innerHTML = res.data.data.editors[0].phone || 'N/A';
@@ -858,7 +991,7 @@
     }
 
     //edior eductoin
-    async function editorEducation(event) {
+    async function teacherEducation(event) {
         event.preventDefault();
         let token = localStorage.getItem('token');
         if (!token) {
@@ -867,7 +1000,7 @@
         }
 
         //get value
-        let editor_id = document.querySelector('input[name="editor_id"]').value;
+        let teacher_id = document.querySelector('input[name="teacher_id"]').value;
         let level = document.querySelector('select[name="level"]').value;
         let roll_number = document.querySelector('input[name="roll_number"]').value;
         let board_university = document.querySelector('input[name="board_university"]').value;
@@ -876,7 +1009,7 @@
         let course_duration = document.querySelector('input[name="course_duration"]').value;
 
         let data = {
-            editor_id: editor_id,
+            teacher_id: teacher_id,
             level: level,
             roll_number: roll_number,
             board_university: board_university,
@@ -897,8 +1030,8 @@
 
             if (res.data.status === 'success') {
                 Swal.fire('Success', 'Data Inserted successfully', 'success');
-                await getEdiorEducationLists(); // Refresh Education Table
-                document.getElementById('editorEducaionl_qualificationForm').reset();
+                await getTeacherEducationLists(); // Refresh Education Table
+                document.getElementById('teacherEducaionl_qualificationForm').reset();
 
 
 
@@ -937,8 +1070,8 @@
     }
 
     //editor educatoin lists
-    getEdiorEducationLists();
-    async function getEdiorEducationLists() {
+    getTeacherEducationLists();
+    async function getTeacherEducationLists() {
         let token = localStorage.getItem('token');
         if (!token) {
             alert('Unauthorized user');
@@ -967,7 +1100,7 @@
                     <td>${education.course_duration || 'N/A'}</td>
                     <td>
                         <div class="btn-group" role="group" aria-label="Basic example">
-                            <button type="button" class="btn btn-info editorEducationEdit" data-id="${education.id}">EDIT</button>
+                            <button type="button" class="btn btn-info teacherEducationEdit" data-id="${education.id}">EDIT</button>
                         </div>
                     </td>
                 `;
@@ -976,7 +1109,7 @@
                 });
 
 
-                $('.editorEducationEdit').on('click', async function(e) {
+                $('.teacherEducationEdit').on('click', async function(e) {
                     e.preventDefault();
                     let id = $(this).data('id');
                     await fillUpdateEducationForm(id);
@@ -1005,7 +1138,7 @@
         }
 
         // Get values
-        let editor_id = document.querySelector('input[name="editor_id"]').value;
+        let teacher_id = document.querySelector('input[name="teacher_id"]').value;
         let type = document.querySelector('select[name="type"]').value;
         let village = document.querySelector('input[name="village"]').value;
         let district = document.querySelector('input[name="district"]').value;
@@ -1014,7 +1147,7 @@
         let postal_code = document.querySelector('input[name="postal_code"]').value;
 
         let data = {
-            editor_id: editor_id,
+            teacher_id: teacher_id,
             type: type,
             village: village,
             district: district,

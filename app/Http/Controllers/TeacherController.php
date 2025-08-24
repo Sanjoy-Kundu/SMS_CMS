@@ -422,7 +422,7 @@ public function teacherStore(Request $request)
                 return response()->json(['status' => 'error', 'message' => 'User not authenticated']);
             }
 
-            $teacherDetails = User::where('role', 'teacher')->find($user->id);
+            $teacherDetails = User::with('teachers')->where('role', 'teacher')->find($user->id);
 
             if (!$teacherDetails) {
                 return response()->json(['status' => 'error', 'message' => 'Teacher Details Not Found']);
