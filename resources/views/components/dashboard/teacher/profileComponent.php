@@ -960,6 +960,21 @@
     });
 
 
+        //password change button
+    $('.passwordChangeBtn').on('click', async function() {
+        let token = localStorage.getItem('token');
+        // if (!token) {
+        //     window.location.href = '/admin/login';
+        //     return;
+        // }
+        let email = $('.profile_email').text().trim();
+        //console.log(email);
+        if (email) {
+            await teacherFillUpdatePasswordForm(email);
+            $('#teacherChangePasswordModal').modal('show');
+        }
+    });
+
 
 
 

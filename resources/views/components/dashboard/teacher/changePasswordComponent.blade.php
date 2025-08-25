@@ -1,10 +1,10 @@
 <!-- Modal -->
-<div class="modal fade" id="changePasswordModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
-    aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+<div class="modal fade" id="teacherChangePasswordModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+    aria-labelledby="teacherChangePasswordModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="changePasswordModalLabel">Admin Password Change</h5>
+                <h5 class="modal-title" id="teacherChangePasswordModalLabel">Admin Password Change</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -54,11 +54,11 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    async function fillUpdatePasswordForm(email) {
+    async function teacherFillUpdatePasswordForm(email) {
 
         let token = localStorage.getItem('token');
         if (!token) {
-            window.location.href = '/admin/login';
+            window.location.href = '/teacher/login';
             return;
         }
         document.querySelector('#password_profile_email').value = email;
@@ -69,7 +69,7 @@
     async function updatePassword() {
         let token = localStorage.getItem('token');
         if (!token) {
-            window.location.href = '/admin/login';
+            window.location.href = '/teacher/login';
             return;
         }
 
@@ -99,7 +99,7 @@
         };
         //console.log(data);
         try {
-            let res = await axios.post('/admin/password/update', data, {
+            let res = await axios.post('/teacher/password/update', data, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -108,7 +108,7 @@
             if (res.data.status === 'success') {
                 Swal.fire('Success', 'Password updated successfully!', 'success').then(() => {
                     localStorage.removeItem('token');
-                    window.location.href = '/admin/login';
+                    window.location.href = '/teacher/login';
                 });
             } else {
                 Swal.fire('Error', res.data.message || 'Password update failed!', 'error');

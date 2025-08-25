@@ -89,14 +89,15 @@
                             'Authorization': `Bearer ${token}`
                         }
                     });
-                //      if (res.data.data.teacher.image) {
-                //     document.querySelector('#profile_img_preview').src = res.data.data.teacher.image;
-                // }  
+                //     console.log(res.data.data.teachers[0].image);
+                // //      if (res.data.data.teacher[0].image) {
+                // //     document.querySelector('#profile_img_preview').src = res.data.data.teacher[0].image;
+                // // }  
 
                     if (res.data.status === 'success') {
                         document.querySelector('#dashboard_name').innerHTML = res.data.data.name ? res.data.data.name :'Not Found';
                         document.querySelector('#dashboard_email').innerHTML = res.data.data.email ? res.data.data.email :'Not Found';
-                        //document.querySelector('#nav_profile_image').src = res.data.data.teacher.image?res.data.data.teacher.image :profileDefault;
+                       document.querySelector('#nav_profile_image').src = res.data.data.teachers[0].image?`/uploads/teacher/profile/${res.data.data.teachers[0].image}` :`/uploads/teacher/profile/default.png`;
                     }
 
                     if (res.data.status === 'error') {

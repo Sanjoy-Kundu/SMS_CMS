@@ -8,4 +8,5 @@
     @include('components.dashboard.teacher.educationUpdateComponent')
     @include('components.dashboard.teacher.addressUpdateComponent')
     @include('components.dashboard.teacher.teacherDetailsCVComponent')
+    @include('components.dashboard.teacher.changePasswordComponent')
 @endsection

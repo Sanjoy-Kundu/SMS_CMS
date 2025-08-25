@@ -279,6 +279,9 @@ Route::middleware(['auth:sanctum', 'teacher'])->group(function () {
     Route::post('/teacher/address/update', [TeacherAddressController::class,'updateAddress']);
     Route::post('/teacher/address/delete', [TeacherAddressController::class,'deleteAddress']);
 
-
+    //teacher view
     Route::post('/teacher/cv-details', [TeacherController::class, 'teacherCVDetails']);
+
+    //change password
+     Route::post('/teacher/password/update', [TeacherDashboardController::class, 'teacherUpdatePassword']);
 });                      

@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use App\Models\User;
 use App\Models\Teacher;
 use App\Models\Institution;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class TeacherDashboardController extends Controller
 {
     //techer pfofile page
-        public function teacherProfilePage()
+    public function teacherProfilePage()
     {
         try {
             return view('pages.dashboard.teacher.teacherProfilePage');
@@ -21,28 +24,23 @@ class TeacherDashboardController extends Controller
         }
     }
 
-
     //Institution details
-      public function institutionDetailsByTeacher()
+    public function institutionDetailsByTeacher()
     {
         try {
             $user = auth()->user();
 
-            if($user->role === 'teacher' || $user->role === 'student' || $user->role === 'parent') {
-            $institutions = Institution::all();
-            return response()->json(['status'=>'success','data'=>$institutions,]);  
-            }else{
-                return response()->json(['status'=>'error','message'=>'Unauthorized']);
+            if ($user->role === 'teacher' || $user->role === 'student' || $user->role === 'parent') {
+                $institutions = Institution::all();
+                return response()->json(['status' => 'success', 'data' => $institutions]);
+            } else {
+                return response()->json(['status' => 'error', 'message' => 'Unauthorized']);
             }
-
-
         } catch (\Exception $e) {
-            return response()->json(['status'=>'fail','message'=>$e->getMessage()]);
+            return response()->json(['status' => 'fail', 'message' => $e->getMessage()]);
         }
     }
 
-
-    
     /**
      * Updaate Teacher
      */
@@ -135,5 +133,78 @@ class TeacherDashboardController extends Controller
                 'image' => $teacher->image ? asset($teacher->image) : asset('uploads/teacher/profile/default.png'), // default image
             ],
         ]);
+    }
+
+    /**
+     * Admin Password Update
+     */
+    public function teacherUpdatePassword(Request $request)
+    {
+        try {
+            // Validate input
+            $request->validate(
+                [
+                    'email' => 'required|email|exists:users,email',
+                    'current_password' => 'required|string|min:8',
+                    'new_password' => 'required|string|min:8|confirmed', // expects new_password_confirmation field
+                ],
+                [
+                    'email.exists' => 'The provided email does not exist in our records.',
+                    'current_password.required' => 'Current password is required.',
+                    'current_password.min' => 'Current password must be at least 8 characters.',
+                    'new_password.required' => 'New password is required.',
+                    'new_password.min' => 'New password must be at least 8 characters.',
+                    'new_password.confirmed' => 'New password and confirmation do not match.',
+                ],
+            );
+
+            // Find user by email and role admin
+            $user = User::where('email', $request->email)->where('role', 'teacher')->first();
+
+            if (!$user) {
+                return response()->json(
+                    [
+                        'status' => 'fail',
+                        'message' => 'Email does not match any teacher account.',
+                    ],
+                    404,
+                );
+            }
+
+            // Verify current password
+            if (!Hash::check($request->current_password, $user->password)) {
+                // Throw validation exception with proper error message
+                throw ValidationException::withMessages([
+                    'current_password' => ['The current password is incorrect.'],
+                ]);
+            }
+
+            // Update password
+            $user->password = Hash::make($request->new_password);
+            $user->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Password updated successfully.',
+            ]);
+        } catch (ValidationException $ex) {
+            // Return validation errors with status 422
+            return response()->json(
+                [
+                    'status' => 'fail',
+                    'errors' => $ex->errors(),
+                ],
+                422,
+            );
+        } catch (\Exception $ex) {
+            // Return generic error with status 500
+            return response()->json(
+                [
+                    'status' => 'fail',
+                    'message' => $ex->getMessage(),
+                ],
+                500,
+            );
+        }
     }
 }
