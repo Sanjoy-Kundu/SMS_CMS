@@ -78,7 +78,7 @@
 
 
            {{-- Nav Item - Teacher Collapse Menu --}}
-           <li class="nav-item {{ Request::is('teachers') || Request::is('teacher/create') ? 'active' : '' }}">
+           <li class="nav-item {{ Request::is('teachers*') || Request::is('teacher/create') ? 'active' : '' }}">
                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTeacher"
                    aria-expanded="false" aria-controls="collapseTeacher">
                    <i class="fas fa-fw fa-chalkboard-teacher"></i>
@@ -93,8 +93,8 @@
                        <a class="collapse-item {{ Request::is('teacher/create') ? 'active' : '' }}"
                            href="{{ url('/teacher/create') }}">Create Teacher</a>
 
-                       <a class="collapse-item {{ Request::is('teachers/permissions') ? 'active' : '' }}"
-                           href="{{ url('/teachers/permissions') }}">Control Panel</a>
+                       <a class="collapse-item {{ Request::is('teacher/control/panel') ? 'active' : '' }}"
+                           href="{{ url('/teacher/control/panel') }}">Control Panel</a>
                    </div>
                </div>
            </li>

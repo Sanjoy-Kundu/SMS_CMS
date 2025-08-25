@@ -20,9 +20,10 @@ use App\Http\Controllers\EditorDashboardController;
 use App\Http\Controllers\EditorEducationController;
 use App\Http\Controllers\TeacherDashboardController;
 use App\Http\Controllers\TeacherEducationController;
+use App\Http\Controllers\TeacherControlPanelController;
 
 //admin registration and login  page route
-Route::get('/admin/login', [AdminController::class, 'admin_login_page']);
+Route::get('/admin/login', [AdminController::class, 'admin_login_page'])->name('login');
 Route::get('/admin/registration', [AdminController::class, 'admin_registration_page']);
 
 //admin registration and login store route
@@ -71,10 +72,13 @@ Route::get('/editor/create', [AdminDashboard::class, 'adminEditorCreatePage']);
 Route::get('/teacher/create', [AdminDashboard::class, 'adminTeacherCreatePage']);
 
 
+Route::get('/teacher/control/panel', [AdminDashboard::class, 'teacherControlPanelPage']);
+
 
 
 // admin protected route
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+
     Route::post('/auth/admin/details', [AdminDashboard::class, 'adminDetails']);
     Route::post('admin/logout', [AdminDashboard::class, 'logout']);
     Route::post('/admin/update-profile', [AdminDashboard::class, 'adminUpdateProfile']);
@@ -177,6 +181,12 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/admin/editor/trash-by-id', [EditorController::class, 'editorTrashAdminDashobard']);
     Route::post('/admin/editor/restore-by-id', [EditorController::class, 'editorRestoreAdminDashboard']);
     Route::post('/admin/editor/delete-by-id', [EditorController::class, 'editorPermanentDeleteAdminDashboard']);
+
+
+
+    //::::::::::::::: Admin Dashboard Teacher Control Panel ::::::::::::::::::::: 
+    Route::post('/admin/teacher/control/panel/cv-details', [AdminDashboard::class, 'teacherControlPanelCVDetails']);
+
 });
 
 
@@ -240,14 +250,7 @@ Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
     Route::post('/all/teacher/trash/lists', [TeacherController::class, 'allteacherTrashListsByAdmin']);
     Route::post('/admin/teacher/delete-by-id', [TeacherController::class, 'teacherDeleteByAdmin']);
     Route::post('/admin/teacher/restore-by-id', [TeacherController::class, 'teacherRestoreByAdmin']);
-    
-
-//     Route::post('/teacher/trashed-list', [TeacherController::class, 'teacherTrashedList']);
-//     Route::post('/teacher/restore', [TeacherController::class, 'teacherRestore']);
-//     Route::post('/teacher/delete', [TeacherController::class, 'teacherDelete']);
-//     Route::post('/teacher/search', [TeacherController::class, 'teacherSearch']);
-//     Route::post('/teacher/trashed-search', [TeacherController::class, 'teacherTrashedSearch']);
-});
+ });
 
 
 
@@ -258,6 +261,8 @@ Route::get('/teacher/login', [TeacherController::class, 'teacherLoginPage']);
 Route::post('/teacher/login/store', [TeacherController::class, 'teacher_login_store']);
 Route::get('/teacher/dashboard', [TeacherController::class, 'teacherDashboardPage']);
 Route::get('/teacher/profile', [TeacherDashboardController::class, 'teacherProfilePage']);
+
+
 
 Route::middleware(['auth:sanctum', 'teacher'])->group(function () {
     Route::post('/teacher/institution/details', [TeacherDashboardController::class, 'institutionDetailsByTeacher']);
