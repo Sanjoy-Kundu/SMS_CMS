@@ -189,7 +189,15 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/admin/teacher/control/panel/cv-details', [AdminDashboard::class, 'teacherControlPanelCVDetails']);
     
     //::::::::::::::: Admin Add Designation :::::::::::::::::::::::
+    Route::post('/admin/designation/trash/list', [DesignationController::class, 'designationTrashList']);
+    Route::post('/admin/designation/list', [DesignationController::class, 'designationList']);
     Route::post('/admin/designation/store', [DesignationController::class, 'designationStore']);
+    Route::post('/admin/designation/delete', [DesignationController::class, 'designationTrash']);
+    Route::post('/admin/designation/restore', [DesignationController::class, 'designationRestore']);
+    Route::post('/admin/designation/permanent-delete', [DesignationController::class, 'designationPermanentDelete']);
+
+    Route::post('/admin/designation/details', [DesignationController::class, 'designationDetails']);
+    Route::post('/admin/designation/update', [DesignationController::class, 'designationUpdate']);
 
 });
 

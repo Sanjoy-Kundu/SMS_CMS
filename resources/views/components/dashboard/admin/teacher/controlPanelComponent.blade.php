@@ -39,7 +39,7 @@
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Designations
                             </div>
-                            <div class="h5 mb-2 font-weight-bold text-gray-800">5</div>
+                            <div class="h5 mb-2 font-weight-bold text-gray-800"><span class="designation_count_control_panel">0</span></div>
 
                             <!-- Action Buttons -->
                             <div class="d-flex gap-2 mt-3">
@@ -136,6 +136,43 @@
             console.error('Error fetching teachers:', error);
         }
     }
+
+
+    getDesignationControlPanelLists();
+    async function getDesignationControlPanelLists() {
+        let token = localStorage.getItem('token');
+        if (!token) {
+            alert('Authorization failed');
+            return;
+        }
+
+
+        try {
+            let res = await axios.post('/admin/designation/list', {}, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (res.data.status === 'success') {
+                const designations = res.data.data;
+                document.querySelector('.designation_count_control_panel').innerText = designations.length;
+            }
+        } catch (error) {
+            console.log(error);
+            Swal.fire("Error!", "Failed to load designations", "error");
+        }
+    }
+
+
+
+
+
+
+
+
+
+
 
     //view teachers lists
     $('.controlPanelViewTeacherLists').on('click', async function(event) {

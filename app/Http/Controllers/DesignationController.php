@@ -13,9 +13,24 @@ class DesignationController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function designationList()
     {
-        //
+        try {
+            $designations = Designation::all();
+            return response()->json(['status' => 'success', 'data' => $designations]);
+        } catch (Exception $ex) {
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
+    }
+
+    public function designationTrashList()
+    {
+        try {
+            $designationsTrash = Designation::onlyTrashed()->get();
+            return response()->json(['status' => 'success', 'data' => $designationsTrash]);
+        } catch (Exception $ex) {
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
     }
 
     /**
@@ -65,40 +80,107 @@ class DesignationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function designationTrash(Request $request)
     {
-        //
+        $request->validate([
+            'id' => 'required|integer|exists:designations,id',
+        ]);
+
+        try {
+            $designation = Designation::findOrFail($request->id);
+
+            // Soft delete
+            $designation->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Designation deleted successfully',
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Designation $designation)
+    // Restore Designation
+    public function designationRestore(Request $request)
     {
-        //
+        $request->validate([
+            'id' => 'required|integer|exists:designations,id',
+        ]);
+
+        try {
+            $designation = Designation::withTrashed()->findOrFail($request->id);
+            $designation->restore();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Designation restored successfully',
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Designation $designation)
+    // Permanent Delete Designation
+    public function designationPermanentDelete(Request $request)
     {
-        //
+        $request->validate([
+            'id' => 'required|integer|exists:designations,id',
+        ]);
+
+        try {
+            $designation = Designation::withTrashed()->findOrFail($request->id);
+            $designation->forceDelete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Designation permanently deleted',
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Designation $designation)
+    // details
+    public function designationDetails(Request $request)
     {
-        //
+        $request->validate([
+            'id' => 'required|integer|exists:designations,id',
+        ]);
+
+        try {
+            $designation = Designation::findOrFail($request->id);
+            return response()->json(['status' => 'success', 'data' => $designation]);
+        } catch (Exception $e) {
+            return response()->json(['status' => 'fail', 'message' => $e->getMessage()]);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Designation $designation)
+    // update
+    public function designationUpdate(Request $request)
     {
-        //
+        $request->validate([
+            'id' => 'required|integer|exists:designations,id',
+            'title' => 'required|string|max:255',
+        ]);
+
+        try {
+            $designation = Designation::findOrFail($request->id);
+            $designation->title = $request->title;
+            $designation->save();
+
+            return response()->json(['status' => 'success', 'message' => 'Designation updated successfully']);
+        } catch (Exception $e) {
+            return response()->json(['status' => 'fail', 'message' => $e->getMessage()]);
+        }
     }
 }
