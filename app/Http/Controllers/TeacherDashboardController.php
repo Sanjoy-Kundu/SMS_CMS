@@ -77,6 +77,7 @@ class TeacherDashboardController extends Controller
             'mother_name' => 'nullable|string|max:255',
             'phone' => 'required|string|max:20|unique:teachers,phone,' . $teacher->id,
             'address' => 'nullable|string|max:500',
+            'about_me' => 'nullable|string|max:2500',
             'birth_date' => 'nullable|date',
             'nid' => 'required|string|max:50|unique:teachers,nid,' . $teacher->id,
             'gender' => 'nullable|in:male,female,other',
@@ -102,6 +103,7 @@ class TeacherDashboardController extends Controller
         $teacher->mother_name = $request->mother_name ?? $teacher->mother_name;
         $teacher->phone = $request->phone ?? $teacher->phone;
         $teacher->address = $request->address ?? $teacher->address;
+        $teacher->about_me = $request->about_me ?? $teacher->about_me;
         $teacher->birth_date = $request->birth_date ?? $teacher->birth_date;
         $teacher->nid = $request->nid ?? $teacher->nid;
         $teacher->gender = $request->gender ?? $teacher->gender;

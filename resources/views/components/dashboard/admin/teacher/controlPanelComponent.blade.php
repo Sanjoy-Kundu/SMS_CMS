@@ -2,45 +2,59 @@
 
     <!-- Content Row -->
     <div class="row">
-
         <!-- Total Teachers -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body d-flex flex-column justify-content-between">
-                    <div class="row no-gutters align-items-center mb-3">
-                        <div class="col mr-2">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-grow-1">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                <h5>Total Teachers</h5>
+                                Total Teachers
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><span class="totalTeachersCountControlPanel"></span></div>
+                            <div class="h5 mb-2 font-weight-bold text-gray-800">
+                                <span class="totalTeachersCountControlPanel"></span>
+                            </div>
+
+                            <div class="d-flex gap-2 mt-3">
+                                <span class="btn btn-sm btn-primary controlPanelViewTeacherLists">View Teachers List</span>
+                            </div>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        <div class="flex-shrink-0">
+                            <img src="{{ asset('/uploads/teacher/icon/teachers.png') }}" 
+                                alt="Teachers" 
+                                style="width:50px; height:50px; object-fit:contain;">
                         </div>
                     </div>
-                    <span class="text-primary controlPanelViewTeacherLists" style="cursor: pointer">View Teacher Lists</span>
                 </div>
             </div>
-
         </div>
+
 
         <!-- Total Designations -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-grow-1">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Designations</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">5</div>
+                                Designations
+                            </div>
+                            <div class="h5 mb-2 font-weight-bold text-gray-800">5</div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex gap-2 mt-3">
+                                <span class="btn btn-sm btn-success create_designation_btn">Create Designation</span>
+                            </div>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-user-tie fa-2x text-gray-300"></i>
+                        <div class="flex-shrink-0">
+                            <img src="{{ asset('/uploads/teacher/icon/designations.png') }}" alt="Designation"
+                                style="width:50px; height:50px; object-fit:contain;">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
 
         <!-- Pending Approvals -->
         <div class="col-xl-3 col-md-6 mb-4">
@@ -95,11 +109,10 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-
     $(document).ready(function() {
         getAllTeacherLists();
     });
-       //all teacher lists admin and editor
+    //all teacher lists admin and editor
     async function getAllTeacherLists() {
         let token = localStorage.getItem('token');
 
@@ -118,35 +131,6 @@
                 const teachers = res.data.allTeachers;
                 //console.log(res.data.allTeachers);
                 document.querySelector('.totalTeachersCountControlPanel').innerText = teachers.length;
-
-                // Destroy old DataTable if exists
-                // if ($.fn.DataTable.isDataTable('#admin_teachers_table')) {
-                //     $('#admin_teachers_table').DataTable().destroy();
-                // }
-
-                // Clear table body
-                // $('#admin_teachers_table_body').html('');
-
-                // Append rows
-                // teachers.forEach((teacher, index) => {
-                //     //console.log(teacher);
-                //     const addedBy = teacher.added_by.role === 'editor' ? 'Editor' : 'Admin';
-                //     const addedName = teacher.added_by.name;
-                //     const row = `
-                //         <tr>
-                //             <td>${index + 1}</td>
-                //             <td>${teacher.user.name}</td>
-                //             <td>${teacher.user.email || ''}</td>
-                //             <td>${addedName} (${addedBy})</td>
-                //             <td>
-                //                 <button class="btn btn-sm btn-primary editTeacher" data-id="${teacher.id}">Edit</button>
-                //                 <button class="btn btn-sm btn-danger trashTeacher" data-id="${teacher.id}">TRASH</button>
-                //             </td>
-                //         </tr>
-                //     `;
-                //     $('#admin_teachers_table_body').append(row);
-                // });
-
             }
         } catch (error) {
             console.error('Error fetching teachers:', error);
@@ -154,10 +138,18 @@
     }
 
     //view teachers lists
-    $('.controlPanelViewTeacherLists').on('click', async function (event) {
-            event.preventDefault();
-            await controlPanelAllTeacherLists();
-            $('#controlPanelTeachersListModal').modal('show');
+    $('.controlPanelViewTeacherLists').on('click', async function(event) {
+        event.preventDefault();
+        await controlPanelAllTeacherLists();
+        $('#controlPanelTeachersListModal').modal('show');
 
     })
+
+
+    // create desingnation button
+    $('.create_designation_btn').on('click', function(){
+        event.preventDefault();
+        $('#controlPanelTeacherDesignationsModal').modal('show');
+        //console.log('create designation button clicked');
+    });
 </script>

@@ -186,6 +186,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
     //::::::::::::::: Admin Dashboard Teacher Control Panel ::::::::::::::::::::: 
     Route::post('/admin/teacher/control/panel/cv-details', [AdminDashboard::class, 'teacherControlPanelCVDetails']);
+    
 
 });
 

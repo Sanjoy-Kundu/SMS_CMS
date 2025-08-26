@@ -105,11 +105,13 @@
 
 
            <!-- Nav Item - Tables -->
-           <li class="nav-item">
-               <a class="nav-link" href="tables.html">
-                   <i class="fas fa-fw fa-table"></i>
-                   <span>Tables</span></a>
-           </li>
+            <li class="nav-item {{ Request::is('teacher/profile') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ url('/teacher/profile') }}" target="_blank">
+                    <i class="fas fa-user-circle"></i>
+                    <span>My Profile</span>
+                </a>
+            </li>
+
 
            <!-- Divider -->
            <hr class="sidebar-divider d-none d-md-block">

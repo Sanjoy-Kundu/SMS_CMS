@@ -22,6 +22,7 @@ class Teacher extends Model
         'user_id',
         'added_by',
         'institution_id',
+        'designation_id',
         'joined_at',
         'is_active',
         'father_name',

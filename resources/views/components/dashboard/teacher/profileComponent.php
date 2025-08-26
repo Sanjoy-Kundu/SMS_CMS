@@ -419,8 +419,8 @@
                     teachersDetails.mother_name : 'N/A'
                 document.querySelector('input[name="phone"]').value = teachersDetails.phone ? teachersDetails.phone :
                     'N/A'
-                document.querySelector('textarea[name="address"]').value = teachersDetails.address ? teachersDetails
-                    .address : 'N/A'
+                document.querySelector('textarea[name="address"]').value = teachersDetails.address ? teachersDetails.address : 'N/A'
+                document.querySelector('textarea[name="about_me"]').value = teachersDetails.about_me ? teachersDetails.about_me : 'N/A'
                 document.querySelector('input[name="nid"]').value = teachersDetails.nid ? teachersDetails.nid : 'N/A'
                 //date
                 let birthDateInput = document.querySelector('input[name="birth_date"]');

@@ -29,8 +29,8 @@
                                 <th>#</th>
                                 <th>Name</th>
                                 <th>Email</th>
+                                <th>Added By</th>
                                 <th>Designation</th>
-                                <th>View</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -101,10 +101,10 @@
                     const row = `
                         <tr>
                             <td>${index + 1}</td>
-                            <td>${teacher.user.name}</td>
-                            <td>${teacher.user.email}</td>
-                            <td>${addedName} (${addedBy})</td>
-                            <td>-----</td>
+                            <td>${teacher.user.name? teacher.user.name : 'N/A'}</td>
+                            <td>${teacher.user.email? teacher.user.email : 'N/A'}</td>
+                            <td>${addedName ? addedName : 'N/A'} (${addedBy ? addedBy : 'N/A'})</td>
+                            <td>Principal</td>
                             <td>
                                 <button class="btn btn-sm btn-primary viewControlPanelTeacher" data-email="${teacher.user.email}">View</button>
                                 <button class="btn btn-sm btn-info trashTeacher" data-id="${teacher.id}">Add Designation</button>
