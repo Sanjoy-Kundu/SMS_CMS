@@ -12,6 +12,7 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\ClassModelController;
+use App\Http\Controllers\DesignationController;
 use App\Http\Controllers\InstitutionController;
 use App\Http\Controllers\EditorAddressController;
 use App\Http\Controllers\TeacherAddressController;
@@ -187,6 +188,8 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     //::::::::::::::: Admin Dashboard Teacher Control Panel ::::::::::::::::::::: 
     Route::post('/admin/teacher/control/panel/cv-details', [AdminDashboard::class, 'teacherControlPanelCVDetails']);
     
+    //::::::::::::::: Admin Add Designation :::::::::::::::::::::::
+    Route::post('/admin/designation/store', [DesignationController::class, 'designationStore']);
 
 });
 

@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\Designation;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class DesignationController extends Controller
 {
@@ -16,11 +19,47 @@ class DesignationController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * designationStore
      */
-    public function create()
+    public function designationStore(Request $request)
     {
-        //
+        try {
+            // Validation
+            $validated = $request->validate([
+                'institution_id' => 'required|exists:institutions,id',
+                'title' => ['required', 'string', Rule::unique('designations')->where(fn($q) => $q->where('institution_id', $request->institution_id))],
+            ]);
+
+            // Create
+            $designation = Designation::create($validated);
+
+            // Success Response
+            return response()->json(
+                [
+                    'status' => 'success',
+                    'message' => 'Designation created successfully!',
+                ],
+                201,
+            );
+        } catch (ValidationException $e) {
+            // Validation Error
+            return response()->json(
+                [
+                    'status' => 'fail',
+                    'errors' => $e->errors(),
+                ],
+                422,
+            );
+        } catch (Exception $ex) {
+            // Other Error
+            return response()->json(
+                [
+                    'status' => 'fail',
+                    'error' => $ex->getMessage(),
+                ],
+                500,
+            );
+        }
     }
 
     /**
