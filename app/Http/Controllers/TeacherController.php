@@ -27,9 +27,9 @@ class TeacherController extends Controller
     public function allTeacherLists(Request $request)
     {
    try{
-            $teachers = Teacher::with('user','addedBy')->get();
-            $teacherTeachers = Teacher::with('user','addedBy')->where('added_by',Auth::user()->id)->get();
-            return response()->json(['status' => 'success', 'allTeachers' => $teachers, 'teacherTeachers' => $teacherTeachers]);
+            $teachers = Teacher::with('user','addedBy','designation')->get();
+            $editorTeachers = Teacher::with('user','addedBy','designation')->where('added_by',Auth::user()->id)->get();
+            return response()->json(['status' => 'success', 'allTeachers' => $teachers, 'editorTeachers' => $editorTeachers]);
         }catch(Exception $ex){
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
         }

@@ -20,13 +20,13 @@
 
                     <!-- Teacher Info -->
                     <div class="border rounded p-3 mb-3 bg-light">
-                        <h6 class="mb-1"><strong>Id:</strong> <span id="teacher_id">10</span></h6>
+                        <h6 class="mb-1" hidden><strong>Id:</strong> <span id="teacher_id">0</span></h6>
                         <h6 class="mb-1"><strong>Name:</strong> <span id="teacher_name">Mr. Example Teacher</span></h6>
                         <p class="mb-0"><strong>Email:</strong> <span id="teacher_email">example@email.com</span></p>
                     </div>
 
                     <!-- Hidden field for designation id -->
-                    <input type="hidden" id="designation_id" name="designation_id">
+                    {{-- <input type="hidden" id="designation_id" name="designation_id"> --}}
 
                     <!-- Designation Dropdown -->
                     <div class="form-group">
@@ -105,11 +105,17 @@
 
 
 
-    function setTeacherDesignation(teacherId, teacherName, teacherEmail) {
+    function setTeacherDesignation(teacherId, teacherName, teacherEmail,designation_id) {
         document.getElementById("teacher_id").textContent = teacherId;
         document.getElementById("teacher_name").textContent = teacherName;
         document.getElementById("teacher_email").textContent = teacherEmail;
        // loadDesignationsDropdown(null)
+           // set selected designation in dropdown
+        if (designation_id) {
+            document.querySelector("#designation").value = designation_id;
+        } else {
+            document.querySelector("#designation").value = "";
+        }
     }
 
     // Update Designation
@@ -131,6 +137,7 @@
         }
 
         let data = { id: id, designation_id: designation_id };
+        console.log(data);
 
         try {
             let res = await axios.post('/update/teacher/designation', data, {
@@ -140,8 +147,11 @@
             });
 
             if (res.data.status === 'success') {
+                let updatedDesignationId = res.data.data.designation_id;
+                document.querySelector('#designation').value = updatedDesignationId;
+                //console.log(res.data.data.designation_id);
                 Swal.fire("Success!", res.data.message, "success");
-                //await controlPanelAllTeacherLists();
+                await controlPanelAllTeacherLists();
                 
 
                 // 

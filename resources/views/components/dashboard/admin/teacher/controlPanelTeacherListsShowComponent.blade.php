@@ -82,7 +82,7 @@
 
             if (res.data.status === 'success') {
                 const teachers = res.data.allTeachers;
-                //console.log(res.data.allTeachers);
+                //console.log(teachers);
                 document.querySelector('.totalTeachersCount').innerText = teachers.length;
 
                 // Destroy old DataTable if exists
@@ -95,19 +95,19 @@
 
                 // Append rows
                 teachers.forEach((teacher, index) => {
-                    console.log(teacher);
+                    const designation = teacher.designation.title ? teacher.designation.title : 'N/A';
                     const addedBy = teacher.added_by.role === 'editor' ? 'Editor' : 'Admin';
-                    const addedName = teacher.added_by.name;
+                    const addedName = teacher.added_by.name?teacher.added_by.name:'N/A';
                     const row = `
                         <tr>
                             <td>${index + 1}</td>
                         <td>${teacher.user && teacher.user.name ? teacher.user.name : 'N/A'}</td>
                         <td>${teacher.user && teacher.user.email ? teacher.user.email : 'N/A'}</td>
-                        <td>${teacher.addedBy ? teacher.addedBy.name : 'N/A'} (${teacher.addedBy && teacher.addedBy.role === 'editor' ? 'Editor' : 'Admin'})</td>
-                        <td>${teacher.designation_id ? teacher.designation_id : 'N/A'}</td>
+                        <td>${addedName} (${addedBy})</td>
+                        <td>${designation}</td>
                             <td>
                                 <button class="btn btn-sm btn-primary viewControlPanelTeacher" data-email="${teacher.user.email}">View</button>
-                                <button class="btn btn-sm btn-info addTeacherDesignation" data-name="${teacher.user.name}" data-email="${teacher.user.email}" data-id="${teacher.id}">Add Designation</button>
+                                <button class="btn btn-sm btn-info addTeacherDesignation" data-name="${teacher.user.name}" data-email="${teacher.user.email}" data-id="${teacher.id}" data-designation_id="${teacher.designation_id ?? ''}">Add Designation</button>
                             </td>
                         </tr>
                     `;
@@ -127,10 +127,11 @@
                 const teacherEmail = $(this).data('email');
                 const teacherId = $(this).data('id');
                 const teacherName = $(this).data('name');
+                const designation_id = $(this).data('designation_id');
 
-                console.log('Edit teacher:', teacherEmail, teacherId, teacherName);
+                //console.log('Edit teacher:', teacherEmail, teacherId, teacherName);
 
-                //await setTeacherDesignation(teacherId, teacherName, teacherEmail);
+                await setTeacherDesignation(teacherId, teacherName, teacherEmail,designation_id);
                 $('#controlPanelTeacherDesignationModal').modal('show');
              });
 

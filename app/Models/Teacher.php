@@ -73,6 +73,13 @@ class Teacher extends Model
     {
         return $this->hasMany(TeacherAddress::class);
     }
+    public function designation()
+    {
+        return $this->belongsTo(Designation::class, 'designation_id', 'id');
+
+    }
+
+    
 
     
 }
