@@ -95,32 +95,44 @@
 
                 // Append rows
                 teachers.forEach((teacher, index) => {
-                    //console.log(teacher);
+                    console.log(teacher);
                     const addedBy = teacher.added_by.role === 'editor' ? 'Editor' : 'Admin';
                     const addedName = teacher.added_by.name;
                     const row = `
                         <tr>
                             <td>${index + 1}</td>
-                            <td>${teacher.user.name? teacher.user.name : 'N/A'}</td>
-                            <td>${teacher.user.email? teacher.user.email : 'N/A'}</td>
-                            <td>${addedName ? addedName : 'N/A'} (${addedBy ? addedBy : 'N/A'})</td>
-                            <td>Principal</td>
+                        <td>${teacher.user && teacher.user.name ? teacher.user.name : 'N/A'}</td>
+                        <td>${teacher.user && teacher.user.email ? teacher.user.email : 'N/A'}</td>
+                        <td>${teacher.addedBy ? teacher.addedBy.name : 'N/A'} (${teacher.addedBy && teacher.addedBy.role === 'editor' ? 'Editor' : 'Admin'})</td>
+                        <td>${teacher.designation_id ? teacher.designation_id : 'N/A'}</td>
                             <td>
                                 <button class="btn btn-sm btn-primary viewControlPanelTeacher" data-email="${teacher.user.email}">View</button>
-                                <button class="btn btn-sm btn-info trashTeacher" data-id="${teacher.id}">Add Designation</button>
+                                <button class="btn btn-sm btn-info addTeacherDesignation" data-name="${teacher.user.name}" data-email="${teacher.user.email}" data-id="${teacher.id}">Add Designation</button>
                             </td>
                         </tr>
                     `;
                     $('#teacher_control_panel_table_body').append(row);
                 });
 
-                // Edit  handlers
+                // View  handlers
                 $(document).on('click', '.viewControlPanelTeacher', async function() {
                     const teacherEmail = $(this).data('email');
                     //console.log('Edit teacher:', teacherEmail);
                     await controlPanelTeacherDetailsCVFormat(teacherEmail);
                     $('#controlPanelTeacherViewCvFormatModal').modal('show');
                 });
+
+                // designation  handlers
+                $(document).on('click', '.addTeacherDesignation', async function() {
+                const teacherEmail = $(this).data('email');
+                const teacherId = $(this).data('id');
+                const teacherName = $(this).data('name');
+
+                console.log('Edit teacher:', teacherEmail, teacherId, teacherName);
+
+                //await setTeacherDesignation(teacherId, teacherName, teacherEmail);
+                $('#controlPanelTeacherDesignationModal').modal('show');
+             });
 
 
                 // Initialize DataTable

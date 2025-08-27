@@ -198,6 +198,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
     Route::post('/admin/designation/details', [DesignationController::class, 'designationDetails']);
     Route::post('/admin/designation/update', [DesignationController::class, 'designationUpdate']);
+    Route::post('/update/teacher/designation', [DesignationController::class, 'updateTeacherDesignation']);
 
 });
 

@@ -7,5 +7,6 @@
     @include('components.dashboard.admin.teacher.controlPanelTeacherListsShowComponent')
     @include('components.dashboard.admin.teacher.controlPanelTeacherViewComponent')
     @include('components.dashboard.admin.teacher.teacherDesignationModalComponent')
+    @include('components.dashboard.admin.teacher.controlPanelTeacherDesignationComponent')
     @include('components.dashboard.admin.footerComponent')
 @endsection

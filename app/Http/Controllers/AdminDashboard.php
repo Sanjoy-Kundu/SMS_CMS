@@ -331,10 +331,8 @@ public function adminUpdatePassword(Request $request)
 
 
 
+
     /**
-     * Teacher Control Panel Cv Details
-     */
-            /**
      * teacher CV
      */
     public function teacherControlPanelCVDetails(Request $request)

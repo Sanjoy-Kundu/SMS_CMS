@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use App\Models\User;
+use App\Models\Teacher;
 use App\Models\Designation;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -181,6 +183,64 @@ class DesignationController extends Controller
             return response()->json(['status' => 'success', 'message' => 'Designation updated successfully']);
         } catch (Exception $e) {
             return response()->json(['status' => 'fail', 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function teacherControlPanelCVDetails(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $email = $request->input('email');
+
+        // Get user with role teacher
+        $user = User::where('email', $email)->where('role', 'teacher')->first();
+        if (!$user) {
+            return response()->json(['error' => 'Teacher not found!'], 404);
+        }
+
+        $teacher = Teacher::with(['educations', 'addresses'])
+            ->where('user_id', $user->id)
+            ->first();
+        if (!$teacher) {
+            return response()->json(['error' => 'Teacher profile not found!'], 404);
+        }
+
+        return response()->json(['status' => 'success', 'user' => $user, 'teacher' => $teacher]);
+    }
+
+    //update teacher designation
+    public function updateTeacherDesignation(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:teachers,id',
+            'designation_id' => 'required|exists:designations,id',
+        ]);
+
+        try {
+            $teacher = Teacher::find($request->id);
+
+            if (!$teacher) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Teacher not found',
+                ]);
+            }
+
+            $teacher->designation_id = $request->designation_id;
+            $teacher->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Designation updated successfully',
+                'data' => $teacher,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $e->getMessage(),
+            ]);
         }
     }
 }

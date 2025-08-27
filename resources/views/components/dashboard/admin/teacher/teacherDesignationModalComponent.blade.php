@@ -195,131 +195,131 @@
         }
     }
 
-    // get designation lists
-    getDesignationLists();
-    async function getDesignationLists() {
-        let token = localStorage.getItem('token');
-        if (!token) {
-            alert('Authorization failed');
-            return;
-        }
+        // get designation lists
+        getDesignationLists();
+        async function getDesignationLists() {
+            let token = localStorage.getItem('token');
+            if (!token) {
+                alert('Authorization failed');
+                return;
+            }
 
 
-        try {
-            let res = await axios.post('/admin/designation/list', {}, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (res.data.status === 'success') {
-                const designations = res.data.data;
-                document.querySelector('.totalDesignationsCount').innerText = designations.length;
-
-                // Destroy old DataTable if exists
-                if ($.fn.DataTable.isDataTable('#designation_control_panel_table')) {
-                    $('#designation_control_panel_table').DataTable().clear().destroy();
-                }
-
-                // Clear table body
-                $('#designation_control_panel_table_body').html('');
-
-                // Append rows
-                designations.forEach((designation, index) => {
-                    const row = `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${designation.title ? designation.title : 'N/A'}</td>
-                        <td>
-                            <button class="btn btn-sm btn-info editDesignation" data-id="${designation.id}">Edit</button>
-                            <button class="btn btn-sm btn-danger deleteDesignation" data-id="${designation.id}">Trash</button>
-                        </td>
-                    </tr>
-                `;
-                    $('#designation_control_panel_table_body').append(row);
+            try {
+                let res = await axios.post('/admin/designation/list', {}, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
 
-                // Initialize DataTable
-                $('#designation_control_panel_table').DataTable({
-                    "pageLength": 10,
-                    "lengthChange": false,
-                    "ordering": true,
-                    "info": true,
-                    "autoWidth": false,
-                });
+                if (res.data.status === 'success') {
+                    const designations = res.data.data;
+                    document.querySelector('.totalDesignationsCount').innerText = designations.length;
 
-                // Event Handlers (Edit/Delete)
-                // Edit Click Handler (Already added console.log, now complete)
-                $(document).off('click', '.editDesignation').on('click', '.editDesignation', async function() {
-                    const id = $(this).data('id');
-                    let token = localStorage.getItem('token');
-                    if (!token) {
-                        Swal.fire("Unauthorized!", "Please login first", "error");
-                        return;
+                    // Destroy old DataTable if exists
+                    if ($.fn.DataTable.isDataTable('#designation_control_panel_table')) {
+                        $('#designation_control_panel_table').DataTable().clear().destroy();
                     }
 
-                    try {
-                        // get designation details
-                        let res = await axios.post('/admin/designation/details', {
-                            id
-                        }, {
-                            headers: {
-                                Authorization: `Bearer ${token}`
-                            }
-                        });
+                    // Clear table body
+                    $('#designation_control_panel_table_body').html('');
 
-                        if (res.data.status === 'success') {
-                            let designation = res.data.data;
-                            $('#edit_designation_id').val(designation.id);
-                            $('#edit_title').val(designation.title);
+                    // Append rows
+                    designations.forEach((designation, index) => {
+                        const row = `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${designation.title ? designation.title : 'N/A'}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info editDesignation" data-id="${designation.id}">Edit</button>
+                                <button class="btn btn-sm btn-danger deleteDesignation" data-id="${designation.id}">Trash</button>
+                            </td>
+                        </tr>
+                    `;
+                        $('#designation_control_panel_table_body').append(row);
+                    });
 
-                            // clear error
-                            $('.edit_title_error').text('');
+                    // Initialize DataTable
+                    $('#designation_control_panel_table').DataTable({
+                        "pageLength": 10,
+                        "lengthChange": false,
+                        "ordering": true,
+                        "info": true,
+                        "autoWidth": false,
+                    });
 
-                            // open modal
-                            $('#editDesignationModal').modal('show');
+                    // Event Handlers (Edit/Delete)
+                    // Edit Click Handler (Already added console.log, now complete)
+                    $(document).off('click', '.editDesignation').on('click', '.editDesignation', async function() {
+                        const id = $(this).data('id');
+                        let token = localStorage.getItem('token');
+                        if (!token) {
+                            Swal.fire("Unauthorized!", "Please login first", "error");
+                            return;
                         }
-                    } catch (error) {
-                        Swal.fire("Error!", "Failed to fetch designation", "error");
-                    }
-                });
 
-                //delete designation 
-                $(document).off('click', '.deleteDesignation').on('click', '.deleteDesignation', async function() {
-                    const id = $(this).data('id');
-                    Swal.fire({
-                        title: "Are you sure?",
-                        text: "This designation will be deleted!",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonText: "Yes, delete it!"
-                    }).then(async (result) => {
-                        if (result.isConfirmed) {
-                            try {
-                                let delRes = await axios.post('/admin/designation/delete', {
-                                    id
-                                }, {
-                                    headers: {
-                                        'Authorization': `Bearer ${token}`
-                                    }
-                                });
-                                if (delRes.data.status === 'success') {
-                                    Swal.fire("Deleted!", delRes.data.message, "success");
-                                    await getDesignationLists(); // refresh
-                                    await getDesignationTrashLists(); // refresh
+                        try {
+                            // get designation details
+                            let res = await axios.post('/admin/designation/details', {
+                                id
+                            }, {
+                                headers: {
+                                    Authorization: `Bearer ${token}`
                                 }
-                            } catch (error) {
-                                Swal.fire("Error!", "Something went wrong!", "error");
+                            });
+
+                            if (res.data.status === 'success') {
+                                let designation = res.data.data;
+                                $('#edit_designation_id').val(designation.id);
+                                $('#edit_title').val(designation.title);
+
+                                // clear error
+                                $('.edit_title_error').text('');
+
+                                // open modal
+                                $('#editDesignationModal').modal('show');
                             }
+                        } catch (error) {
+                            Swal.fire("Error!", "Failed to fetch designation", "error");
                         }
                     });
-                });
+
+                    //delete designation 
+                    $(document).off('click', '.deleteDesignation').on('click', '.deleteDesignation', async function() {
+                        const id = $(this).data('id');
+                        Swal.fire({
+                            title: "Are you sure?",
+                            text: "This designation will be deleted!",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonText: "Yes, delete it!"
+                        }).then(async (result) => {
+                            if (result.isConfirmed) {
+                                try {
+                                    let delRes = await axios.post('/admin/designation/delete', {
+                                        id
+                                    }, {
+                                        headers: {
+                                            'Authorization': `Bearer ${token}`
+                                        }
+                                    });
+                                    if (delRes.data.status === 'success') {
+                                        Swal.fire("Deleted!", delRes.data.message, "success");
+                                        await getDesignationLists(); // refresh
+                                        await getDesignationTrashLists(); // refresh
+                                    }
+                                } catch (error) {
+                                    Swal.fire("Error!", "Something went wrong!", "error");
+                                }
+                            }
+                        });
+                    });
+                }
+            } catch (error) {
+                console.log(error);
+                Swal.fire("Error!", "Failed to load designations", "error");
             }
-        } catch (error) {
-            console.log(error);
-            Swal.fire("Error!", "Failed to load designations", "error");
         }
-    }
 
     
                 // Update Designation Function
