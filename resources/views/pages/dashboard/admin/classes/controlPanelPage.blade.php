@@ -1,0 +1,23 @@
+@extends('layouts.dashboard')
+@section('title', 'Class Control Panel')
+@section('content')
+    @include('components.dashboard.admin.sidebarComponent')
+    @include('components.dashboard.admin.navComponent')
+    @include('components.dashboard.admin.classes.controlPanelComponent')
+    @include('components.dashboard.admin.footerComponent')
+@endsection
+
+
+
+{{-- @extends('layouts.dashboard')
+@section('title', 'Teacher Control Panel')
+@section('content')
+    @include('components.dashboard.admin.sidebarComponent')
+    @include('components.dashboard.admin.navComponent')
+    @include('components.dashboard.admin.teacher.controlPanelComponent')
+    @include('components.dashboard.admin.teacher.controlPanelTeacherListsShowComponent')
+    @include('components.dashboard.admin.teacher.controlPanelTeacherViewComponent')
+    @include('components.dashboard.admin.teacher.teacherDesignationModalComponent')
+    @include('components.dashboard.admin.teacher.controlPanelTeacherDesignationComponent')
+    @include('components.dashboard.admin.footerComponent')
+@endsection --}}

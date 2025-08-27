@@ -6,6 +6,7 @@ use App\Http\Controllers\PasswordReset;
 use App\Http\Controllers\AdminDashboard;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\GradeController;
 use App\Http\Controllers\PaperController;
 use App\Http\Controllers\EditorController;
 use App\Http\Controllers\SubjectController;
@@ -74,6 +75,7 @@ Route::get('/teacher/create', [AdminDashboard::class, 'adminTeacherCreatePage'])
 
 
 Route::get('/teacher/control/panel', [AdminDashboard::class, 'teacherControlPanelPage']);
+Route::get('/class/control/panel', [AdminDashboard::class, 'classControlPanelPage']);
 
 
 
@@ -263,6 +265,21 @@ Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
     Route::post('/all/teacher/trash/lists', [TeacherController::class, 'allteacherTrashListsByAdmin']);
     Route::post('/admin/teacher/delete-by-id', [TeacherController::class, 'teacherDeleteByAdmin']);
     Route::post('/admin/teacher/restore-by-id', [TeacherController::class, 'teacherRestoreByAdmin']);
+
+
+
+    // -----------------------------
+    // Grades CRUD Routes (POST)
+    // -----------------------------
+
+    Route::post('/grades', [GradeController::class, 'index']);
+    Route::post('/grades/create', [GradeController::class, 'create']);
+    Route::post('/grades/store', [GradeController::class, 'store']);
+    Route::post('/grades/details-by-id', [GradeController::class, 'detailsById']);
+    Route::post('/grades/edit-by-id', [GradeController::class, 'edit']);
+    Route::post('/grades/update-by-id', [GradeController::class, 'update']);
+    Route::post('/grades/delete-by-id', [GradeController::class, 'destroy']);
+ 
  });
 
 
@@ -299,7 +316,6 @@ Route::middleware(['auth:sanctum', 'teacher'])->group(function () {
 
     //teacher view
     Route::post('/teacher/cv-details', [TeacherController::class, 'teacherCVDetails']);
-
     //change password
      Route::post('/teacher/password/update', [TeacherDashboardController::class, 'teacherUpdatePassword']);
 });                      

@@ -330,8 +330,6 @@ public function adminUpdatePassword(Request $request)
 
 
 
-
-
     /**
      * teacher CV
      */
@@ -357,5 +355,20 @@ public function adminUpdatePassword(Request $request)
         }
 
         return response()->json(['status' => 'success', 'user' => $user, 'teacher' => $teacher]);
+    }
+
+
+
+
+    /**
+ * Class Control panel
+ * 
+ */
+    public function classControlPanelPage(){
+        try{
+            return view('pages.dashboard.admin.classes.controlPanelPage');
+        }catch(Exception $ex){
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
     }
 }

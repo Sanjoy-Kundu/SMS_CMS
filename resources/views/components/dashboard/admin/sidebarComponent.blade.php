@@ -100,6 +100,25 @@
            </li>
 
 
+           {{-- Nav Item - Class Control Collapse Menu --}}
+            <li class="nav-item {{ Request::is('classControl*') || Request::is('class/control/panel') ? 'active' : '' }}">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseClassControl"
+                aria-expanded="false" aria-controls="collapseClassControl">
+                <i class="fas fa-fw fa-school"></i>
+                <span>Class Management</span>
+                </a>
+                <div id="collapseClassControl"class="collapse"
+                    data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Manage Classes:</h6>
+                        {{-- Optional: Grade control panel --}}
+                        <a class="collapse-item"
+                            href="{{ url('/class/control/panel') }}">Control Panel</a>
+                    </div>
+                </div>
+            </li>
+
+
 
 
 
