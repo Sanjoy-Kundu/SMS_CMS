@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Exception;
 use App\Models\User;
 use App\Models\Admin;
+use App\Models\ClassModel;
 use App\Models\Teacher;
 use App\Models\Institution;
 use Illuminate\Http\Request;
@@ -367,6 +368,22 @@ public function adminUpdatePassword(Request $request)
     public function classControlPanelPage(){
         try{
             return view('pages.dashboard.admin.classes.controlPanelPage');
+        }catch(Exception $ex){
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
+    }
+
+
+    /**
+     * Class work Space
+     */
+    public function classWorkSpacePage($id){
+        try{
+            $classId = ClassModel::findOrFail($id);
+            if(!$classId){
+                return response()->json(['status' => 'fail', 'message' => 'Class not found!']);
+            }
+            return view('pages.dashboard.admin.classes.workSpacePage', compact('classId'));
         }catch(Exception $ex){
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
         }

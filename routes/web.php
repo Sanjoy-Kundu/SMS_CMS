@@ -245,6 +245,7 @@ Route::middleware(['auth:sanctum', 'editor'])->group(function () {
 
 
 //admin and editor same route
+ Route::get('/class/work/space/{id}', [AdminDashboard::class, 'classWorkSpacePage']);
 Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
 
     //editor cv
@@ -268,6 +269,12 @@ Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
 
 
 
+
+    //------------------------------
+    //Class work Space
+    //------------------------------
+   
+
     // -----------------------------
     // Grades CRUD Routes (POST)
     // -----------------------------
@@ -280,7 +287,7 @@ Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
     Route::post('/grades/update-by-id', [GradeController::class, 'update']);
     Route::post('/grades/delete-by-id', [GradeController::class, 'destroy']);
  
- });
+});
 
 
 

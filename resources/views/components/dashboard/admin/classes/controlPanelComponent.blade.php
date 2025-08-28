@@ -86,10 +86,9 @@
                                                 ${element.name}
                                             </div>
                                             <div class="d-flex gap-2 mt-3">
-                                                <a href="/class/control/panel/${element.id}" 
-                                                   class="btn btn-sm btn-primary">
-                                                   View
-                                                </a>
+                                                <button class="btn btn-sm btn-primary classHubBtn" data-id="${element.id}">
+                                                   Go ClassHub
+                                                </button>
                                             </div>
                                         </div>
                                         <div class="flex-shrink-0">
@@ -111,7 +110,6 @@
                     text: response.data.message || 'No data found'
                 });
             }
-
         } catch (error) {
             console.error('Error fetching class models:', error);
 
@@ -120,7 +118,16 @@
                 title: 'Error',
                 text: 'Fail to load class models. Please try again later'
             });
-
         }
+
+        //class hub button
+        $(".classHubBtn").click(function (event) {
+            event.preventDefault();
+            let id = $(this).data('id');
+            //console.log('button clicked', id);
+             window.location.href = `/class/work/space/${id}`;
+            //pass id WorkSpace Page How is possible
+        })
+        
     }
 </script>
