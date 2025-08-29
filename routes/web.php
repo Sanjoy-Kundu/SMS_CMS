@@ -273,20 +273,18 @@ Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
     //------------------------------
     //Class work Space
     //------------------------------
-    Route::post('/classes/grading', [GradeController::class, 'ClassGradingStore']);
-    Route::post('/class/grading/lists/by-class', [GradeController::class, 'ClassGradingListsByClass']);
+
+
 
     // -----------------------------
     // Grades CRUD Routes (POST)
     // -----------------------------
 
-    Route::post('/grades', [GradeController::class, 'index']);
-    Route::post('/grades/create', [GradeController::class, 'create']);
-    Route::post('/grades/store', [GradeController::class, 'store']);
-    Route::post('/grades/details-by-id', [GradeController::class, 'detailsById']);
-    Route::post('/grades/edit-by-id', [GradeController::class, 'edit']);
-    Route::post('/grades/update-by-id', [GradeController::class, 'update']);
-    Route::post('/grades/delete-by-id', [GradeController::class, 'destroy']);
+    Route::post('/classes/grading', [GradeController::class, 'ClassGradingStore']);
+    Route::post('/class/grading/lists/by-class', [GradeController::class, 'ClassGradingListsByClass']);
+    Route::post('/classes/grading/delete-by-id', [GradeController::class, 'ClassGradingDeleteById']);
+    Route::post('/classes/grading/get-by-id', [GradeController::class, 'getGradingById']);
+    Route::post('/classes/grading/update', [GradeController::class, 'updateGradingById']);
  
 });
 

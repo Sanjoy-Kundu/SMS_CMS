@@ -99,25 +99,104 @@ class GradeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($grade)
+    public function ClassGradingDeleteById(Request $request)
     {
-        //
+        try {
+            // check if id present
+            if (!$request->has('id')) {
+                return response()->json(
+                    [
+                        'status' => 'fail',
+                        'message' => 'Grading Scale ID is missing!',
+                    ],
+                    400,
+                );
+            }
+
+            $gradingScale = GradingScale::find($request->id);
+
+            if (!$gradingScale) {
+                return response()->json(
+                    [
+                        'status' => 'fail',
+                        'message' => 'Grading Scale not found!',
+                    ],
+                    404,
+                );
+            }
+
+            // Permanent delete
+            $gradingScale->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Grading Scale deleted successfully!',
+            ]);
+        } catch (Exception $ex) {
+            return response()->json(
+                [
+                    'status' => 'fail',
+                    'message' => $ex->getMessage(),
+                ],
+                500,
+            );
+        }
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Grade List by Id
      */
-    public function edit($grade)
+    public function getGradingById(Request $request)
     {
-        //
+        $id = $request->id;
+        if (!$id) {
+            return response()->json(['status'=>'fail','message'=>'ID is required']);
+        }
+
+        try {
+            $grading = GradingScale::find($id);
+            if (!$grading) {
+                return response()->json(['status'=>'fail','message'=>'Grading not found']);
+            }
+            return response()->json(['status'=>'success','data'=>$grading]);
+        } catch (\Exception $ex) {
+            return response()->json(['status'=>'fail','message'=>$ex->getMessage()]);
+        }
     }
 
     /**
-     * Update the specified resource in storage.
+     * Grade Update
      */
-    public function update(Request $request, $grade)
+    public function updateGradingById(Request $request)
     {
-        //
+        $id = $request->id;
+        if (!$id) {
+            return response()->json(['status'=>'fail','message'=>'ID is required']);
+        }
+
+        $request->validate([
+            'grade'=>'nullable|string',
+            'gpa'=>'nullable|numeric',
+            'min_range'=>'nullable|integer',
+            'max_range'=>'nullable|integer',
+        ]);
+
+        try {
+            $grading = GradingScale::find($id);
+            if (!$grading) {
+                return response()->json(['status'=>'fail','message'=>'Grading not found']);
+            }
+
+            $grading->grade = $request->grade;
+            $grading->gpa = $request->gpa;
+            $grading->min_range = $request->min_range;
+            $grading->max_range = $request->max_range;
+            $grading->save();
+
+            return response()->json(['status'=>'success','message'=>'Grading updated successfully']);
+        } catch (\Exception $ex) {
+            return response()->json(['status'=>'fail','message'=>$ex->getMessage()]);
+        }
     }
 
     /**

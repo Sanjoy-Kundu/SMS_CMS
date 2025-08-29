@@ -103,14 +103,22 @@
     async function gradingListsByClass() {
         let token = localStorage.getItem('token');
         if (!token) {
-            Swal.fire({ icon: 'error', title: 'Unauthorized', text: 'You are not logged in!' });
+            Swal.fire({
+                icon: 'error',
+                title: 'Unauthorized',
+                text: 'You are not logged in!'
+            });
             return;
         }
 
         let class_id = document.querySelector('.grading_class_id').value;
         try {
-            let res = await axios.post('/class/grading/lists/by-class', { class_id: class_id }, {
-                headers: { Authorization: `Bearer ${token}` }
+            let res = await axios.post('/class/grading/lists/by-class', {
+                class_id: class_id
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             });
 
             if (res.data.status === 'success') {
@@ -139,7 +147,11 @@
                 });
             }
         } catch (error) {
-            Swal.fire({ icon: 'error', title: 'Error!', text: 'Failed to load grading scales.' });
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Failed to load grading scales.'
+            });
         }
     }
 
@@ -158,7 +170,11 @@
         event.preventDefault();
         let token = localStorage.getItem('token');
         if (!token) {
-            Swal.fire({ icon: 'error', title: 'Unauthorized', text: 'You are not logged in!' });
+            Swal.fire({
+                icon: 'error',
+                title: 'Unauthorized',
+                text: 'You are not logged in!'
+            });
             return;
         }
 
@@ -176,17 +192,37 @@
         let max_range = document.querySelector('#max_range').value;
 
         let isError = false;
-        if (grade === '') { document.querySelector('.grade_error').textContent = 'Grade is required'; isError = true; }
-        if (gpa === '') { document.querySelector('.gpa_error').textContent = 'GPA is required'; isError = true; }
-        if (min_range === '') { document.querySelector('.min_range_error').textContent = 'Minimum range is required'; isError = true; }
-        if (max_range === '') { document.querySelector('.max_range_error').textContent = 'Maximum range is required'; isError = true; }
+        if (grade === '') {
+            document.querySelector('.grade_error').textContent = 'Grade is required';
+            isError = true;
+        }
+        if (gpa === '') {
+            document.querySelector('.gpa_error').textContent = 'GPA is required';
+            isError = true;
+        }
+        if (min_range === '') {
+            document.querySelector('.min_range_error').textContent = 'Minimum range is required';
+            isError = true;
+        }
+        if (max_range === '') {
+            document.querySelector('.max_range_error').textContent = 'Maximum range is required';
+            isError = true;
+        }
         if (isError) return;
 
-        let data = { class_id, grade, gpa, min_range, max_range };
+        let data = {
+            class_id,
+            grade,
+            gpa,
+            min_range,
+            max_range
+        };
 
         try {
             let response = await axios.post('/classes/grading', data, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             });
 
             if (response.data.status === 'success') {
@@ -212,9 +248,17 @@
                 if (errors.min_range) document.querySelector('.min_range_error').textContent = errors.min_range[0];
                 if (errors.max_range) document.querySelector('.max_range_error').textContent = errors.max_range[0];
 
-                Swal.fire({ icon: 'warning', title: 'Validation Error', text: 'Please fix the highlighted fields' });
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Validation Error',
+                    text: 'Please fix the highlighted fields'
+                });
             } else {
-                Swal.fire({ icon: 'error', title: 'Error!', text: error.response?.data?.message || 'Something went wrong!' });
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: error.response?.data?.message || 'Something went wrong!'
+                });
             }
         }
     }
@@ -222,11 +266,15 @@
     // ========================
     // Delete grading scale (Event Delegation)
     // ========================
-    $(document).on('click', '.deleteGradingScale', async function (e) {
+    $(document).on('click', '.deleteGradingScale', async function(e) {
         e.preventDefault();
         let token = localStorage.getItem('token');
         if (!token) {
-            Swal.fire({ icon: 'error', title: 'Unauthorized', text: 'You are not logged in!' });
+            Swal.fire({
+                icon: 'error',
+                title: 'Unauthorized',
+                text: 'You are not logged in!'
+            });
             return;
         }
         let id = $(this).data('id');
@@ -241,8 +289,12 @@
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    let res = await axios.post('/classes/grading/delete-by-id', { id: id }, {
-                        headers: { Authorization: `Bearer ${token}` }
+                    let res = await axios.post('/classes/grading/delete-by-id', {
+                        id: id
+                    }, {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
                     });
 
                     if (res.data.status === 'success') {
@@ -253,14 +305,51 @@
                             timer: 1500,
                             showConfirmButton: false
                         });
-                        gradingListsByClass();
+                        await gradingListsByClass();
+                    } else {
+                        console.error('Delete Error:', res.data.message);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: res.data.message
+                        });
                     }
+
                 } catch (error) {
-                    Swal.fire({ icon: 'error', title: 'Error!', text: error.response?.data?.message || 'Failed to delete grading scale.' });
+                    console.error('Delete Exception:', error.response?.data || error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: error.response?.data?.message ||
+                            'Failed to delete grading scale.'
+                    });
                 }
+
             }
         });
     });
+
+
+
+    // =========================
+    // edit Grading Scale (Event Delegation)
+    //==========================
+    $(document).on('click', '.editGradingScale', async function (e) {
+        e.preventDefault();
+        let token = localStorage.getItem('token');
+        if (!token) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Unauthorized',
+                text: 'You are not logged in!'
+            });
+            return;
+        }
+        let id = $(this).data('id');
+        if(id){
+            await fillGradingInfoDetails(id);
+           $('#gradingEditScaleModal').modal('show'); 
+        }
+
+    })
 </script>
-
-
