@@ -194,9 +194,11 @@
 
 
     //manage grade marks
-    $('.graderManageBtn').on('click', function(event){
+    $('.graderManageBtn').on('click', async function(event){
         event.preventDefault();
         let id = $(this).data('id');
-        console.log('class id is',id);
+        await fillupGradingScaleByClass(id);
+        $('#gradingScaleModal').modal('show');
+        //console.log('class id is',id);
     })
 </script>

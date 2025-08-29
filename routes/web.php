@@ -273,7 +273,8 @@ Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
     //------------------------------
     //Class work Space
     //------------------------------
-   
+    Route::post('/classes/grading', [GradeController::class, 'ClassGradingStore']);
+    Route::post('/class/grading/lists/by-class', [GradeController::class, 'ClassGradingListsByClass']);
 
     // -----------------------------
     // Grades CRUD Routes (POST)
