@@ -388,4 +388,18 @@ public function adminUpdatePassword(Request $request)
             return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
         }
     }
+    /**
+     * Class work Space
+     */
+    public function classAnnouncementPage($id){
+        try{
+            $classId = ClassModel::findOrFail($id);
+            if(!$classId){
+                return response()->json(['status' => 'fail', 'message' => 'Class not found!']);
+            }
+            return view('pages.dashboard.admin.classes.announcementsPage', compact('classId'));
+        }catch(Exception $ex){
+            return response()->json(['status' => 'fail', 'message' => $ex->getMessage()]);
+        }
+    }
 }

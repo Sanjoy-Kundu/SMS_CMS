@@ -113,7 +113,7 @@
                             <p class="text-muted small mb-0">Class notices & messages</p>
                         </div>
                     </div>
-                    <a href="/class/{{ $classId->id }}/announcements" class="btn btn-secondary btn-sm mt-3 w-100">View</a>
+                     <button class="btn btn-primary btn-sm mt-3 w-100 announcementManageBtn" data-id="{{ $classId->id }}">Manage</button>
                 </div>
             </div>
         </div>
@@ -199,6 +199,14 @@
         let id = $(this).data('id');
         await fillupGradingScaleByClass(id);
         $('#gradingScaleModal').modal('show');
+        //console.log('class id is',id);
+    })
+
+    //manage announchment class
+    $('.announcementManageBtn').on('click', async function(event){
+        event.preventDefault();
+        let id = $(this).data('id');
+        window.location.href = `/class/announchment/page/${id}`;
         //console.log('class id is',id);
     })
 </script>

@@ -15,6 +15,7 @@ use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\ClassModelController;
 use App\Http\Controllers\DesignationController;
 use App\Http\Controllers\InstitutionController;
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\EditorAddressController;
 use App\Http\Controllers\TeacherAddressController;
 use App\Http\Controllers\AcademicSectionController;
@@ -246,7 +247,7 @@ Route::middleware(['auth:sanctum', 'editor'])->group(function () {
 
 //admin and editor same route
  Route::get('/class/work/space/{id}', [AdminDashboard::class, 'classWorkSpacePage']);
- 
+ Route::get('/class/announchment/page/{id}', [AdminDashboard::class, 'classAnnouncementPage']);
 Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
 
     //editor cv
@@ -281,7 +282,7 @@ Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
     //------------------------------
     //Announcement work Space
     //------------------------------
- 
+    Route::post('/announcement/store', [AnnouncementController::class, 'AnnouncementStore']);
 });
 
 
