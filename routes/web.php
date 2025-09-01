@@ -282,6 +282,7 @@ Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
     //------------------------------
     //Announcement work Space
     //------------------------------
+    Route::post('/announcement/lists-by-class', [AnnouncementController::class, 'AnnouncementLists']);
     Route::post('/announcement/store', [AnnouncementController::class, 'AnnouncementStore']);
 });
 
