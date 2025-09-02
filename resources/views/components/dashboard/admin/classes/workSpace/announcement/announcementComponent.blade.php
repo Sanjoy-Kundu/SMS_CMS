@@ -188,10 +188,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
- <script>
+<script>
     $(document).ready(function() {
-        // loadAnnouncements();
-        // loadTrashedAnnouncements();
         $('#summernote').summernote({
             placeholder: 'Write announcement details here...',
             tabsize: 2,
@@ -247,36 +245,57 @@
             if (res.data.status === 'success') {
                 let announcementLists = res.data.data;
 
-                // পুরনো DataTable destroy
+                // DataTable destroy
                 if ($.fn.DataTable.isDataTable('#announcementsTable')) {
                     $('#announcementsTable').DataTable().clear().destroy();
                 }
 
-                // নতুন data insert
+                //  data insert
                 let rows = "";
+
                 if (announcementLists.length > 0) {
+                    function getShortDescription(html, maxLength = 50) {
+                        if (!html) return '';
+                        const div = document.createElement('div');
+                        div.innerHTML = html; // Summernote content
+                        const text = div.textContent || div.innerText || '';
+
+                        // truncate only if long
+                        return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+                    }
+
+                    // inside forEach:
                     announcementLists.forEach((item, index) => {
+                        let description = getShortDescription(item.description, 50); // 50 characters max
+
                         rows += `
                         <tr>
                             <td>${index+1}</td>
                             <td>
                                 <strong>${item.title}</strong><br>
-                                <small class="text-muted">${item.description.substring(0, 50)}...</small>
+                                <small class="text-muted">${description}</small>
                             </td>
                             <td><span class="badge badge-info">${item.category}</span></td>
-                            <td><span class="badge badge-${item.priority === 'High' ? 'danger' : (item.priority === 'Medium' ? 'warning' : 'secondary')}">${item.priority}</span></td>
+                            <td>
+                                <span class="badge badge-${item.priority === 'High' ? 'danger' : (item.priority === 'Medium' ? 'warning' : 'secondary')}">
+                                    ${item.priority}
+                                </span>
+                            </td>
                             <td>${item.audience}</td>
                             <td>${item.valid_until ?? '-'}</td>
-                            <td><span class="badge badge-${item.is_active ? 'success' : 'danger'}">${item.is_active ? 'Active' : 'Inactive'}</span></td>
+                            <td>
+                                <span class="badge badge-${item.is_active ? 'success' : 'danger'}">
+                                    ${item.is_active ? 'Active' : 'Inactive'}
+                                </span>
+                            </td>
                             <td>
                                 <button class="btn btn-sm btn-info viewAnnouncement"  data-id="${item.id}"><i class="fas fa-eye"></i></button>
                                 <button class="btn btn-sm btn-warning editAnnouncement" data-id="${item.id}"><i class="fas fa-edit"></i></button>
                                 <button class="btn btn-sm btn-danger trashAnnouncement" data-id="${item.id}"><i class="fas fa-trash"></i></button>
                             </td>
                         </tr>`;
-                    });
-                } else {
-                    rows = `<tr><td colspan="8" class="text-center">No announcements found.</td></tr>`;
+                  });
+
                 }
 
                 document.querySelector("#announcementsTableBody").innerHTML = rows;
@@ -350,6 +369,16 @@
             });
 
 
+            //view announchment
+            $(document).on('click', '.viewAnnouncement', async function(e) {
+                e.preventDefault();
+                const id = $(this).data('id');
+                await announcementViewModal(id);
+                $('#announcementViewModal').modal('show');
+                //console.log('Announcement ID:', id);
+            });
+
+
 
 
         } catch (error) {
@@ -382,7 +411,7 @@
         let form = event.target;
         let formData = new FormData(form);
         formData.append("class_id", classId);
-
+        let prevAttachmentHtml = document.querySelector("#attachmentPreview").innerHTML;
         try {
             let res = await axios.post('/announcement/store', formData, {
                 headers: {
@@ -402,6 +431,8 @@
 
                 form.reset();
                 $('#summernote').summernote('reset');
+            // restore attachment preview
+            document.querySelector("#attachmentPreview").innerHTML = prevAttachmentHtml;
                 loadAnnouncements();
             }
 
@@ -453,7 +484,9 @@
             let res = await axios.post('/announcement/trashed-lists', {
                 class_id: classId
             }, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             });
 
             if (res.data.status === 'success') {
@@ -462,9 +495,9 @@
                 // DataTable instance চেক
                 if ($.fn.DataTable.isDataTable('#trashedAnnouncementsTable')) {
                     let table = $('#trashedAnnouncementsTable').DataTable();
-                    table.clear(); // পুরনো ডাটা clear করো
+                    table.clear();
 
-                    // নতুন ডাটা যোগ করো
+
                     if (list.length > 0) {
                         list.forEach((item, index) => {
                             table.row.add([
@@ -484,16 +517,11 @@
                                 `
                             ]);
                         });
-                    } else {
-                        table.row.add([
-                            '-', '-', '-', '-', '-', '-',
-                            `<span class="text-muted">No trashed announcements found.</span>`
-                        ]);
                     }
 
-                    table.draw(); 
+                    table.draw();
                 } else {
-                    
+
                     let rows = "";
                     if (list.length > 0) {
                         list.forEach((item, index) => {
@@ -522,7 +550,7 @@
 
                     $('#trashedAnnouncementsTable').DataTable({
                         pageLength: 5,
-                        lengthMenu: [5,10,20,50],
+                        lengthMenu: [5, 10, 20, 50],
                         responsive: true,
                         autoWidth: false
                     });
@@ -536,349 +564,7 @@
 
 
     // Restore Announcement
-    $(document).on('click', '.restoreAnnouncement', async function(){
-        const id = $(this).data('id');
-        const { isConfirmed } = await Swal.fire({
-            title: 'Restore Announcement?',
-            text: "This announcement will be restored.",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#28a745',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Yes, Restore'
-        });
-
-        if(!isConfirmed) return;
-
-        try {
-            let res = await axios.post('/announcement/restore', {id}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if(res.data.status === 'success'){
-                Swal.fire('Restored!', res.data.message, 'success');
-                loadTrashedAnnouncements();
-                loadAnnouncements(); // Optional: refresh main list
-            } else {
-                Swal.fire('Failed!', res.data.message || 'Could not restore.', 'error');
-            }
-        } catch(err){
-            console.error(err);
-            Swal.fire('Error!', 'Server error. Check console.', 'error');
-        }
-    });
-
-    // Permanent Delete
-    $(document).on('click', '.permDeleteAnnouncement', async function(){
-        const id = $(this).data('id');
-        const { isConfirmed } = await Swal.fire({
-            title: 'Delete Permanently?',
-            text: "This cannot be undone!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Yes, Delete Permanently'
-        });
-
-        if(!isConfirmed) return;
-
-        try {
-            let res = await axios.post('/announcement/delete-permanent', {id}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if(res.data.status === 'success'){
-                Swal.fire('Deleted!', res.data.message, 'success');
-                loadTrashedAnnouncements();
-            } else {
-                Swal.fire('Failed!', res.data.message || 'Could not delete.', 'error');
-            }
-        } catch(err){
-            console.error(err);
-            Swal.fire('Error!', 'Server error. Check console.', 'error');
-        }
-    });
-
-</script>
-
-
-{{-- <script>
-    $(document).ready(function() {
-        let token = localStorage.getItem('token');
-        let classId = {{ $classId->id }};
-        $('.workPaceClassId').val(classId);
-
-        // Initialize Summernote
-        $('#summernote').summernote({
-            placeholder: 'Write announcement details here...',
-            tabsize: 2,
-            height: 150
-        });
-
-        // Preview attachment
-        $('#attachmentInput').on('change', function(e) {
-            let file = e.target.files[0];
-            let preview = $("#attachmentPreview");
-            preview.html('');
-
-            if (!file) return;
-
-            const fileType = file.type;
-            if (fileType.startsWith('image/')) {
-                let reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.html(
-                        `<img src="${e.target.result}" class="img-fluid rounded" style="max-height:150px;">`
-                        );
-                }
-                reader.readAsDataURL(file);
-            } else if (fileType === 'application/pdf') {
-                preview.html(`<i class="fas fa-file-pdf text-danger fa-2x"></i> ${file.name}`);
-            } else if (fileType.includes('word') || fileType.includes('doc')) {
-                preview.html(`<i class="fas fa-file-word text-primary fa-2x"></i> ${file.name}`);
-            } else {
-                preview.html(`<i class="fas fa-file text-muted fa-2x"></i> ${file.name}`);
-            }
-        });
-
-        // Load both tables initially
-        // loadAnnouncements();
-        // loadTrashedAnnouncements();
-    });
-
-    // ===================== Load Announcements =====================
-    loadAnnouncements();
-    async function loadAnnouncements() {
-        let token = localStorage.getItem('token');
-        let classId = $('.workPaceClassId').val();
-        if (!token && !classId) {
-            alert('Please login first. Unauthorized Access');
-            window.location.href = '/admin/login'
-        }
-
-        try {
-            let res = await axios.post('/announcement/lists-by-class', {
-                class_id: classId
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
-            if (res.data.status !== 'success') {
-                Swal.fire('Error', 'Failed to fetch announcements', 'error');
-                return;
-            }
-
-            let list = res.data.data;
-            let rows = '';
-
-            if (list.length > 0) {
-                list.forEach((item, index) => {
-                    rows += `<tr>
-                    <td>${index+1}</td>
-                    <td><strong>${item.title}</strong><br><small class="text-muted">${item.description.substring(0,50)}...</small></td>
-                    <td><span class="badge badge-info">${item.category}</span></td>
-                    <td><span class="badge badge-${item.priority === 'High' ? 'danger' : (item.priority === 'Medium' ? 'warning' : 'secondary')}">${item.priority}</span></td>
-                    <td>${item.audience}</td>
-                    <td>${item.valid_until ?? '-'}</td>
-                    <td><span class="badge badge-${item.is_active ? 'success' : 'danger'}">${item.is_active ? 'Active' : 'Inactive'}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-info viewAnnouncement"  data-id="${item.id}"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-sm btn-warning editAnnouncement" data-id="${item.id}"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-sm btn-danger trashAnnouncement" data-id="${item.id}"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>`;
-                });
-            } else {
-                rows = `<tr><td colspan="8" class="text-center">No announcements found.</td></tr>`;
-            }
-
-            $('#announcementsTableBody').html(rows);
-
-            // Destroy previous DataTable if exists
-            if ($.fn.DataTable.isDataTable('#announcementsTable')) {
-                $('#announcementsTable').DataTable().clear().destroy();
-            }
-
-            $('#announcementsTable').DataTable({
-                pageLength: 5,
-                lengthMenu: [5, 10, 20, 50],
-                responsive: true,
-                autoWidth: false
-            });
-        } catch (err) {
-            console.error(err);
-            Swal.fire('Error', 'Could not load announcements', 'error');
-        }
-    }
-
-    // ===================== Load Trashed Announcements =====================
-    loadTrashedAnnouncements();
-    async function loadTrashedAnnouncements() {
-        let token = localStorage.getItem('token');
-        let classId = $('.workPaceClassId').val();
-        try {
-            let res = await axios.post('/announcement/trashed-lists', {
-                class_id: classId
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
-            if (res.data.status !== 'success') {
-                Swal.fire('Error', 'Failed to fetch trashed announcements', 'error');
-                return;
-            }
-
-            let list = res.data.data;
-            let rows = '';
-
-            if (list.length > 0) {
-                list.forEach((item, index) => {
-                    rows += `<tr>
-                    <td>${index+1}</td>
-                    <td><strong>${item.title ?? '-'}</strong></td>
-                    <td>${item.category ?? '-'}</td>
-                    <td>${item.priority ?? '-'}</td>
-                    <td>${item.audience ?? '-'}</td>
-                    <td>${item.deleted_at ?? '-'}</td>
-                    <td>
-                        <button class="btn btn-sm btn-success restoreAnnouncement" data-id="${item.id}">
-                            <i class="fas fa-undo"></i> Restore
-                        </button>
-                        <button class="btn btn-sm btn-danger permDeleteAnnouncement" data-id="${item.id}">
-                            <i class="fas fa-trash-alt"></i> Delete Permanently
-                        </button>
-                    </td>
-                </tr>`;
-                });
-            } else {
-                rows = `<tr><td colspan="7" class="text-center">No trashed announcements found.</td></tr>`;
-            }
-
-            $('#trashedAnnouncementsTableBody').html(rows);
-
-            if ($.fn.DataTable.isDataTable('#trashedAnnouncementsTable')) {
-                $('#trashedAnnouncementsTable').DataTable().clear().destroy();
-            }
-
-            $('#trashedAnnouncementsTable').DataTable({
-                pageLength: 5,
-                lengthMenu: [5, 10, 20, 50],
-                responsive: true,
-                autoWidth: false
-            });
-        } catch (err) {
-            console.error(err);
-            Swal.fire('Error', 'Could not load trashed announcements', 'error');
-        }
-    }
-
-
-    // ===================== Create Announcement =====================
-    async function createAnnouncement(event) {
-        let token = localStorage.getItem('token');
-        let classId = $('.workPaceClassId').val();
-        if (!token && !classId) {
-            return window.location.href = '/admin/login';
-        }
-        event.preventDefault();
-        let form = event.target;
-        let formData = new FormData(form);
-        formData.append('class_id', classId);
-
-        try {
-            let res = await axios.post('/announcement/store', formData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "multipart/form-data"
-                }
-            });
-
-            if (res.data.status === 'success') {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Created!',
-                    text: res.data.message,
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-                form.reset();
-                $('#summernote').summernote('reset');
-                loadAnnouncements();
-            }
-        } catch (err) {
-            console.error(err);
-            if (err.response?.status === 422) {
-                let errors = err.response.data.errors;
-                let html = "<ul>";
-                Object.keys(errors).forEach(key => {
-                    html += `<li>${errors[key][0]}</li>`;
-                });
-                html += "</ul>";
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Validation Error',
-                    html
-                });
-            } else {
-                Swal.fire('Error', 'Something went wrong. Check console', 'error');
-            }
-        }
-    }
-
-    // ===================== Trash Announcement =====================
-    $(document).on('click', '.trashAnnouncement', async function() {
-        const id = $(this).data('id');
-        let token = localStorage.getItem('token');
-        let classId = $('.workPaceClassId').val();
-        if (!token && !classId) {
-            return window.location.href = '/admin/login';
-        }
-
-        const {
-            isConfirmed
-        } = await Swal.fire({
-            title: 'Trash Announcement?',
-            text: "This announcement will be moved to trash.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, Trash it'
-        });
-
-        if (!isConfirmed) return;
-
-        try {
-            let res = await axios.post('/announcement/trash', {
-                id
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            if (res.data.status === 'success') {
-                Swal.fire('Trashed!', res.data.message, 'success');
-                loadAnnouncements();
-                loadTrashedAnnouncements();
-            } else {
-                Swal.fire('Failed!', res.data.message || 'Could not trash.', 'error');
-            }
-        } catch (err) {
-            console.error(err);
-            Swal.fire('Error', 'Server error. Check console.', 'error');
-        }
-    });
-
-    // ===================== Restore Announcement =====================
     $(document).on('click', '.restoreAnnouncement', async function() {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            alert('Please login first.');
-            window.location.href = '/admin/login';
-        }
         const id = $(this).data('id');
         const {
             isConfirmed
@@ -905,34 +591,29 @@
             if (res.data.status === 'success') {
                 Swal.fire('Restored!', res.data.message, 'success');
                 loadTrashedAnnouncements();
-                loadAnnouncements();
+                loadAnnouncements(); // Optional: refresh main list
             } else {
                 Swal.fire('Failed!', res.data.message || 'Could not restore.', 'error');
             }
         } catch (err) {
             console.error(err);
-            Swal.fire('Error', 'Server error. Check console.', 'error');
+            Swal.fire('Error!', 'Server error. Check console.', 'error');
         }
     });
 
-    // ===================== Permanent Delete =====================
+    // Permanent Delete
     $(document).on('click', '.permDeleteAnnouncement', async function() {
         const id = $(this).data('id');
-        const token = localStorage.getItem('token');
-        if (!token) {
-            alert('Please login first.');
-            window.location.href = '/admin/login';
-        }
         const {
             isConfirmed
         } = await Swal.fire({
             title: 'Delete Permanently?',
-            text: 'This action cannot be undone!',
+            text: "This cannot be undone!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Yes, Delete'
+            confirmButtonText: 'Yes, Delete Permanently'
         });
 
         if (!isConfirmed) return;
@@ -953,7 +634,7 @@
             }
         } catch (err) {
             console.error(err);
-            Swal.fire('Error', 'Server error. Check console.', 'error');
+            Swal.fire('Error!', 'Server error. Check console.', 'error');
         }
     });
-</script> --}}
+</script>

@@ -6,6 +6,7 @@ use App\Models\Announcement;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 
 class AnnouncementController extends Controller
 {
@@ -166,15 +167,58 @@ class AnnouncementController extends Controller
         }
     }
 
-    public function deletePermanent(Request $request){
-        try{
+public function deletePermanent(Request $request){
+    try {
+        // শুধু trashed announcement
         $announcement = Announcement::onlyTrashed()->findOrFail($request->id);
+
+        // যদি attachment delete করো
+        if($announcement->attachment){
+            $filePath = public_path($announcement->attachment); // public/uploads/attachments/filename.pdf
+            if(File::exists($filePath)){
+                File::delete($filePath);
+            }
+        }
+
+        // permanently delete
         $announcement->forceDelete();
-        return response()->json(['status'=>'success','message'=>'Announcement permanently deleted']);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Announcement permanently deleted along with attachment'
+        ]);
+        
+    } catch(Exception $ex) {
+        return response()->json([
+            'status' => 'fail',
+            'message' => $ex->getMessage()
+        ]);
+    }
+}
+
+
+    //Announcement View
+     public function view(Request $request)
+    {
+        try{
+         $id = $request->id;
+        $announcement = Announcement::find($id);
+        if(!$announcement){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Announcement not found'
+            ], 404);
+        }
+        // $attachmentType = null;
+        // $attachmentUrl = null;
+        return response()->json([
+            'status' => 'success',
+            'data' => $announcement
+        ]);
+
         }catch(Exception $ex){
             return response()->json(['status' => 'fail','message' => $ex->getMessage()]);
         }
-
     }
 
 }
