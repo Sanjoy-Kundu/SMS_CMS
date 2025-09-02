@@ -111,34 +111,70 @@ class AnnouncementController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Announcement Trash
      */
-    public function show(Announcement $announcement)
-    {
-        //
+    public function AnnouncementTrash(Request $request)
+        {
+            $request->validate([
+                'id' => 'required|exists:announcements,id',
+            ]);
+
+            try {
+                $announcement = Announcement::findOrFail($request->id);
+                
+                // Optional: Only admin or owner can delete Auth::user()->role !== 'editor'
+                if(Auth::user()->role !== 'admin' && $announcement->user_id !== Auth::id()){
+                    return response()->json([
+                        'status' => 'fail',
+                        'message' => 'Unauthorized action.'
+                    ], 403);
+                }
+
+                $announcement->delete();
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Announcement trashed successfully.'
+                ]);
+            } catch (Exception $ex) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => $ex->getMessage()
+                ], 500);
+            }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Announcement $announcement)
-    {
-        //
+    // Announcement Trash Lists
+    public function trashedLists(Request $request){
+        try{
+        $announcements = Announcement::onlyTrashed()->where('class_id', $request->class_id)->get();
+          return response()->json(['status'=>'success','data'=>$announcements]);
+        }catch(Exception $ex){
+            return response()->json(['status' => 'fail','message' => $ex->getMessage()]);
+
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Announcement $announcement)
-    {
-        //
+    //Announcyhment Resote
+    public function restore(Request $request){
+        try{
+        $announcement = Announcement::onlyTrashed()->findOrFail($request->id);
+        $announcement->restore();
+        return response()->json(['status'=>'success','message'=>'Announcement restored successfully']);
+        }catch(Exception $ex){
+            return response()->json(['status' => 'fail','message' => $ex->getMessage()]);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Announcement $announcement)
-    {
-        //
+    public function deletePermanent(Request $request){
+        try{
+        $announcement = Announcement::onlyTrashed()->findOrFail($request->id);
+        $announcement->forceDelete();
+        return response()->json(['status'=>'success','message'=>'Announcement permanently deleted']);
+        }catch(Exception $ex){
+            return response()->json(['status' => 'fail','message' => $ex->getMessage()]);
+        }
+
     }
+
 }
