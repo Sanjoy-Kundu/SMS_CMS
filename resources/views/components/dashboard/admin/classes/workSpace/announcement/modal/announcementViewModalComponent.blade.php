@@ -61,39 +61,6 @@
 </div>
 
 
-{{-- <script>
-    async function announcementViewModal(id) {
-        let token = localStorage.getItem('token');
-        if(!token && !id){
-            alert('Error: Invalid Request');
-        }
-        //console.log(id);
-        document.querySelector('#announcementId').value = id;
-
-        try{
-            let res = await axios.post('/announcement/view',{id},{
-                headers:{
-                    Authorization: `Bearer ${token}` 
-                }
-            });
-
-            if(res.data.status !== 'success'){
-                console.log(res.data);
-            Swal.fire('Error', res.data.message || 'Could not fetch announcement.', 'error');
-            return;
-           }
-
-           if(res.data.status === 'success'){
-                console.log(res.data);
-           }
-        }catch(error){
-            console.log(error);
-        }
-
-    }
-</script> --}}
-
-
 <script>
     async function announcementViewModal(id) {
         let token = localStorage.getItem('token');

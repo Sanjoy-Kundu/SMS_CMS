@@ -378,6 +378,15 @@
                 //console.log('Announcement ID:', id);
             });
 
+            //edit announchment
+            $(document).on('click', '.editAnnouncement', async function(e) {
+                e.preventDefault();
+                const id = $(this).data('id');
+                await announcementEditDetails(id);
+                $('#announcementEditModal').modal('show');
+                //console.log('Announcement ID:', id);
+            });
+
 
 
 

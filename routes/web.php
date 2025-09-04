@@ -286,6 +286,7 @@ Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
     Route::post('/announcement/lists-by-class', [AnnouncementController::class, 'AnnouncementLists']);
     Route::post('/announcement/store', [AnnouncementController::class, 'AnnouncementStore']);
     Route::post('/announcement/trash', [AnnouncementController::class, 'AnnouncementTrash']);
+    Route::post('/announcement/update', [AnnouncementController::class, 'AnnouncementUpdate']);
     //---- Announchment Trash Lists ----
     Route::post('/announcement/trashed-lists', [AnnouncementController::class,'trashedLists']);
     Route::post('/announcement/restore', [AnnouncementController::class,'restore']);
