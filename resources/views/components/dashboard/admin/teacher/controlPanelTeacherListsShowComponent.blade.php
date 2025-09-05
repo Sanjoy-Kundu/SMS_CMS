@@ -83,6 +83,7 @@
             if (res.data.status === 'success') {
                 const teachers = res.data.allTeachers;
                 //console.log(teachers);
+                //console.log(teachers);
                 document.querySelector('.totalTeachersCount').innerText = teachers.length;
 
                 // Destroy old DataTable if exists
@@ -95,7 +96,8 @@
 
                 // Append rows
                 teachers.forEach((teacher, index) => {
-                    const designation = teacher.designation.title ? teacher.designation.title : 'N/A';
+                    //const designation = teacher.designation.title ? teacher.designation.title : 'N/A';
+                    const designation = teacher.designation?.title || 'N/A';
                     const addedBy = teacher.added_by.role === 'editor' ? 'Editor' : 'Admin';
                     const addedName = teacher.added_by.name?teacher.added_by.name:'N/A';
                     const row = `

@@ -11,22 +11,29 @@
     <div class="row">
 
         <!-- Teachers Card -->
+        <!-- Class Professionals Card -->
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card shadow-sm h-100 hover-shadow border-left-primary">
+            <div class="card shadow-sm h-100 hover-shadow border-left-success">
                 <div class="card-body d-flex flex-column justify-content-between py-4 px-3">
                     <div class="d-flex align-items-center mb-3">
-                        <div class="icon-wrapper-primary me-3">
-                            <i class="fas fa-chalkboard-teacher fa-lg"></i>
+                        <div class="icon-wrapper-success me-3">
+                            <i class="fas fa-users-cog fa-lg"></i>
                         </div>
                         <div>
-                            <h5 class="fw-bold mb-1 text-primary">Teachers</h5>
-                            <p class="text-muted small mb-0">Assign / update teachers & subjects</p>
+                            <h5 class="fw-bold mb-1 text-success">Class Professionals</h5>
+                            <p class="text-muted small mb-0">
+                                Manage class-wise teachers & their subjects
+                            </p>
                         </div>
                     </div>
-                    <a href="/class/{{ $classId->id }}/teachers" class="btn btn-primary btn-sm mt-3 w-100">Manage</a>
+                    <a href="/class/{{ $classId->id }}/professionals" 
+                    class="btn btn-primary btn-sm mt-3 w-100">
+                    Manage
+                    </a>
                 </div>
             </div>
         </div>
+
 
         <!-- Routine Card -->
         <div class="col-xl-3 col-md-6 mb-4">
@@ -74,10 +81,10 @@
                         </div>
                         <div>
                             <h5 class="fw-bold mb-1 text-info">Subjects</h5>
-                            <p class="text-muted small mb-0">Manage subjects & papers</p>
+                            <p class="text-muted small mb-0">Subject lists fo Class {{ $classId->name }}</p>
                         </div>
                     </div>
-                    <a href="/class/{{ $classId->id }}/subjects" class="btn btn-info btn-sm mt-3 w-100">Manage</a>
+                    <button class="btn btn-danger btn-sm mt-3 w-100 classWiseSbujectListsBtn" data-id="{{ $classId->id }}">View Subject</button>
                 </div>
             </div>
         </div>
@@ -206,7 +213,15 @@
     $('.announcementManageBtn').on('click', async function(event){
         event.preventDefault();
         let id = $(this).data('id');
-        window.location.href = `/class/announchment/page/${id}`;
+        window.location.href = `/announchment/${id}`;
+        //console.log('class id is',id);
+    })
+
+    //manage announchment class
+    $('.classWiseSbujectListsBtn').on('click', async function(event){
+        event.preventDefault();
+        let id = $(this).data('id');
+        window.location.href = `/subjects/${id}`;
         //console.log('class id is',id);
     })
 </script>
