@@ -6,7 +6,7 @@
 
     <!-- Class Workspace Heading -->
     <div class="mb-4">
-        <input type="text" class="workPaceClassId" readonly>
+        <input type="text" class="workPaceClassId" readonly hidden>
         <h3 class="text-primary" style="text-transform: uppercase">
             Announcements Of Class <span class="text-danger">{{ $classId->name }}</span>
         </h3>

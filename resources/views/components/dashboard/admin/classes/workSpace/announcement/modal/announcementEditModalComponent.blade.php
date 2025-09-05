@@ -13,7 +13,7 @@
             </div>
             <div class="modal-body">
                 <form id="announcementEditForm" onsubmit="updateAnnouncement(event)" enctype="multipart/form-data">
-                    <input type="hidden" name="id" id="announcementId">
+                    <input type="hidden" name="id" id="announcementId" hidden>
 
                     <div class="row mb-3">
                         <div class="col-md-6">
@@ -291,7 +291,7 @@
               </div>`;
                             previewDiv.innerHTML = previewHtml;
                         });
-                    return; // অ্যাসিঙ্ক প্রিভিউর জন্য রিটার্ন করো
+                    return; 
                 }
             } else {
                 previewHtml = `<em>No attachment selected</em>`;
@@ -300,7 +300,7 @@
             previewDiv.innerHTML = previewHtml;
         }
 
-        // মডাল ক্লোজ করার সময় ক্লিনআপ
+        //Model Email
         $('#announcementEditModal').on('hidden.bs.modal', function() {
             document.querySelector('#announcementEditForm').reset();
             $('#editSummernote').summernote('reset');
@@ -333,14 +333,14 @@
 
         // Check required fields
         if (!id) {
-            Swal.fire('Error', 'অ্যানাউন্সমেন্ট আইডি প্রয়োজন।', 'error');
+            Swal.fire('Error', 'Announchment ID is required', 'error');
             submitButton.disabled = false;
             submitButton.innerHTML = '<i class="fas fa-save"></i> Update Announcement';
             return;
         }
         if (!title || !priority || !description || !audience || !category || !recurring || !validUntil || !
             isActive) {
-            Swal.fire('Error', 'সব প্রয়োজনীয় ফিল্ড পূরণ করুন।', 'error');
+            Swal.fire('Error', 'Please fill in all required fields', 'error');
             submitButton.disabled = false;
             submitButton.innerHTML = '<i class="fas fa-save"></i> Update Announcement';
             return;
@@ -348,7 +348,7 @@
 
         // URL validation
         if (link && !/^(https?:\/\/)/i.test(link)) {
-            Swal.fire('Error', 'দয়া করে একটি বৈধ URL লিখুন (যেমন, https://example.com)।', 'error');
+            Swal.fire('Error', 'Write valid URL (Example, https://example.com)।', 'error');
             submitButton.disabled = false;
             submitButton.innerHTML = '<i class="fas fa-save"></i> Update Announcement';
             return;
@@ -359,13 +359,13 @@
             const fileExt = attachment.name.split('.').pop().toLowerCase();
             const allowedExtensions = ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'];
             if (!allowedExtensions.includes(fileExt)) {
-                Swal.fire('Error', 'শুধুমাত্র JPG, PNG, PDF, বা Word ফাইল আপলোড করুন।', 'error');
+                Swal.fire('Error', 'Only JPG, PNG, PDF, Word documents are allowed.', 'error');
                 submitButton.disabled = false;
                 submitButton.innerHTML = '<i class="fas fa-save"></i> Update Announcement';
                 return;
             }
             if (attachment.size > 5 * 1024 * 1024) {
-                Swal.fire('Error', 'ফাইলের সাইজ ৫ মেগাবাইটের বেশি হতে পারবে না।', 'error');
+                Swal.fire('Error', 'File Size 5 Megabites।', 'error');
                 submitButton.disabled = false;
                 submitButton.innerHTML = '<i class="fas fa-save"></i> Update Announcement';
                 return;
@@ -374,7 +374,7 @@
 
         let token = localStorage.getItem('token');
         if (!token) {
-            Swal.fire('Error', 'অথেনটিকেশন টোকেন নেই। দয়া করে লগইন করুন।', 'error');
+            Swal.fire('Error', 'Token not found.', 'error');
             submitButton.disabled = false;
             submitButton.innerHTML = '<i class="fas fa-save"></i> Update Announcement';
             return;
@@ -395,25 +395,25 @@
             });
 
             if (res.data.status === 'success') {
-                Swal.fire('Success', 'অ্যানাউন্সমেন্ট সফলভাবে আপডেট হয়েছে!', 'success');
+                Swal.fire('Success', 'Announcement updated successfully.', 'success');
                 await loadAnnouncements();
                 $('#announcementEditModal').modal('hide');
             } else {
                 if (res.data.errors) {
                     // Create a summary message for all errors
-                    let errorSummary = 'নিচের ফিল্ডগুলোতে সমস্যা আছে:<br><ul>';
+                    let errorSummary = "Field Error Summary:<br><ol type='a'>";
                     const fieldNames = {
-                        id: 'অ্যানাউন্সমেন্ট আইডি',
-                        title: 'টাইটেল',
-                        priority: 'প্রায়োরিটি',
-                        description: 'বর্ণনা',
-                        audience: 'অডিয়েন্স',
-                        category: 'ক্যাটাগরি',
-                        recurring: 'রিকারিং',
-                        link: 'লিঙ্ক',
-                        valid_until: 'বৈধতার সময়সীমা',
-                        is_active: 'স্ট্যাটাস',
-                        attachment: 'অ্যাটাচমেন্ট'
+                        id: 'Announchment Id',
+                        title: 'Title',
+                        priority: 'Priority',
+                        description: 'Description',
+                        audience: 'Audience',
+                        category: 'Category',
+                        recurring: 'Recurring',
+                        link: 'Link',
+                        valid_until: 'Valid Until',
+                        is_active: 'Status',
+                        attachment: 'Attachment'
                     };
 
                     Object.keys(res.data.errors).forEach(field => {
@@ -425,7 +425,7 @@
                         errorSummary +=
                             `<li><strong>${fieldNames[field] || field}:</strong> ${res.data.errors[field].join(', ')}</li>`;
                     });
-                    errorSummary += '</ul>';
+                    errorSummary += '</ol>';
 
                     // Show summary in Swal alert
                     Swal.fire({
@@ -434,33 +434,33 @@
                         html: errorSummary
                     });
                 } else {
-                    Swal.fire('Error', res.data.message || 'অ্যানাউন্সমেন্ট আপডেট করা যায়নি।', 'error');
+                    Swal.fire('Error', res.data.message || 'Dont Update Announchment।', 'error');
                 }
             }
         } catch (error) {
             console.error(error);
-            let errorMessage = 'অ্যানাউন্সমেন্ট আপডেট করার সময় কিছু ভুল হয়েছে।';
+            let errorMessage = 'Error occurred while updating announcement. Please try again later.';
             if (error.response) {
                 if (error.response.status === 401) {
-                    errorMessage = 'আপনার সেশন মেয়াদ শেষ হয়েছে। দয়া করে আবার লগইন করুন।';
+                    errorMessage = 'Your session has expired. Please log in again.';
                 } else if (error.response.status === 413) {
-                    errorMessage = 'ফাইলের সাইজ খুব বড়। দয়া করে ছোট ফাইল আপলোড করুন।';
+                    errorMessage = 'The file size is too large. Please upload a smaller file.';
                 } else if (error.response.status === 422) {
-                    errorMessage = error.response.data.message || 'ভ্যালিডেশন ফেইলড।';
+                    errorMessage = error.response.data.message || 'Validation Failed';
                     if (error.response.data.errors) {
-                        let errorSummary = 'নিচের ফিল্ডগুলোতে সমস্যা আছে:<br><ul>';
+                        let errorSummary = "Summery Error:<br><ol type='a'>";
                         const fieldNames = {
-                            id: 'অ্যানাউন্সমেন্ট আইডি',
-                            title: 'টাইটেল',
-                            priority: 'প্রায়োরিটি',
-                            description: 'বর্ণনা',
-                            audience: 'অডিয়েন্স',
-                            category: 'ক্যাটাগরি',
-                            recurring: 'রিকারিং',
-                            link: 'লিঙ্ক',
-                            valid_until: 'বৈধতার সময়সীমা',
-                            is_active: 'স্ট্যাটাস',
-                            attachment: 'অ্যাটাচমেন্ট'
+                            id: 'Announchment ID',
+                            title: 'Title',
+                            priority: 'Priority',
+                            description: 'Description',
+                            audience: 'Audience',
+                            category: 'Category',
+                            recurring: 'Recurring',
+                            link: 'Link',
+                            valid_until: 'Valid Until',
+                            is_active: 'Status',
+                            attachment: 'Attachment'
                         };
 
                         Object.keys(error.response.data.errors).forEach(field => {
@@ -472,20 +472,20 @@
                             errorSummary +=
                                 `<li><strong>${fieldNames[field] || field}:</strong> ${error.response.data.errors[field].join(', ')}</li>`;
                         });
-                        errorSummary += '</ul>';
+                        errorSummary += '</ol>';
 
                         Swal.fire({
                             icon: 'error',
-                            title: 'এরর',
+                            title: 'Error Occurred',
                             html: errorSummary
                         });
                         return; // Stop further processing
                     }
                 } else if (error.response.status >= 500) {
-                    errorMessage = 'সার্ভারে সমস্যা। দয়া করে পরে আবার চেষ্টা করুন।';
+                    errorMessage = 'Server Error. Please try again later.';
                 }
             } else if (error.request) {
-                errorMessage = 'নেটওয়ার্ক সমস্যা। দয়া করে ইন্টারনেট সংযোগ চেক করুন।';
+                errorMessage = 'Network Error. Please check your internet connection.';
             }
             Swal.fire('Error', errorMessage, 'error');
         } finally {
