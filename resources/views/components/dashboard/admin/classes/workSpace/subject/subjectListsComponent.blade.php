@@ -1,521 +1,260 @@
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs4.min.css" rel="stylesheet">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject and Papers List</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.min.css">
+{{-- <style>
+    body {
+        background-color: #f4f6f9;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .container-fluid {
+        padding: 20px;
+    }
+    .card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        background: #fff;
+    }
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+    }
+    .card-header {
+        background: linear-gradient(135deg, #0062ff, #00c6ff);
+        color: #fff;
+        font-weight: 600;
+        font-size: 1.2rem;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        letter-spacing: 0.5px;
+    }
+    .divider {
+        border-top: 3px solid #0062ff;
+        margin: 20px 0;
+        border-radius: 2px;
+    }
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0 6px;
+    }
+    .table thead th {
+        background-color: #f1f3f6;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        padding: 14px 12px;
+        border: none;
+        letter-spacing: 0.3px;
+        color: #495057;
+    }
+    .table tbody tr {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .table tbody td {
+        padding: 14px 12px;
+        vertical-align: middle;
+        border-top: none;
+        font-size: 0.95rem;
+        color: #333;
+    }
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #fafbfc;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #eef7ff !important;
+        transform: scale(1.01);
+        transition: 0.2s;
+    }
+    .badge {
+        padding: 6px 14px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        border-radius: 30px;
+    }
+    .badge.bg-primary {
+        background-color: #0069d9 !important;
+    }
+    .badge.bg-warning {
+        background-color: #ffb700 !important;
+        color: #212529 !important;
+    }
+    .badge.bg-success {
+        background-color: #28a745 !important;
+    }
+    .badge.bg-danger {
+        background-color: #dc3545 !important;
+    }
+</style> --}}
 
-<div class="container-fluid">
-
-    <!-- Class Workspace Heading -->
+</head>
+<body>
+<div class="container-fluid mt-4">
+    <!-- Heading -->
     <div class="mb-4">
-        <input type="text" class="workPaceClassId" readonly hidden>
-        <h3 class="text-primary" style="text-transform: uppercase">
-            Subject Of Class <span class="text-danger">{{ $classId->name }}</span>
+        <h3 class="text-primary text-uppercase">
+            Subject of Class <span class="text-danger">{{ $classId->name }}</span>
+            <input type="text" name="class_id" value="{{ $classId->id }}" class="admin_subject_list_view_class_id" readonly hidden>
         </h3>
-        <hr class="mb-4">
+        <hr>
     </div>
 
-
-
-    <!-- List subjects -->
+    <!-- Card with Table -->
     <div class="card shadow-sm">
-        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
-            <span>Subject lists</span>
-            <i class="fas fa-list"></i>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-list mr-2"></i> Subjects and Papers List</span>
         </div>
-        <div class="card-body table-responsive">
-            <table id="subjectsTable" class="table table-bordered table-hover align-middle">
-                <thead class="thead-light">
-                    <tr>
-                        <th>#</th>
-                        <th>Title</th>
-                        <th>Category</th>
-                        <th>Priority</th>
-                        <th>Audience</th>
-                        <th>Valid Until</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="subjectsTableBody">
-                    <!-- Axios data load হবে -->
-                </tbody>
-            </table>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="subjectsPapersTable" class="table table-striped table-bordered table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">Sl No</th>
+                            <th scope="col">Subject Name</th>
+                            <th scope="col">Code</th>
+                            <th scope="col">Type</th>
+                            {{-- <th scope="col">Status</th> --}}
+                            <th scope="col">Paper Name</th>
+                            <th scope="col">Paper Code</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subjectsPapersTableBody">
+                        <!-- Data will load dynamically -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <script>
+        let token = localStorage.getItem('token');
+        let classId = document.querySelector('.admin_subject_list_view_class_id').value;
 
-</div>
-
-<style>
-    .hover-shadow:hover {
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-        transition: 0.3s;
-    }
-</style>
-
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
-<script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs4.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
-{{-- <script>
-    $(document).ready(function() {
-        $('#summernote').summernote({
-            placeholder: 'Write announcement details here...',
-            tabsize: 2,
-            height: 150
-        });
-        //image pdf and docs preview
-        document.getElementById("attachmentInput").addEventListener("change", function(e) {
-            let file = e.target.files[0];
-            let preview = document.getElementById("attachmentPreview");
-            preview.innerHTML = "";
-
-            if (file) {
-                let fileType = file.type;
-
-                if (fileType.startsWith("image/")) {
-                    let reader = new FileReader();
-                    reader.onload = function(e) {
-                        preview.innerHTML =
-                            `<img src="${e.target.result}" class="img-fluid rounded" style="max-height:150px;">`;
-                    }
-                    reader.readAsDataURL(file);
-                } else if (fileType === "application/pdf") {
-                    preview.innerHTML =
-                        `<i class="fas fa-file-pdf text-danger fa-2x"></i> ${file.name}`;
-                } else if (fileType.includes("word") || fileType.includes("doc")) {
-                    preview.innerHTML =
-                        `<i class="fas fa-file-word text-primary fa-2x"></i> ${file.name}`;
-                } else {
-                    preview.innerHTML = `<i class="fas fa-file text-muted fa-2x"></i> ${file.name}`;
-                }
-            }
-        });
-    });
-
-    let token = localStorage.getItem('token');
-    let classId = {{ $classId->id }};
-    document.querySelector('.workPaceClassId').value = classId;
-
-
-
-    //load loadsubjects 
-    loadsubjects();
-    async function loadsubjects() {
-        try {
-            let res = await axios.post('/announcement/lists-by-class', {
-                class_id: classId
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
-            if (res.data.status === 'success') {
-                let announcementLists = res.data.data;
-
-                // DataTable destroy
-                if ($.fn.DataTable.isDataTable('#subjectsTable')) {
-                    $('#subjectsTable').DataTable().clear().destroy();
-                }
-
-                //  data insert
-                let rows = "";
-
-                if (announcementLists.length > 0) {
-                    function getShortDescription(html, maxLength = 50) {
-                        if (!html) return '';
-                        const div = document.createElement('div');
-                        div.innerHTML = html; // Summernote content
-                        const text = div.textContent || div.innerText || '';
-
-                        // truncate only if long
-                        return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-                    }
-
-                    // inside forEach:
-                    announcementLists.forEach((item, index) => {
-                        let description = getShortDescription(item.description, 50); // 50 characters max
-
-                        rows += `
-                        <tr>
-                            <td>${index+1}</td>
-                            <td>
-                                <strong>${item.title}</strong><br>
-                                <small class="text-muted">${description}</small>
-                            </td>
-                            <td><span class="badge badge-info">${item.category}</span></td>
-                            <td>
-                                <span class="badge badge-${item.priority === 'High' ? 'danger' : (item.priority === 'Medium' ? 'warning' : 'secondary')}">
-                                    ${item.priority}
-                                </span>
-                            </td>
-                            <td>${item.audience}</td>
-                            <td>${item.valid_until ?? '-'}</td>
-                            <td>
-                                <span class="badge badge-${item.is_active ? 'success' : 'danger'}">
-                                    ${item.is_active ? 'Active' : 'Inactive'}
-                                </span>
-                            </td>
-                            <td>
-                                <button class="btn btn-sm btn-info viewAnnouncement"  data-id="${item.id}"><i class="fas fa-eye"></i></button>
-                                <button class="btn btn-sm btn-warning editAnnouncement" data-id="${item.id}"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-sm btn-danger trashAnnouncement" data-id="${item.id}"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>`;
-                  });
-
-                }
-
-                document.querySelector("#subjectsTableBody").innerHTML = rows;
-
-                // DataTable initialize
-                $('#subjectsTable').DataTable({
-                    pageLength: 5,
-                    lengthMenu: [5, 10, 20, 50],
-                    responsive: true,
-                    autoWidth: false
-                });
-
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Failed',
-                    text: res.data.message || "Failed to fetch subjects!"
-                });
-            }
-
-            //trash announchment
-            $(document).on('click', '.trashAnnouncement', async function(e) {
-                e.preventDefault();
-                const id = $(this).data('id');
-
-                const result = await Swal.fire({
-                    title: 'Are you sure?',
-                    text: "This announcement will be trash!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Yes, trash it!'
-                });
-
-                if (result.isConfirmed) {
-                    try {
-                        let res = await axios.post('/announcement/trash', {
-                            id: id
-                        }, {
-                            headers: {
-                                Authorization: `Bearer ${token}`
-                            }
-                        });
-
-                        if (res.data.status === 'success') {
-                            Swal.fire(
-                                'Deleted!',
-                                res.data.message,
-                                'success'
-                            );
-                            await loadsubjects(); // Refresh table
-                            await loadTrashedsubjects(); // Refresh trashed table
-                        } else {
-                            Swal.fire(
-                                'Failed!',
-                                res.data.message || 'Could not delete.',
-                                'error'
-                            );
-                        }
-
-                    } catch (err) {
-                        console.error("🚨 Trash Error:", err);
-                        Swal.fire(
-                            'Error!',
-                            'Server error. Check console.',
-                            'error'
-                        );
-                    }
-                }
-            });
-
-
-            //view announchment
-            $(document).on('click', '.viewAnnouncement', async function(e) {
-                e.preventDefault();
-                const id = $(this).data('id');
-                await announcementViewModal(id);
-                $('#announcementViewModal').modal('show');
-                //console.log('Announcement ID:', id);
-            });
-
-            //edit announchment
-            $(document).on('click', '.editAnnouncement', async function(e) {
-                e.preventDefault();
-                const id = $(this).data('id');
-                await announcementEditDetails(id);
-                $('#announcementEditModal').modal('show');
-                //console.log('Announcement ID:', id);
-            });
-
-
-
-
-        } catch (error) {
-            console.error("🚨 Error fetching subjects:", error);
-
-            Swal.fire({
-                icon: 'error',
-                title: 'Server Error',
-                text: 'Could not load subjects. Check console for details.'
-            });
-        }
-    }
-
-
-    //Announchment Create 
-    async function createAnnouncement(event) {
-        event.preventDefault();
-
-        let token = localStorage.getItem("token");
-        if (!token) {
+        if (!token || !classId) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Unauthorized',
-                text: 'Please login first!'
+                text: 'Please login first.',
+                confirmButtonText: 'Go to Login'
+            }).then(() => {
+                window.location.href = '/admin/login';
             });
-            window.location.href = "/admin/login";
-            return;
+            //return;
         }
 
-        let form = event.target;
-        let formData = new FormData(form);
-        formData.append("class_id", classId);
-        let prevAttachmentHtml = document.querySelector("#attachmentPreview").innerHTML;
-        try {
-            let res = await axios.post('/announcement/store', formData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "multipart/form-data"
-                }
+        // Initialize DataTable
+        $(document).ready(function() {
+            $('#subjectsPapersTable').DataTable({
+                pageLength: 5,
+                lengthMenu: [5, 10, 20, 50],
+                responsive: true,
+                autoWidth: false,
+                ordering: true,
+                searching: true
             });
 
-            if (res.data.status === 'success') {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: res.data.message,
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-
-                form.reset();
-                $('#summernote').summernote('reset');
-            // restore attachment preview
-            document.querySelector("#attachmentPreview").innerHTML = prevAttachmentHtml;
-                loadsubjects();
-            }
-
-        } catch (error) {
-            // 🔹 Emergency / Server error -> শুধু console এ log হবে
-            console.error("🚨 Server Error:", error);
-
-            if (error.response) {
-                if (error.response.status === 422) {
-                    // 🔹 Validation error
-                    let errors = error.response.data.errors;
-                    let errorHtml = "<ul>";
-                    Object.keys(errors).forEach(key => {
-                        errorHtml += `<li>${errors[key][0]}</li>`;
-                    });
-                    errorHtml += "</ul>";
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Validation Error',
-                        html: errorHtml
-                    });
-                } else {
-                    // 🔹 Server / Other error
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Server Error',
-                        text: "Something went wrong! Please check console."
-                    });
-                }
-            } else {
-                // 🔹 Axios বা Network Error
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Network Error',
-                    text: 'Please check your internet connection.'
-                });
-            }
-        }
-    }
-
-
-
-
-    // Load Trashed subjects
-    loadTrashedsubjects();
-    async function loadTrashedsubjects() {
-        try {
-            let res = await axios.post('/announcement/trashed-lists', {
-                class_id: classId
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
-            if (res.data.status === 'success') {
-                let list = res.data.data;
-
-                // DataTable instance চেক
-                if ($.fn.DataTable.isDataTable('#trashedsubjectsTable')) {
-                    let table = $('#trashedsubjectsTable').DataTable();
-                    table.clear();
-
-
-                    if (list.length > 0) {
-                        list.forEach((item, index) => {
-                            table.row.add([
-                                index + 1,
-                                `<strong>${item.title}</strong>`,
-                                item.category,
-                                item.priority,
-                                item.audience,
-                                item.deleted_at,
-                                `
-                                    <button class="btn btn-sm btn-success restoreAnnouncement" data-id="${item.id}">
-                                        <i class="fas fa-undo"></i> Restore
-                                    </button>
-                                    <button class="btn btn-sm btn-danger permDeleteAnnouncement" data-id="${item.id}">
-                                        <i class="fas fa-trash-alt"></i> Delete Permanently
-                                    </button>
-                                `
-                            ]);
-                        });
-                    }
-
-                    table.draw();
-                } else {
-
-                    let rows = "";
-                    if (list.length > 0) {
-                        list.forEach((item, index) => {
-                            rows += `
-                                <tr>
-                                    <td>${index+1}</td>
-                                    <td><strong>${item.title}</strong></td>
-                                    <td>${item.category}</td>
-                                    <td>${item.priority}</td>
-                                    <td>${item.audience}</td>
-                                    <td>${item.deleted_at}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-success restoreAnnouncement" data-id="${item.id}">
-                                            <i class="fas fa-undo"></i> Restore
-                                        </button>
-                                        <button class="btn btn-sm btn-danger permDeleteAnnouncement" data-id="${item.id}">
-                                            <i class="fas fa-trash-alt"></i> Delete Permanently
-                                        </button>
-                                    </td>
-                                </tr>
-                            `;
-                        });
-                    }
-
-                    document.querySelector("#trashedsubjectsTableBody").innerHTML = rows;
-
-                    $('#trashedsubjectsTable').DataTable({
-                        pageLength: 5,
-                        lengthMenu: [5, 10, 20, 50],
-                        responsive: true,
-                        autoWidth: false
-                    });
-                }
-            }
-        } catch (err) {
-            console.error("🚨 Error fetching trashed subjects:", err);
-            Swal.fire('Error', 'Could not load trashed subjects.', 'error');
-        }
-    }
-
-
-    // Restore Announcement
-    $(document).on('click', '.restoreAnnouncement', async function() {
-        const id = $(this).data('id');
-        const {
-            isConfirmed
-        } = await Swal.fire({
-            title: 'Restore Announcement?',
-            text: "This announcement will be restored.",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#28a745',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Yes, Restore'
+            loadSubjectDetailsByClass(classId);
         });
 
-        if (!isConfirmed) return;
+        // Function to load subject details
+        async function loadSubjectDetailsByClass(classId) {
+            try {
+                const response = await axios.post('/subject/get-subject-details', {
+                    class_id: classId
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
 
-        try {
-            let res = await axios.post('/announcement/restore', {
-                id
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`
+                if (response.data.status === 'success') {
+                    displaySubjectsAndPapers(response.data.data);
+                } else {
+                    displayError('No data found for this class');
                 }
-            });
-            if (res.data.status === 'success') {
-                Swal.fire('Restored!', res.data.message, 'success');
-                loadTrashedsubjects();
-                loadsubjects(); // Optional: refresh main list
-            } else {
-                Swal.fire('Failed!', res.data.message || 'Could not restore.', 'error');
+            } catch (error) {
+                console.error('Error fetching subject details:', error);
+                displayError('Failed to load subject details: ' + (error.response?.data?.message || error.message));
             }
-        } catch (err) {
-            console.error(err);
-            Swal.fire('Error!', 'Server error. Check console.', 'error');
         }
-    });
 
-    // Permanent Delete
-    $(document).on('click', '.permDeleteAnnouncement', async function() {
-        const id = $(this).data('id');
-        const {
-            isConfirmed
-        } = await Swal.fire({
-            title: 'Delete Permanently?',
-            text: "This cannot be undone!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Yes, Delete Permanently'
-        });
+        // Function to display subjects and papers in a single table with rowspan
+        function displaySubjectsAndPapers(subjects) {
+            const tbody = document.getElementById('subjectsPapersTableBody');
+            tbody.innerHTML = ''; // Clear existing content
 
-        if (!isConfirmed) return;
-
-        try {
-            let res = await axios.post('/announcement/delete-permanent', {
-                id
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            if (res.data.status === 'success') {
-                Swal.fire('Deleted!', res.data.message, 'success');
-                loadTrashedsubjects();
-            } else {
-                Swal.fire('Failed!', res.data.message || 'Could not delete.', 'error');
+            if (subjects.length === 0) {
+                displayError('No subjects found.');
+                return;
             }
-        } catch (err) {
-            console.error(err);
-            Swal.fire('Error!', 'Server error. Check console.', 'error');
+
+            let serialNo = 1;
+            subjects.forEach(subject => {
+                const papers = subject.papers && subject.papers.length > 0 ? subject.papers : [{ name: '-', code: '-' }];
+                const rowspan = papers.length;
+
+                papers.forEach((paper, index) => {
+                    const row = document.createElement('tr');
+                    if (index === 0) {
+                        // First row for the subject, include subject details with rowspan
+                        row.innerHTML = `
+                            <td rowspan="${rowspan}">${serialNo}</td>
+                            <td rowspan="${rowspan}">${subject.name}</td>
+                            <td rowspan="${rowspan}">${subject.code || '-'}</td>
+                            <td rowspan="${rowspan}">
+                                <span class="badge ${subject.type === 'compulsory' ? 'bg-primary' : 'bg-warning'}">
+                                    ${subject.type.charAt(0).toUpperCase() + subject.type.slice(1)}
+                                </span>
+                            </td>
+                 
+                            <td>${paper.name}</td>
+                            <td>${paper.code || '-'}</td>
+                        `;
+                    } else {
+                        // Subsequent rows for additional papers
+                        row.innerHTML = `
+                            <td>${paper.name}</td>
+                            <td>${paper.code || '-'}</td>
+                        `;
+                    }
+                    tbody.appendChild(row);
+                });
+                serialNo++;
+            });
         }
-    });
-</script> --}}
+
+        // Function to display error messages with colspan
+        function displayError(message) {
+            const tbody = document.getElementById('subjectsPapersTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center text-danger">${message}</td>
+                </tr>
+            `;
+        }
+    </script>
+</body>
+</html>
