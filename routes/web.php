@@ -248,7 +248,8 @@ Route::middleware(['auth:sanctum', 'editor'])->group(function () {
 //admin and editor same route
  Route::get('/class/work/space/{id}', [AdminDashboard::class, 'classWorkSpacePage']);
  Route::get('/announchment/{id}', [AdminDashboard::class, 'classAnnouncementPage']);
- Route::get('//subjects/{id}', [AdminDashboard::class, 'classSbujectListsPage']);
+ Route::get('/subjects/{id}', [AdminDashboard::class, 'classSbujectListsPage']);
+ Route::get('/teachers/{id}', [AdminDashboard::class, 'classTeacherManagePage']);
 Route::middleware(['auth:sanctum', 'editor_or_admin'])->group(function () {
 
     //editor cv

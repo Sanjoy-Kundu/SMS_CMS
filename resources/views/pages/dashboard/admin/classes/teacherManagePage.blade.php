@@ -1,0 +1,10 @@
+@extends('layouts.dashboard')
+@section('title', 'Teacher Manage')
+@section('content')
+    @include('components.dashboard.admin.sidebarComponent')
+    @include('components.dashboard.admin.navComponent')
+    @include('components.dashboard.admin.classes.workSpace.teacherManagement.teacherManagementComponent')
+    @include('components.dashboard.admin.classes.workSpace.teacherManagement.modal.createTeacherManagementComponent')
+    @include('components.dashboard.admin.classes.workSpace.announcement.modal.announcementEditModalComponent')
+    @include('components.dashboard.admin.footerComponent')
+@endsection

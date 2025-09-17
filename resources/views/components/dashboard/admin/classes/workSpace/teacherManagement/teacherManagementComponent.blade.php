@@ -1,25 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subject and Papers List</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome for Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.min.css">
-
-
-</head>
-<body>
 <div class="container-fluid mt-4">
     <!-- Heading -->
     <div class="mb-4">
         <h3 class="text-primary text-uppercase">
-            Subject of Class <span class="text-danger">{{ $classId->name }}</span>
-            <input type="text" name="class_id" value="{{ $classId->id }}" class="admin_subject_list_view_class_id" readonly hidden>
+            Teacher of Class <span class="text-danger">{{ $classId->name }}</span>
+            <input type="text" name="class_id" value="{{ $classId->id }}" class="admin_teacher_list_view_class_id"
+                readonly hidden>
         </h3>
         <hr>
     </div>
@@ -27,29 +12,34 @@
     <!-- Card with Table -->
     <div class="card shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <span><i class="fas fa-list mr-2"></i> Subjects and Papers List</span>
+            <span><i class="fas fa-list me-2"></i> Subject Teacher Lists</span>
+            <!-- Add Class By Teacher Button -->
+            <button class="btn btn-sm btn-primary addTeacherByClassBtn" data-id="{{ $classId->id }}">
+                <i class="fas fa-plus me-1"></i> Add Teacher By Class
+            </button>
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table id="subjectsPapersTable" class="table table-striped table-bordered table-hover">
-                    <thead class="thead-light">
+                <table id="subjectsTeachersTable" class="table table-hover align-middle">
+                    <thead class="table-light">
                         <tr>
                             <th scope="col">Sl No</th>
+                            <th scope="col">Teacher Name</th>
                             <th scope="col">Subject Name</th>
                             <th scope="col">Code</th>
-                            {{-- <th scope="col">Status</th> --}}
                             <th scope="col">Paper Name</th>
                             <th scope="col">Paper Code</th>
                             <th scope="col">Type</th>
                         </tr>
                     </thead>
-                    <tbody id="subjectsPapersTableBody">
+                    <tbody id="subjectsTeachersTableBody">
                         <!-- Data will load dynamically -->
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
 
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
@@ -59,9 +49,9 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script>
+    {{-- <script>
         let token = localStorage.getItem('token');
-        let classId = document.querySelector('.admin_subject_list_view_class_id').value;
+        let classId = document.querySelector('.admin_teacher_list_view_class_id').value;
 
         if (!token || !classId) {
             Swal.fire({
@@ -77,7 +67,7 @@
 
         // Initialize DataTable
         $(document).ready(function() {
-            $('#subjectsPapersTable').DataTable({
+            $('#subjectsTeachersTable').DataTable({
                 pageLength: 5,
                 lengthMenu: [5, 10, 20, 50],
                 responsive: true,
@@ -101,7 +91,7 @@
                 });
 
                 if (response.data.status === 'success') {
-                    displaySubjectsAndPapers(response.data.data);
+                    displaySubjectsAndTeachers(response.data.data);
                 } else {
                     displayError('No data found for this class');
                 }
@@ -111,9 +101,9 @@
             }
         }
 
-        // Function to display subjects and papers in a single table with rowspan
-        function displaySubjectsAndPapers(subjects) {
-            const tbody = document.getElementById('subjectsPapersTableBody');
+        // Function to display subjects and Teachers in a single table with rowspan
+        function displaySubjectsAndTeachers(subjects) {
+            const tbody = document.getElementById('subjectsTeachersTableBody');
             tbody.innerHTML = ''; // Clear existing content
 
             if (subjects.length === 0) {
@@ -123,10 +113,10 @@
 
             let serialNo = 1;
             subjects.forEach(subject => {
-                const papers = subject.papers && subject.papers.length > 0 ? subject.papers : [{ name: '-', code: '-' }];
-                const rowspan = papers.length;
+                const Teachers = subject.Teachers && subject.Teachers.length > 0 ? subject.Teachers : [{ name: '-', code: '-' }];
+                const rowspan = Teachers.length;
 
-                papers.forEach((paper, index) => {
+                Teachers.forEach((paper, index) => {
                     const row = document.createElement('tr');
                     if (index === 0) {
                         // First row for the subject, include subject details with rowspan
@@ -143,7 +133,7 @@
                             </td>
                         `;
                     } else {
-                        // Subsequent rows for additional papers
+                        // Subsequent rows for additional Teachers
                         row.innerHTML = `
                             <td>${paper.name}</td>
                             <td>${paper.code || '-'}</td>
@@ -157,13 +147,23 @@
 
         // Function to display error messages with colspan
         function displayError(message) {
-            const tbody = document.getElementById('subjectsPapersTableBody');
+            const tbody = document.getElementById('subjectsTeachersTableBody');
             tbody.innerHTML = `
                 <tr>
                     <td colspan="7" class="text-center text-danger">${message}</td>
                 </tr>
             `;
         }
+    </script> --}}
+
+    <script>
+        $('.addTeacherByClassBtn').on('click', function (event) {
+            event.preventDefault();
+            let id = $(this).data('id');
+            fillUpClassBySubjectWithTeacher(id);
+            $('#addTeacherByClassModal').modal('show');
+            //console.log('class id is',id);
+        })
     </script>
-</body>
-</html>
+
+ 

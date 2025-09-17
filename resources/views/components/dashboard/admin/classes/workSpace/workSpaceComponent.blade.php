@@ -26,10 +26,10 @@
                             </p>
                         </div>
                     </div>
-                    <a href="/class/{{ $classId->id }}/professionals" 
-                    class="btn btn-primary btn-sm mt-3 w-100">
-                    Manage
-                    </a>
+                    <button
+                    class="btn btn-primary btn-sm mt-3 w-100 classWiseTeacherBtn" data-id="{{ $classId->id }}">
+                    Manage Teachers
+                </button>
                 </div>
             </div>
         </div>
@@ -222,6 +222,14 @@
         event.preventDefault();
         let id = $(this).data('id');
         window.location.href = `/subjects/${id}`;
+        //console.log('class id is',id);
+    })
+
+    //manage announchment class
+    $('.classWiseTeacherBtn').on('click', async function(event){
+        event.preventDefault();
+        let id = $(this).data('id');
+        window.location.href = `/teachers/${id}`;
         //console.log('class id is',id);
     })
 </script>
