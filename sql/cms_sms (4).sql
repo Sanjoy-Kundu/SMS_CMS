@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Aug 25, 2025 at 12:20 AM
+-- Generation Time: Sep 18, 2025 at 06:21 PM
 -- Server version: 9.1.0
 -- PHP Version: 8.3.16
 
@@ -78,6 +78,45 @@ INSERT INTO `admins` (`id`, `user_id`, `phone`, `address`, `image`, `birth_date`
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `announcements`
+--
+
+CREATE TABLE `announcements` (
+  `id` bigint UNSIGNED NOT NULL,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `class_id` bigint UNSIGNED NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `priority` enum('High','Medium','Low') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Medium',
+  `attachment` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `link` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `audience` enum('Students','Teachers','All') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Students',
+  `category` enum('Exam','Event','Homework','General') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'General',
+  `recurring` enum('None','Daily','Weekly','Monthly') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'None',
+  `read_count` int NOT NULL DEFAULT '0',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `valid_until` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `announcements`
+--
+
+INSERT INTO `announcements` (`id`, `user_id`, `class_id`, `title`, `description`, `priority`, `attachment`, `link`, `audience`, `category`, `recurring`, `read_count`, `is_active`, `valid_until`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 1, 'Mathematics Exam Notice', '<p>গণিত পরীক্ষা আগামী <b>15 সেপ্টেম্বর </b>অনুষ্ঠিত হবে।&nbsp;<span style=\"font-size: 1rem;\">পরীক্ষার সময় সকাল <b>10টা থেকে দুপুর 1টা</b> পর্যন্ত।&nbsp;</span><span style=\"font-size: 1rem;\">সবাইকে প্রস্তুত থাকতে বলা হলো।</span></p>', 'High', NULL, NULL, 'All', 'Exam', 'None', 0, 1, '2025-10-08 18:00:00', '2025-09-05 06:20:13', '2025-09-17 10:45:46', NULL),
+(2, 1, 1, 'Science Project Submission', '<p>সকল শিক্ষার্থীকে আগামী 20 সেপ্টেম্বরের মধ্যে বিজ্ঞান প্রজেক্ট জমা দিতে হবে।</p>', 'High', NULL, NULL, 'Students', 'Homework', 'None', 0, 1, '2025-09-19 18:00:00', '2025-09-05 06:23:11', '2025-09-05 06:23:11', NULL),
+(3, 1, 1, 'Parent-Teacher Meeting', '<p>অভিভাবক-শিক্ষক সভা অনুষ্ঠিত হবে <b>25 সেপ্টেম্বর</b> বিকেল 4টায়।</p>', 'High', NULL, 'https://classroom.google.com', 'All', 'Event', 'None', 0, 1, '2025-09-24 18:00:00', '2025-09-05 06:25:17', '2025-09-05 06:25:17', NULL),
+(4, 1, 2, 'Library Book Submission', '<p>শিক্ষার্থীদের আগামী <b>10 সেপ্টেম্বরের </b>মধ্যে লাইব্রেরি বই ফেরত দিতে হবে।</p>', 'High', NULL, NULL, 'Students', 'General', 'None', 0, 1, '2025-09-09 18:00:00', '2025-09-05 06:28:00', '2025-09-05 06:28:00', NULL),
+(5, 1, 2, 'Sports Day Announcement', '<p>School Sports Day অনুষ্ঠিত হবে <b>5 অক্টোবর</b>। শিক্ষার্থীরা খেলার জন্য নাম রেজিস্ট্রেশন করবে।</p><p><br></p>', 'High', NULL, NULL, 'Students', 'Event', 'None', 0, 1, '2025-10-04 18:00:00', '2025-09-05 06:29:41', '2025-09-05 06:29:41', NULL),
+(6, 1, 2, 'Computer Lab Schedule', '<p>শিক্ষার্থীদের জন্য প্রতি <b>বুধবার বিকেলে</b> কম্পিউটার ল্যাব খোলা থাকবে।</p>', 'Medium', NULL, NULL, 'Students', 'General', 'Weekly', 0, 1, NULL, '2025-09-05 06:46:01', '2025-09-05 06:46:01', NULL),
+(8, 1, 1, 'dfasvfdafa', '<p>dfdf dfas dfa</p>', 'Medium', 'uploads/attachments/1758217522_90785921-9c7a-47e1-aca3-5f1fea73e69a.jpg', NULL, 'Students', 'General', 'None', 0, 1, '2025-12-11 18:00:00', '2025-09-18 11:45:22', '2025-09-18 11:45:22', NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `class_models`
 --
 
@@ -100,7 +139,35 @@ INSERT INTO `class_models` (`id`, `academic_section_id`, `admin_id`, `name`, `de
 (2, 1, 1, 'Seven', NULL, '2025-08-18 06:03:11', '2025-08-18 06:03:11'),
 (3, 1, 1, 'Eight', NULL, '2025-08-18 06:03:18', '2025-08-18 06:03:18'),
 (4, 1, 1, 'Nine', NULL, '2025-08-18 06:03:31', '2025-08-18 06:03:31'),
-(5, 1, 1, 'Ten', NULL, '2025-08-18 06:03:44', '2025-08-18 06:03:44');
+(5, 1, 1, 'Ten', NULL, '2025-08-18 06:03:44', '2025-08-18 06:03:44'),
+(6, 1, 1, 'Eleven', NULL, '2025-08-29 00:19:03', '2025-08-29 00:19:03');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `designations`
+--
+
+CREATE TABLE `designations` (
+  `id` bigint UNSIGNED NOT NULL,
+  `institution_id` bigint UNSIGNED NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `designations`
+--
+
+INSERT INTO `designations` (`id`, `institution_id`, `title`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 1, 'Headmaster', '2025-08-26 05:32:45', '2025-08-26 06:54:52', NULL),
+(2, 1, 'Assistant Headmaster', '2025-08-26 05:49:29', '2025-08-26 06:24:46', NULL),
+(3, 1, 'Assistant Teacher', '2025-08-26 05:57:00', '2025-08-26 07:04:44', NULL),
+(6, 1, 'Senior Teacher', '2025-09-05 07:23:02', '2025-09-05 07:23:02', NULL),
+(7, 1, 'Subject Teacher', '2025-09-05 07:23:26', '2025-09-05 07:23:26', NULL),
+(8, 1, 'Physical Education Teacher / Sports Teacher', '2025-09-05 07:23:39', '2025-09-05 07:23:39', NULL);
 
 -- --------------------------------------------------------
 
@@ -194,7 +261,7 @@ CREATE TABLE `editor_addresses` (
 --
 
 INSERT INTO `editor_addresses` (`id`, `editor_id`, `type`, `village`, `district`, `upazila`, `post_office`, `postal_code`, `created_at`, `updated_at`) VALUES
-(1, 2, 'present', 'Charbaramodi', 'Madaripur', 'Madaripur Sadar', 'Madaripur Sadar', '7900', '2025-08-19 07:37:38', '2025-08-19 07:37:38'),
+(1, 2, 'present', 'Charbaramodi', 'Madaripur', 'Madaripur Sadar', 'Madaripur Sadar', '9900', '2025-08-19 07:37:38', '2025-09-18 11:56:25'),
 (2, 2, 'permanent', 'Kulpaddi', 'Madaripur', 'Madaripur Sadar', 'Kulpaddi', '7902', '2025-08-19 08:11:59', '2025-08-19 08:16:43'),
 (3, 7, 'present', 'Kulpaddi', 'Madaripur', 'Madaripur Sadar', 'Kulpaddi', '7902', '2025-08-21 08:27:44', '2025-08-21 08:27:44'),
 (4, 7, 'permanent', 'Kulpaddi', 'Madaripur', 'Madaripur Sadar', 'Madaripur Sadar', '7905', '2025-08-21 08:28:16', '2025-08-21 08:28:25'),
@@ -257,6 +324,44 @@ CREATE TABLE `failed_jobs` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `grading_scales`
+--
+
+CREATE TABLE `grading_scales` (
+  `id` bigint UNSIGNED NOT NULL,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `class_id` bigint UNSIGNED NOT NULL,
+  `grade` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `gpa` decimal(3,2) DEFAULT NULL,
+  `min_range` int DEFAULT NULL,
+  `max_range` int DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `grading_scales`
+--
+
+INSERT INTO `grading_scales` (`id`, `user_id`, `class_id`, `grade`, `gpa`, `min_range`, `max_range`, `created_at`, `updated_at`) VALUES
+(4, 1, 1, 'A+', 5.00, 80, 100, '2025-08-29 07:15:41', '2025-08-29 07:15:41'),
+(9, 1, 1, 'A', 4.00, 70, 79, '2025-08-29 07:21:28', '2025-08-29 11:24:30'),
+(10, 1, 1, 'A-', 3.50, 60, 69, '2025-08-29 07:51:06', '2025-08-29 07:51:06'),
+(11, 1, 1, 'B', 3.00, 50, 59, '2025-08-29 07:53:38', '2025-08-29 07:53:38'),
+(12, 1, 1, 'C', 2.00, 40, 49, '2025-08-29 07:54:12', '2025-08-29 07:54:12'),
+(13, 1, 1, 'D', 1.00, 33, 39, '2025-08-29 07:54:39', '2025-08-29 07:54:39'),
+(15, 1, 1, 'F', 0.00, 0, 32, '2025-08-29 10:05:20', '2025-08-29 10:05:20'),
+(16, 1, 2, 'A+', 5.00, 80, 100, '2025-08-29 11:26:12', '2025-08-29 11:26:12'),
+(17, 1, 2, 'A', 4.00, 70, 79, '2025-08-29 11:26:25', '2025-08-29 11:26:25'),
+(18, 1, 2, 'A-', 3.50, 60, 69, '2025-08-29 11:26:56', '2025-08-29 11:26:56'),
+(19, 1, 2, 'B', 3.00, 50, 59, '2025-08-29 11:27:37', '2025-08-29 11:27:37'),
+(20, 1, 2, 'C', 2.50, 40, 49, '2025-08-29 11:28:10', '2025-08-29 11:28:10'),
+(21, 1, 2, 'D', 2.00, 33, 39, '2025-08-29 11:28:32', '2025-08-29 11:28:32'),
+(22, 1, 2, 'F', 0.00, 0, 32, '2025-08-29 11:28:47', '2025-08-29 11:28:47');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `institutions`
 --
 
@@ -278,7 +383,7 @@ CREATE TABLE `institutions` (
 --
 
 INSERT INTO `institutions` (`id`, `admin_id`, `name`, `type`, `eiin`, `address`, `parent_id`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 1, 'AB High School', 'school', '1231', 'Madaripur-7902, Dhaka, Bangladesh', NULL, '2025-08-18 05:58:38', '2025-08-18 05:58:38', NULL);
+(1, 1, 'AB High School', 'school', '1231', 'Madaripur-7902, Dhaka, Bangladesh', NULL, '2025-08-18 05:58:38', '2025-09-18 11:31:21', NULL);
 
 -- --------------------------------------------------------
 
@@ -315,7 +420,11 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (19, '2025_08_20_001519_create_teachers_table', 13),
 (20, '2025_08_20_190319_add_soft_deletes_to_users_table', 14),
 (21, '2025_08_24_221939_create_teacher_educations_table', 15),
-(22, '2025_08_24_230939_create_teacher_addresses_table', 16);
+(22, '2025_08_24_230939_create_teacher_addresses_table', 16),
+(23, '2025_08_26_005533_create_designations_table', 17),
+(24, '2025_08_26_005851_add_designation_id_to_teachers_table', 18),
+(26, '2025_08_28_195028_create_grading_scales_table', 19),
+(27, '2025_08_29_174815_create_announcements_table', 20);
 
 -- --------------------------------------------------------
 
@@ -343,7 +452,11 @@ INSERT INTO `papers` (`id`, `subject_id`, `name`, `code`, `admin_id`, `is_active
 (1, 1, 'First Paper', '201', 1, 1, '2025-08-18 06:07:00', '2025-08-18 06:07:00', NULL),
 (2, 1, 'Second Paper', '202', 1, 1, '2025-08-18 06:07:18', '2025-08-18 06:07:18', NULL),
 (3, 2, 'First Paper', '301', 1, 1, '2025-08-18 06:07:31', '2025-08-18 06:07:31', NULL),
-(4, 2, 'Second Paper', '302', 1, 1, '2025-08-18 06:07:47', '2025-08-18 06:07:47', NULL);
+(4, 2, 'Second Paper', '302', 1, 1, '2025-08-18 06:07:47', '2025-08-18 06:07:47', NULL),
+(5, 9, 'First Paper', '960', 1, 1, '2025-09-17 13:26:39', '2025-09-17 13:26:39', NULL),
+(6, 9, 'Second Paper', '961', 1, 1, '2025-09-17 13:27:01', '2025-09-17 13:27:01', NULL),
+(7, 10, 'First Paper', '202', 1, 1, '2025-09-17 13:27:17', '2025-09-17 13:27:17', NULL),
+(8, 10, 'Second Paper', '205', 1, 1, '2025-09-17 13:27:29', '2025-09-17 13:27:29', NULL);
 
 -- --------------------------------------------------------
 
@@ -436,13 +549,39 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 (52, 'App\\Models\\User', 35, 'token', '84a7df0c3cc563cccfabe044c91368f75aef840c1b729c1e27716f209ce9b2a5', '[\"*\"]', '2025-08-24 17:04:49', NULL, '2025-08-24 15:30:26', '2025-08-24 17:04:49'),
 (53, 'App\\Models\\User', 2, 'token', 'e9de3b76c4e1f8d5c94f7e045e13b9e4fff5bb07e7aaefa0e58bbfc89213464c', '[\"*\"]', '2025-08-24 17:40:23', NULL, '2025-08-24 15:41:07', '2025-08-24 17:40:23'),
 (54, 'App\\Models\\User', 35, 'token', '8d6dd8f3b4e690eaa950736f0d70213d05ae263d99e7432f6ee06b0839bc3b15', '[\"*\"]', '2025-08-24 18:09:41', NULL, '2025-08-24 17:05:25', '2025-08-24 18:09:41'),
-(56, 'App\\Models\\User', 2, 'token', 'cf9375044de88d2a422b16a6eeda47fbe9e91fb8dc352254950ed7bc0ca67ab6', '[\"*\"]', '2025-08-24 17:41:28', NULL, '2025-08-24 17:41:15', '2025-08-24 17:41:28'),
+(56, 'App\\Models\\User', 2, 'token', 'cf9375044de88d2a422b16a6eeda47fbe9e91fb8dc352254950ed7bc0ca67ab6', '[\"*\"]', '2025-08-25 04:15:29', NULL, '2025-08-24 17:41:15', '2025-08-25 04:15:29'),
 (57, 'App\\Models\\User', 35, 'token', 'f242a73aeb4d9309b4caa89385feb0ac9dbfd0dd27a9f285d2667291739ff1a9', '[\"*\"]', '2025-08-24 18:10:37', NULL, '2025-08-24 18:10:02', '2025-08-24 18:10:37'),
 (58, 'App\\Models\\User', 35, 'token', '8f0d72a3feafbdf7988dc3e7b72bdf174ca7cad982d2d18e7b85e2eff39405c6', '[\"*\"]', '2025-08-24 18:11:32', NULL, '2025-08-24 18:10:47', '2025-08-24 18:11:32'),
 (59, 'App\\Models\\User', 35, 'token', '0bb8de8df27566a0093147a9c794c9553df526ccc839817bab7f7af0a723a91a', '[\"*\"]', '2025-08-24 18:11:44', NULL, '2025-08-24 18:11:41', '2025-08-24 18:11:44'),
 (60, 'App\\Models\\User', 35, 'token', '7eff7e7a0444336bee7b7db8687f064779e8315e8d70d2539407784567492676', '[\"*\"]', '2025-08-24 18:17:02', NULL, '2025-08-24 18:12:10', '2025-08-24 18:17:02'),
 (61, 'App\\Models\\User', 35, 'token', '441f3d3e2ae2ba9654f117f15b24f0ef35a436060071c3debefebb316a73939a', '[\"*\"]', '2025-08-24 18:17:52', NULL, '2025-08-24 18:17:51', '2025-08-24 18:17:52'),
-(62, 'App\\Models\\User', 35, 'token', '230211cb0e47073b5db27c3b447e987e02250dceadc75ccb13052d2d60652627', '[\"*\"]', '2025-08-24 18:19:51', NULL, '2025-08-24 18:18:13', '2025-08-24 18:19:51');
+(62, 'App\\Models\\User', 35, 'token', '230211cb0e47073b5db27c3b447e987e02250dceadc75ccb13052d2d60652627', '[\"*\"]', '2025-08-24 18:19:51', NULL, '2025-08-24 18:18:13', '2025-08-24 18:19:51'),
+(63, 'App\\Models\\User', 1, 'token', '2b006fcf02fedde80027e65ed31a5c1e3c3b36344185bcd90fc1f7d4442fba62', '[\"*\"]', '2025-08-25 04:30:30', NULL, '2025-08-25 04:15:46', '2025-08-25 04:30:30'),
+(64, 'App\\Models\\User', 1, 'token', 'f7bf030ec290a8e9dab468446e3d0448501c15a408fbf18fbf2ec7eb4e6536a9', '[\"*\"]', '2025-08-25 04:56:37', NULL, '2025-08-25 04:42:07', '2025-08-25 04:56:37'),
+(69, 'App\\Models\\User', 3, 'token', 'a3c078c7a4255b8366951b4cb25e81eab01f57e74caa57856da23f7b4d1c4f8c', '[\"*\"]', '2025-08-25 11:09:03', NULL, '2025-08-25 08:26:43', '2025-08-25 11:09:03'),
+(70, 'App\\Models\\User', 1, 'token', 'ac61429cbef88a42163d06ad86caf35adcf48505274042f3848fa73e4a8a6dcf', '[\"*\"]', '2025-08-25 11:41:56', NULL, '2025-08-25 11:03:50', '2025-08-25 11:41:56'),
+(71, 'App\\Models\\User', 35, 'token', '1505edca6202afc6906738d20f03613fbf13fa0a2d4bf311f391e186020c1dd3', '[\"*\"]', '2025-08-25 11:15:27', NULL, '2025-08-25 11:10:02', '2025-08-25 11:15:27'),
+(72, 'App\\Models\\User', 37, 'token', 'f9034614d1ce1d09985cd9486f14c94f17c0f8062accea17d863d5fedd961d14', '[\"*\"]', '2025-08-25 11:32:08', NULL, '2025-08-25 11:31:40', '2025-08-25 11:32:08'),
+(73, 'App\\Models\\User', 37, 'token', '0511428fff369eeab60b7dad685bd4567f9056323dac5656419454de5bb06c1e', '[\"*\"]', '2025-08-25 11:41:35', NULL, '2025-08-25 11:32:19', '2025-08-25 11:41:35'),
+(74, 'App\\Models\\User', 1, 'token', 'b0e71cd4c6468033a7804ecb013cf29042fdca93df8f8632ac2b7dc775041da3', '[\"*\"]', '2025-08-25 19:57:36', NULL, '2025-08-25 19:09:57', '2025-08-25 19:57:36'),
+(75, 'App\\Models\\User', 1, 'token', '42ef5f22e2c376777dfb765da09ef016afdbbcc7dfaff38cb8e448f2053f651f', '[\"*\"]', '2025-08-26 18:31:52', NULL, '2025-08-26 04:39:34', '2025-08-26 18:31:52'),
+(76, 'App\\Models\\User', 1, 'token', '944518650344857423d06a549bf5a81c283455e4d0bab624fe79fdbfba1c8889', '[\"*\"]', '2025-08-27 07:59:07', NULL, '2025-08-27 07:09:31', '2025-08-27 07:59:07'),
+(77, 'App\\Models\\User', 3, 'token', '649da8df0c2f727ecc01ae09a81cc023d0245069a7b40bd2e4b0ee2a7e013f56', '[\"*\"]', '2025-08-27 07:58:33', NULL, '2025-08-27 07:14:41', '2025-08-27 07:58:33'),
+(78, 'App\\Models\\User', 1, 'token', 'a74090ae2cf792406a6c5b87f75319c2bd1b98a993c08a76e5c269e1201d813c', '[\"*\"]', '2025-08-28 13:57:21', NULL, '2025-08-27 10:46:08', '2025-08-28 13:57:21'),
+(79, 'App\\Models\\User', 1, 'token', 'e3ad3b5f11e85934ef64b414a5946d8d9d00dbc3ed61d8df1dd188e4551c0bb0', '[\"*\"]', '2025-08-29 07:55:47', NULL, '2025-08-29 00:12:42', '2025-08-29 07:55:47'),
+(80, 'App\\Models\\User', 1, 'token', 'b5c9e61d1989864dc0a053c99632f6c2aef7ed5b73b10757020c3088d1221c78', '[\"*\"]', '2025-08-29 11:52:29', NULL, '2025-08-29 09:54:01', '2025-08-29 11:52:29'),
+(81, 'App\\Models\\User', 1, 'token', 'f0fef7f27716ef1525605234ae5823137067c9e2b87dd7e50e5e0d40664bb252', '[\"*\"]', '2025-08-30 06:33:07', NULL, '2025-08-30 05:43:27', '2025-08-30 06:33:07'),
+(82, 'App\\Models\\User', 1, 'token', 'e4cc08cd31fb1c90550be68ae9c8ee92849de2a11564d5e60d5548af364d1c95', '[\"*\"]', '2025-09-01 07:56:41', NULL, '2025-09-01 06:57:46', '2025-09-01 07:56:41'),
+(83, 'App\\Models\\User', 1, 'token', 'b594f886038e0e21da150e05ab6751c1bd9af81b848ad794ed6a26965fb7a8be', '[\"*\"]', '2025-09-02 12:03:02', NULL, '2025-09-02 05:00:53', '2025-09-02 12:03:02'),
+(84, 'App\\Models\\User', 1, 'token', '64400ae3efaccd682a47e8f1268d228e23514097a12e1331bc174095b18e5521', '[\"*\"]', '2025-09-04 07:49:12', NULL, '2025-09-04 04:35:22', '2025-09-04 07:49:12'),
+(85, 'App\\Models\\User', 1, 'token', '8671e157b8b46593a23ce5a1be44c2c86054c44bdab9d8d51931baf44188636a', '[\"*\"]', '2025-09-05 07:56:30', NULL, '2025-09-04 07:58:44', '2025-09-05 07:56:30'),
+(86, 'App\\Models\\User', 39, 'token', '128f973ed1eb3a24174ab18f373a60eca138ae636e089ac49640ca5a25847944', '[\"*\"]', '2025-09-05 06:36:49', NULL, '2025-09-05 06:36:11', '2025-09-05 06:36:49'),
+(87, 'App\\Models\\User', 39, 'token', 'c964807dc1670b7d5dd780134cc368f9130f92072f87b4ef84fc2969fff545ea', '[\"*\"]', '2025-09-05 06:38:28', NULL, '2025-09-05 06:37:24', '2025-09-05 06:38:28'),
+(89, 'App\\Models\\User', 1, 'token', '4c5ca2ce8a4db92e0bb976454d6b04f3d7dd77dc9fdfe61ea756411c193be793', '[\"*\"]', '2025-09-06 10:50:34', NULL, '2025-09-06 10:46:57', '2025-09-06 10:50:34'),
+(91, 'App\\Models\\User', 1, 'token', '152adc69ee2c76f0a4dde8727fc6d8f3eccd2a3e266c213f83566d6a2845c698', '[\"*\"]', '2025-09-17 12:12:51', NULL, '2025-09-17 12:12:45', '2025-09-17 12:12:51'),
+(92, 'App\\Models\\User', 1, 'token', '2345106bdd3e4bf6235fa0fe04f5ec0e1723f9d9f82daddea16eb7390cff4575', '[\"*\"]', '2025-09-18 12:19:12', NULL, '2025-09-18 11:30:31', '2025-09-18 12:19:12'),
+(93, 'App\\Models\\User', 3, 'token', '96e8e0d2f4db42776d4064b1312a59edb2c26bb0c8c5ab9ec835d64c3ed48dd0', '[\"*\"]', '2025-09-18 11:54:24', NULL, '2025-09-18 11:52:36', '2025-09-18 11:54:24'),
+(94, 'App\\Models\\User', 3, 'token', '9fb7eba3978417544c2a1f369094a56936e535629b8952a2c85a9d3a2c4f0b24', '[\"*\"]', '2025-09-18 11:56:48', NULL, '2025-09-18 11:55:08', '2025-09-18 11:56:48');
 
 -- --------------------------------------------------------
 
@@ -473,7 +612,11 @@ INSERT INTO `subjects` (`id`, `class_id`, `division_id`, `admin_id`, `name`, `co
 (2, 1, NULL, 1, 'English', NULL, 'compulsory', 1, '2025-08-18 06:05:48', '2025-08-18 06:05:48', NULL),
 (3, 1, NULL, 1, 'Mathematics', '107', 'compulsory', 1, '2025-08-18 06:06:01', '2025-08-18 06:06:01', NULL),
 (4, 1, NULL, 1, 'Information and Communication Technology', '109', 'compulsory', 1, '2025-08-18 06:06:17', '2025-08-18 06:06:17', NULL),
-(5, 1, NULL, 1, 'Agriculture', '111', 'optional', 1, '2025-08-18 06:06:35', '2025-08-18 06:06:35', NULL);
+(5, 1, NULL, 1, 'Agriculture', '111', 'optional', 1, '2025-08-18 06:06:35', '2025-08-18 06:06:35', NULL),
+(7, 4, NULL, 1, 'Bangla', NULL, 'compulsory', 1, '2025-09-17 13:25:19', '2025-09-17 13:25:19', NULL),
+(8, 4, NULL, 1, 'English', NULL, 'compulsory', 1, '2025-09-17 13:25:33', '2025-09-17 13:25:33', NULL),
+(9, 4, 1, 1, 'Physic', NULL, 'additional', 1, '2025-09-17 13:25:50', '2025-09-17 13:25:50', NULL),
+(10, 4, 2, 1, 'Accounting', NULL, 'additional', 1, '2025-09-17 13:26:10', '2025-09-17 13:26:10', NULL);
 
 -- --------------------------------------------------------
 
@@ -502,19 +645,18 @@ CREATE TABLE `teachers` (
   `marital_status` enum('single','married','divorced','widowed') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `designation_id` bigint UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `teachers`
 --
 
-INSERT INTO `teachers` (`id`, `user_id`, `added_by`, `institution_id`, `joined_at`, `is_active`, `father_name`, `mother_name`, `phone`, `address`, `about_me`, `image`, `nationality`, `birth_date`, `nid`, `gender`, `religion`, `marital_status`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(2, 16, 1, 1, '2025-08-20', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-08-20 10:25:28', '2025-08-20 14:25:22', NULL),
-(9, 23, 3, 1, '2025-08-20', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-08-20 14:23:59', '2025-08-21 05:51:02', NULL),
-(12, 26, 3, 1, '2025-08-21', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-08-21 04:12:37', '2025-08-22 04:28:42', NULL),
-(15, 30, 3, 1, '2025-08-21', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-08-21 05:55:55', '2025-08-22 04:08:29', NULL),
-(16, 35, 34, 1, '2025-08-21', 1, 'Sumon Golder', 'Rupa Golder', '01536800124', '22/7 Block C, Green Road, Panthapath Dhaka-8098', NULL, '1756073606.png', 'Bangladeshi', '2000-01-01', '123597014510', 'male', 'Hindu', 'single', '2025-08-21 08:29:12', '2025-08-24 16:13:26', NULL);
+INSERT INTO `teachers` (`id`, `user_id`, `added_by`, `institution_id`, `joined_at`, `is_active`, `father_name`, `mother_name`, `phone`, `address`, `about_me`, `image`, `nationality`, `birth_date`, `nid`, `gender`, `religion`, `marital_status`, `created_at`, `updated_at`, `deleted_at`, `designation_id`) VALUES
+(18, 37, 1, 1, '2025-08-25', 1, 'Anwar Haque', 'Amena Begum', '01568740124', 'House # 23, Road # 5,\r\nShyamoli, Mohammadpur,\r\nDhaka – 1207,\r\nBangladesh', 'My name is Enamul Kazi, and I am from Natore, Bangladesh. I have recently joined Green Valley High School, Dhaka as an English Teacher. I completed my Bachelor of Arts in English Literature and Language from the University of Rajshahi, followed by a Master’s degree in Applied Linguistics.\r\n\r\nTeaching has always been my dream profession. From an early age, I was inspired by my teachers and their ability to change students’ lives. As an English teacher, I try to make learning both enjoyable and meaningful. My classroom approach focuses on developing students’ reading, writing, listening, and speaking skills, while also helping them to build confidence in using English in their daily life.\r\n\r\nI strongly believe that education is not just about textbooks and exams—it is about preparing young minds for the future. Therefore, I encourage creativity, critical thinking, and interactive learning among my students.\r\n\r\nApart from teaching, I enjoy reading novels, traveling, and participating in cultural activities. I also love guiding students in debates and public speaking, as these activities improve their communication and leadership skills.\r\n\r\nMy ultimate goal as a teacher is to inspire students, help them achieve academic excellence, and motivate them to become responsible citizens who will contribute positively to society.', '1756143692.png', 'Bangladeshi', '1980-01-01', '202154001410', 'male', 'Muslim', 'single', '2025-08-25 11:31:03', '2025-08-27 07:56:00', NULL, 2),
+(19, 38, 3, 1, '2025-08-27', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-08-27 07:15:08', '2025-08-27 07:59:00', NULL, 3),
+(20, 39, 1, 1, '2025-09-05', 1, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', '1757075900.jpg', 'N/A', NULL, 'N/A', NULL, NULL, NULL, '2025-09-05 06:33:50', '2025-09-18 11:39:09', NULL, 3);
 
 -- --------------------------------------------------------
 
@@ -540,8 +682,7 @@ CREATE TABLE `teacher_addresses` (
 --
 
 INSERT INTO `teacher_addresses` (`id`, `teacher_id`, `type`, `village`, `district`, `upazila`, `post_office`, `postal_code`, `created_at`, `updated_at`) VALUES
-(1, 16, 'present', 'Chukumbura', 'Faripdur', 'Faridpur Sadar', 'Falidpur Sadar', '8001', '2025-08-24 17:19:26', '2025-08-24 17:38:18'),
-(3, 16, 'permanent', 'Charbramandi', 'Madaripur', 'Madaripur Sadar', 'Madaripur Sadar', '7900', '2025-08-24 17:39:06', '2025-08-24 17:39:06');
+(4, 18, 'permanent', 'Kazipara', 'Natore', 'Natore Sadar', 'Baraigram', '8085', '2025-08-25 11:41:13', '2025-08-25 11:41:13');
 
 -- --------------------------------------------------------
 
@@ -568,10 +709,9 @@ CREATE TABLE `teacher_educations` (
 --
 
 INSERT INTO `teacher_educations` (`id`, `teacher_id`, `level`, `roll_number`, `board_university`, `result`, `passing_year`, `course_duration`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(4, 16, 'SSC', '101015', 'Dhaka Board', '4.5', '2010', NULL, '2025-08-24 16:33:59', '2025-08-24 16:33:59', NULL),
-(5, 16, 'HSC', '201015', 'Dhaka Board', '4.56', '2012', NULL, '2025-08-24 16:39:08', '2025-08-24 16:39:08', NULL),
-(6, 16, 'Graduation', NULL, 'National University', '3.30', '2017', '4', '2025-08-24 16:41:46', '2025-08-24 16:59:06', NULL),
-(7, 16, 'Masters', NULL, 'Uttara Univerisy', '3.79', '2020', '1.5', '2025-08-24 16:43:01', '2025-08-24 16:58:43', NULL);
+(8, 18, 'SSC', '158088', 'Dhaka Board', '4.25', '2007', NULL, '2025-08-25 11:38:40', '2025-08-25 11:38:40', NULL),
+(9, 18, 'HSC', '169490', 'Dhaka Board', '4.45', '2009', NULL, '2025-08-25 11:39:02', '2025-08-25 11:39:02', NULL),
+(10, 18, 'Graduation', NULL, 'National University', '3.75', '2013', '4', '2025-08-25 11:39:28', '2025-08-25 11:39:28', NULL);
 
 -- --------------------------------------------------------
 
@@ -599,15 +739,13 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `role`, `remember_token`, `deleted_at`, `created_at`, `updated_at`) VALUES
 (1, 'Sanjoy Kundu', 'sanjoykundu187@gmail.com', NULL, '$2y$12$A841J.k.5YoGiqFyu4DUjuCy1YJb31i8oPYbdraSc3Tt6jT3nvXJu', 'admin', NULL, NULL, '2025-08-18 05:57:23', '2025-08-18 05:57:23'),
 (2, 'Romen Munshi', 'romen@gmail.com', NULL, '$2y$12$q/nKeH4EFQmAd19k8t5Ql.Pbua9hkMQhm.Jf.VWRaC0OD1Jh5CwjG', 'editor', NULL, NULL, '2025-08-18 06:08:34', '2025-08-22 11:23:42'),
-(3, 'Zihad Hossain', 'zihad@gmail.com', NULL, '$2y$12$xg031EOJokRJzoLlqwvEMuywR6PGpUfS5jeqX8Xk7RLi9KB7Lw0RW', 'editor', NULL, NULL, '2025-08-18 08:12:40', '2025-08-23 06:25:22'),
-(16, 'Bipul Chandra Roy', 'bipul@gmail.com', NULL, '$2y$12$H4tSZ9X2pghL.x97llOqjuc7fvX.wVaXAeJoQwkO976Etl.OGFTDW', 'teacher', NULL, NULL, '2025-08-20 10:25:28', '2025-08-23 06:31:51'),
-(23, 'Milon Munshi', 'milon@gmial.com', NULL, '$2y$12$uFv5XZIBTlLo3M6PwwsEWeREhgYTtBMcCiQJ6I5UK8XDATGNHCsli', 'teacher', NULL, NULL, '2025-08-20 14:23:59', '2025-08-22 04:37:12'),
-(26, 'Robiul Isam Roni', 'robiul005@gmail.com', NULL, '$2y$12$w6Zhm5ZdtLMdpm6MFbzAVuTK0Vvy18NMDuBgjdVP833UdE0AtWt0W', 'teacher', NULL, NULL, '2025-08-21 04:12:37', '2025-08-22 04:28:42'),
+(3, 'Zihad Hossain', 'zihad@gmail.com', NULL, '$2y$12$SJCQLBzekb6leCrhG2aTp.FwHwMpEgJDDIntz1ckdsM4CCZ8P8ozy', 'editor', NULL, NULL, '2025-08-18 08:12:40', '2025-09-18 11:54:35'),
 (27, 'Rubel Khan', 'khan@gmail.com', NULL, '$2y$12$xebBIxKlXeAo5jwoNGTK/eVocdi23DxFRln.CYPXPieNDSarzKHWG', 'editor', NULL, NULL, '2025-08-21 04:38:50', '2025-08-21 04:38:50'),
-(30, 'Goni  Islam Mia', 'goni001@gmail.com', NULL, '$2y$12$yk2En1hN61LoYuTL1GodteFGS7a6bopUR.OZ0v01Qghda6bcETxNK', 'teacher', NULL, NULL, '2025-08-21 05:55:55', '2025-08-22 10:30:05'),
 (31, 'Sunmon Roy', 'sunmon@gmail.com', NULL, '$2y$12$4rqkS4DgjiYXdlVr/iTA.eGS2qk/Fyi0Rou08aSCGX90aGsGNVVgW', 'editor', NULL, NULL, '2025-08-21 06:30:58', '2025-08-23 06:29:14'),
 (34, 'Himel Chowdhury', 'himel@gmail.com', NULL, '$2y$12$ZxatexJ6qZPTzOeNoSJyD.p4bVp26m7n3hzdvqK/fUVmukShwi7QC', 'editor', NULL, NULL, '2025-08-21 08:25:40', '2025-08-21 08:34:55'),
-(35, 'Somir Golader', 'somir@gmail.com', NULL, '$2y$12$/2624dHAfMp1dRcTT0XaBeewZ/8X/If7dgarH8VLXAsC7nOzSYpSS', 'teacher', NULL, NULL, '2025-08-21 08:29:12', '2025-08-24 18:10:38');
+(37, 'MD. Enamul Haque', 'enamul112haque@gmail.com', NULL, '$2y$12$zofWLxqberUT/8JX3zASqeWJFloe7yUburpaMFU/9ogNTV.1Ji312', 'teacher', NULL, NULL, '2025-08-25 11:31:03', '2025-08-25 11:32:08'),
+(38, 'Abdur Rahman', 'abdur101@gmail.com', NULL, '$2y$12$iw62wVXszbRJdninb7tkdO0dYyNRIN8QvL3gKoghNu93A8fCad80W', 'teacher', NULL, NULL, '2025-08-27 07:15:08', '2025-08-27 07:59:00'),
+(39, 'Kaniz Fatema', 'kanizfatema10@gmail.com', NULL, '$2y$12$VcGoAwWn6BYLT3ze3q5MgOORLAd69YVXzHAl0uKNH0D1Sj9LkHPca', 'teacher', NULL, NULL, '2025-09-05 06:33:50', '2025-09-05 06:36:49');
 
 --
 -- Indexes for dumped tables
@@ -631,12 +769,27 @@ ALTER TABLE `admins`
   ADD KEY `admins_user_id_foreign` (`user_id`);
 
 --
+-- Indexes for table `announcements`
+--
+ALTER TABLE `announcements`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `announcements_user_id_foreign` (`user_id`),
+  ADD KEY `announcements_class_id_foreign` (`class_id`);
+
+--
 -- Indexes for table `class_models`
 --
 ALTER TABLE `class_models`
   ADD PRIMARY KEY (`id`),
   ADD KEY `class_models_academic_section_id_foreign` (`academic_section_id`),
   ADD KEY `class_models_admin_id_foreign` (`admin_id`);
+
+--
+-- Indexes for table `designations`
+--
+ALTER TABLE `designations`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `designations_institution_id_foreign` (`institution_id`);
 
 --
 -- Indexes for table `divisions`
@@ -676,6 +829,14 @@ ALTER TABLE `editor_educations`
 ALTER TABLE `failed_jobs`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
+
+--
+-- Indexes for table `grading_scales`
+--
+ALTER TABLE `grading_scales`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_class_grade` (`class_id`,`grade`),
+  ADD KEY `grading_scales_user_id_foreign` (`user_id`);
 
 --
 -- Indexes for table `institutions`
@@ -738,7 +899,8 @@ ALTER TABLE `teachers`
   ADD UNIQUE KEY `teachers_phone_unique` (`phone`),
   ADD UNIQUE KEY `teachers_nid_unique` (`nid`),
   ADD KEY `teachers_added_by_foreign` (`added_by`),
-  ADD KEY `teachers_institution_id_foreign` (`institution_id`);
+  ADD KEY `teachers_institution_id_foreign` (`institution_id`),
+  ADD KEY `teachers_designation_id_foreign` (`designation_id`);
 
 --
 -- Indexes for table `teacher_addresses`
@@ -778,10 +940,22 @@ ALTER TABLE `admins`
   MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `announcements`
+--
+ALTER TABLE `announcements`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
 -- AUTO_INCREMENT for table `class_models`
 --
 ALTER TABLE `class_models`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `designations`
+--
+ALTER TABLE `designations`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `divisions`
@@ -814,6 +988,12 @@ ALTER TABLE `failed_jobs`
   MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `grading_scales`
+--
+ALTER TABLE `grading_scales`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+
+--
 -- AUTO_INCREMENT for table `institutions`
 --
 ALTER TABLE `institutions`
@@ -823,55 +1003,55 @@ ALTER TABLE `institutions`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `papers`
 --
 ALTER TABLE `papers`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `password_otps`
 --
 ALTER TABLE `password_otps`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=95;
 
 --
 -- AUTO_INCREMENT for table `subjects`
 --
 ALTER TABLE `subjects`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `teachers`
 --
 ALTER TABLE `teachers`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `teacher_addresses`
 --
 ALTER TABLE `teacher_addresses`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `teacher_educations`
 --
 ALTER TABLE `teacher_educations`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- Constraints for dumped tables
@@ -891,11 +1071,24 @@ ALTER TABLE `admins`
   ADD CONSTRAINT `admins_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `announcements`
+--
+ALTER TABLE `announcements`
+  ADD CONSTRAINT `announcements_class_id_foreign` FOREIGN KEY (`class_id`) REFERENCES `class_models` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `announcements_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `class_models`
 --
 ALTER TABLE `class_models`
   ADD CONSTRAINT `class_models_academic_section_id_foreign` FOREIGN KEY (`academic_section_id`) REFERENCES `academic_sections` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `class_models_admin_id_foreign` FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `designations`
+--
+ALTER TABLE `designations`
+  ADD CONSTRAINT `designations_institution_id_foreign` FOREIGN KEY (`institution_id`) REFERENCES `institutions` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `divisions`
@@ -924,6 +1117,13 @@ ALTER TABLE `editor_educations`
   ADD CONSTRAINT `editor_educations_editor_id_foreign` FOREIGN KEY (`editor_id`) REFERENCES `editors` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `grading_scales`
+--
+ALTER TABLE `grading_scales`
+  ADD CONSTRAINT `grading_scales_class_id_foreign` FOREIGN KEY (`class_id`) REFERENCES `class_models` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `grading_scales_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `institutions`
 --
 ALTER TABLE `institutions`
@@ -950,6 +1150,7 @@ ALTER TABLE `subjects`
 --
 ALTER TABLE `teachers`
   ADD CONSTRAINT `teachers_added_by_foreign` FOREIGN KEY (`added_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `teachers_designation_id_foreign` FOREIGN KEY (`designation_id`) REFERENCES `designations` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `teachers_institution_id_foreign` FOREIGN KEY (`institution_id`) REFERENCES `institutions` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `teachers_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 

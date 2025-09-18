@@ -381,7 +381,7 @@ public function adminUpdatePassword(Request $request)
      */
     public function classWorkSpacePage($id){
         try{
-            $classId = ClassModel::findOrFail($id);
+            $classId = ClassModel::findOrFail($id); 
             if(!$classId){
                 return response()->json(['status' => 'fail', 'message' => 'Class not found!']);
             }
